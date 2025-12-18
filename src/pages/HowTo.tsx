@@ -184,7 +184,7 @@ const HowTo = () => {
       </section>
 
       {/* Application Guide */}
-      <section className="section-padding bg-muted/30">
+      <section id="application" className="section-padding bg-muted/30 scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 sm:mb-16">
             <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
@@ -274,7 +274,7 @@ const HowTo = () => {
       </section>
 
       {/* Care & Maintenance */}
-      <section className="section-padding bg-muted/30">
+      <section id="care" className="section-padding bg-muted/30 scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">

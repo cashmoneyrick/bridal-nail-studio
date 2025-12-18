@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { fetchProductByHandle, ShopifyProduct } from "@/lib/shopify";
+import { fetchProductByHandle, fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useNailProfilesStore } from "@/stores/nailProfilesStore";
@@ -12,7 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -86,6 +92,7 @@ const ProductDetail = () => {
   const [selectedShape, setSelectedShape] = useState('Almond');
   const [selectedLength, setSelectedLength] = useState('Medium');
   const [sizingOption, setSizingOption] = useState<'kit' | 'known'>('kit');
+  const [relatedProducts, setRelatedProducts] = useState<ShopifyProduct[]>([]);
   
   const addItem = useCartStore(state => state.addItem);
   const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
@@ -146,6 +153,20 @@ const ProductDetail = () => {
       setSelectedVariant(matchingVariant.node.id);
     }
   }, [selectedOptions, product]);
+
+  // Fetch related products
+  useEffect(() => {
+    const loadRelatedProducts = async () => {
+      try {
+        const products = await fetchProducts(12);
+        const filtered = products.filter(p => p.node.handle !== handle);
+        setRelatedProducts(filtered.slice(0, 8));
+      } catch (err) {
+        console.error('Failed to fetch related products:', err);
+      }
+    };
+    loadRelatedProducts();
+  }, [handle]);
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
@@ -522,8 +543,166 @@ const ProductDetail = () => {
                   )}
                 </Button>
               </div>
+
+              {/* Product Info Accordion */}
+              <div className="border-t border-border pt-6 mt-2">
+                <Accordion type="single" collapsible defaultValue="whats-included" className="space-y-2">
+                  <AccordionItem value="whats-included" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <span className="flex items-center gap-3 text-base font-medium">
+                        <Package className="h-5 w-5 text-primary" />
+                        What's Included
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pl-8">
+                      <ul className="space-y-2 text-sm">
+                        <li>• 24 press-on nails (full set)</li>
+                        <li>• Nail glue tube</li>
+                        <li>• Mini nail file</li>
+                        <li>• Prep pad</li>
+                        <li>• Application instructions card</li>
+                        <li>• Reusable storage case</li>
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="how-to-apply" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <span className="flex items-center gap-3 text-base font-medium">
+                        <PlayCircle className="h-5 w-5 text-primary" />
+                        How to Apply
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pl-8">
+                      <div className="space-y-3 text-sm">
+                        <p><strong>1.</strong> Clean and prep your nails</p>
+                        <p><strong>2.</strong> Select the right size for each finger</p>
+                        <p><strong>3.</strong> Apply adhesive and press firmly for 30 seconds</p>
+                        <Link 
+                          to="/how-to#application" 
+                          className="inline-flex items-center text-primary hover:underline mt-2"
+                        >
+                          View Full Tutorial
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="care" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <span className="flex items-center gap-3 text-base font-medium">
+                        <ShieldCheck className="h-5 w-5 text-primary" />
+                        Care & Maintenance
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pl-8">
+                      <div className="space-y-2 text-sm">
+                        <p>• Avoid prolonged water exposure</p>
+                        <p>• Be gentle—don't use nails as tools</p>
+                        <p>• Apply cuticle oil daily for best results</p>
+                        <p>• With proper care, nails last 1-2 weeks</p>
+                        <Link 
+                          to="/how-to#care" 
+                          className="inline-flex items-center text-primary hover:underline mt-2"
+                        >
+                          View Care Guide
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="shipping" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <span className="flex items-center gap-3 text-base font-medium">
+                        <Truck className="h-5 w-5 text-primary" />
+                        Shipping & Returns
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pl-8">
+                      <div className="space-y-3 text-sm">
+                        <div>
+                          <p className="font-medium text-foreground mb-1">Shipping</p>
+                          <p>• Free shipping on orders $50+</p>
+                          <p>• Standard: 5-7 business days</p>
+                          <p>• Express: 2-3 business days</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground mb-1">Returns</p>
+                          <p>• 30-day return policy</p>
+                          <p>• Unused items in original packaging</p>
+                          <Link 
+                            to="/contact" 
+                            className="inline-flex items-center text-primary hover:underline mt-1"
+                          >
+                            Contact us with questions
+                            <ChevronRight className="h-4 w-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
             </div>
           </div>
+
+          {/* Product Recommendations */}
+          {relatedProducts.length > 0 && (
+            <section className="mt-16 lg:mt-24">
+              <h2 className="font-display text-2xl sm:text-3xl font-medium mb-8 text-center">
+                You May Also Like
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                {relatedProducts.slice(0, 4).map((product) => {
+                  const productImage = product.node.images?.edges?.[0]?.node;
+                  const productPrice = parseFloat(product.node.priceRange.minVariantPrice.amount);
+                  const isProductFavorite = isFavorite(product.node.id);
+                  
+                  return (
+                    <Link 
+                      key={product.node.id} 
+                      to={`/product/${product.node.handle}`}
+                      className="group"
+                    >
+                      <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted/30 mb-3">
+                        {productImage ? (
+                          <img
+                            src={productImage.url}
+                            alt={productImage.altText || product.node.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-muted-foreground text-sm">No image</span>
+                          </div>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleFavorite(product);
+                            toast.success(isProductFavorite ? 'Removed from favorites' : 'Added to favorites', {
+                              position: "top-center",
+                            });
+                          }}
+                          className="absolute top-3 right-3 p-2 rounded-full bg-background/80 hover:bg-background transition-colors"
+                        >
+                          <Heart className={`h-4 w-4 ${isProductFavorite ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+                        </button>
+                      </div>
+                      <h3 className="font-medium text-sm sm:text-base line-clamp-1 group-hover:text-primary transition-colors">
+                        {product.node.title}
+                      </h3>
+                      <p className="text-primary font-display">
+                        ${productPrice.toFixed(2)}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
       </main>
 

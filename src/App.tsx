@@ -8,6 +8,7 @@ import ProductDetail from "./pages/ProductDetail";
 import CustomStudio from "./pages/CustomStudio";
 import Shop from "./pages/Shop";
 import NailClub from "./pages/NailClub";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/custom-studio" element={<CustomStudio />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/club" element={<NailClub />} />
+          <Route path="/favorites" element={<Favorites />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

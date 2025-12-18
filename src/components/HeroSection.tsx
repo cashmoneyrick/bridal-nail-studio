@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
+  const scrollToShop = () => {
+    document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image Placeholder */}
@@ -37,17 +42,20 @@ const HeroSection = () => {
             <Button 
               className="btn-primary text-base min-w-[200px] group"
               size="lg"
+              onClick={scrollToShop}
             >
               Shop Collection
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button 
-              variant="outline"
-              className="btn-secondary text-base min-w-[200px]"
-              size="lg"
-            >
-              Create Custom Set
-            </Button>
+            <Link to="/custom">
+              <Button 
+                variant="outline"
+                className="btn-secondary text-base min-w-[200px]"
+                size="lg"
+              >
+                Create Custom Set
+              </Button>
+            </Link>
           </div>
 
           {/* Trust Badge */}

@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import CategoryGrid from "@/components/CategoryGrid";
+import ProductGrid from "@/components/ProductGrid";
 import CustomStudioPreview from "@/components/CustomStudioPreview";
 import ThreeStepProcess from "@/components/ThreeStepProcess";
 import Footer from "@/components/Footer";
@@ -11,6 +12,7 @@ const Index = () => {
       <Navigation />
       <main>
         <HeroSection />
+        <ProductGrid />
         <CategoryGrid />
         <CustomStudioPreview />
         <ThreeStepProcess />

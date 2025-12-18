@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { ShopifyProduct, fetchProducts } from "@/lib/shopify";
 import { useCartStore, CartItem } from "@/stores/cartStore";
+import { useFavoritesStore } from "@/stores/favoritesStore";
 import { Button } from "@/components/ui/button";
-import { Loader2, ShoppingBag } from "lucide-react";
+import { Loader2, ShoppingBag, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -11,6 +12,7 @@ const ProductGrid = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const addItem = useCartStore(state => state.addItem);
+  const { toggleFavorite, isFavorite } = useFavoritesStore();
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -47,6 +49,18 @@ const ProductGrid = () => {
 
     addItem(cartItem);
     toast.success(`${product.node.title} added to bag`, {
+      position: "top-center",
+    });
+  };
+
+  const handleToggleFavorite = (product: ShopifyProduct, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const wasInFavorites = isFavorite(product.node.id);
+    toggleFavorite(product);
+    
+    toast.success(wasInFavorites ? `Removed from favorites` : `Added to favorites`, {
       position: "top-center",
     });
   };
@@ -139,6 +153,20 @@ const ProductGrid = () => {
                       <ShoppingBag className="h-12 w-12 text-muted-foreground" />
                     </div>
                   )}
+                  
+                  {/* Favorite Button */}
+                  <button
+                    onClick={(e) => handleToggleFavorite(product, e)}
+                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-background hover:scale-110"
+                  >
+                    <Heart 
+                      className={`h-5 w-5 transition-colors ${
+                        isFavorite(product.node.id) 
+                          ? 'fill-primary text-primary' 
+                          : 'text-foreground/70'
+                      }`} 
+                    />
+                  </button>
                   
                   {/* Quick Add Button */}
                   <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

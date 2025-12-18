@@ -18,6 +18,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag, Droplets, FileText, Clock, Hand, Gift, RotateCcw, Check } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
@@ -94,6 +100,7 @@ const ProductDetail = () => {
   const [selectedLength, setSelectedLength] = useState('Medium');
   const [sizingOption, setSizingOption] = useState<'kit' | 'known'>('kit');
   const [relatedProducts, setRelatedProducts] = useState<ShopifyProduct[]>([]);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   
   const addItem = useCartStore(state => state.addItem);
   const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
@@ -607,14 +614,14 @@ const ProductDetail = () => {
                             </div>
                           </div>
                         ))}
-                        <Link 
-                          to="/how-to#application" 
-                          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline mt-2 bg-primary/10 px-4 py-2 rounded-full"
+                        <button 
+                          onClick={() => setIsTutorialOpen(true)}
+                          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline mt-2 bg-primary/10 px-4 py-2 rounded-full transition-colors hover:bg-primary/20"
                         >
                           <PlayCircle className="h-4 w-4" />
                           Watch Full Tutorial
                           <ChevronRight className="h-4 w-4" />
-                        </Link>
+                        </button>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -764,6 +771,106 @@ const ProductDetail = () => {
           <ProductReviews productTitle={product.title} />
         </div>
       </main>
+
+      {/* Application Tutorial Modal */}
+      <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <PlayCircle className="h-5 w-5 text-primary" />
+              </div>
+              How to Apply Your Nails
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 pt-4">
+            {/* Steps */}
+            {[
+              {
+                step: "1",
+                title: "Prep Your Nails",
+                desc: "Start with clean, dry nails. Gently push back cuticles and lightly buff the nail surface for better adhesion. Wipe with alcohol to remove any oils.",
+                icon: Hand,
+              },
+              {
+                step: "2",
+                title: "Select Your Size",
+                desc: "Match each press-on nail to your natural nail width. The nail should fit from sidewall to sidewall without touching your skin. Use your Perfect Fit Profile for faster sizing.",
+                icon: FileText,
+              },
+              {
+                step: "3",
+                title: "Apply Adhesive",
+                desc: "For adhesive tabs: peel and place on your natural nail. For nail glue: apply a thin layer to both your natural nail and the press-on nail.",
+                icon: Droplets,
+              },
+              {
+                step: "4",
+                title: "Press & Hold",
+                desc: "Starting at the cuticle, press the nail firmly at a slight angle, then press down. Hold for 30-60 seconds with steady pressure to ensure a secure bond.",
+                icon: Clock,
+              },
+              {
+                step: "5",
+                title: "Final Touches",
+                desc: "After all nails are applied, avoid water for at least 1 hour. Gently file any edges if needed. Apply cuticle oil around the edges for a polished look.",
+                icon: Sparkles,
+              },
+            ].map((item) => (
+              <div key={item.step} className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
+                    <span className="text-lg font-bold text-primary-foreground">{item.step}</span>
+                  </div>
+                </div>
+                <div className="flex-1 pt-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <item.icon className="h-4 w-4 text-primary" />
+                    <h3 className="font-display text-lg font-medium">{item.title}</h3>
+                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+
+            {/* Pro Tips */}
+            <div className="bg-muted/50 rounded-2xl p-4 mt-6">
+              <h4 className="font-medium flex items-center gap-2 mb-3">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Pro Tips
+              </h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  Apply nails at night so glue can set while you sleep
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  If a nail feels too big, file the sides for a custom fit
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  Avoid hot water and steam for the first 2 hours
+                </li>
+              </ul>
+            </div>
+
+            {/* Full Guide Link */}
+            <div className="flex items-center justify-between pt-2 border-t border-border">
+              <span className="text-sm text-muted-foreground">Need more details?</span>
+              <Link 
+                to="/how-to#application" 
+                onClick={() => setIsTutorialOpen(false)}
+                className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1"
+              >
+                View Full Guide
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

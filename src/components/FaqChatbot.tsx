@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2, Mail } from "lucide-react";
+import { MessageCircle, X, Send, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -147,8 +147,10 @@ const FaqChatbot = () => {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-2.5">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1">
+                    <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" />
                   </div>
                 </div>
               )}

@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Sparkles, Tag, Gift, Truck, Cake, Star, Check } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const benefits = [
   { icon: Sparkles, title: "Early Access", description: "Be first to shop new collections before anyone else" },
@@ -74,6 +80,30 @@ const faqs = [
   {
     question: "How does the birthday gift work?",
     answer: "Simply add your birthday to your profile and we'll send you a free full-size nail set during your birthday month. It's our way of celebrating you!",
+  },
+  {
+    question: "Can I upgrade or downgrade my membership?",
+    answer: "Yes! You can change your membership tier at any time. When you upgrade, you'll get immediate access to your new benefits. Downgrades take effect at the start of your next billing cycle.",
+  },
+  {
+    question: "Do my discounts stack with sale prices?",
+    answer: "Member discounts apply to full-price items. During sales, you'll automatically receive whichever discount is greater—your member discount or the sale price.",
+  },
+  {
+    question: "What happens if I miss a month?",
+    answer: "If you pause or cancel your subscription, you'll miss that month's nail drop. However, you can always rejoin and your perks will resume immediately.",
+  },
+  {
+    question: "Are the monthly nail drops full-size sets?",
+    answer: "Monthly drops are curated mini sets featuring 2-3 exclusive designs. Full-size sets are reserved for special occasions like birthdays and the quarterly VIP gift box.",
+  },
+  {
+    question: "How do I access my member discounts?",
+    answer: "Once you're a member, discounts are automatically applied at checkout when you're logged in. No codes needed—just shop and save!",
+  },
+  {
+    question: "Can I gift a membership to someone?",
+    answer: "Yes! Gift memberships are available for all tiers. Simply select 'Gift a Membership' at checkout and enter the recipient's details. They'll receive a beautiful digital gift card.",
   },
 ];
 
@@ -223,19 +253,26 @@ const NailClub = () => {
             <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
               Frequently Asked Questions
             </h2>
+            <p className="text-muted-foreground text-lg">
+              Everything you need to know about the Nail Drop Club
+            </p>
           </div>
-          <div className="space-y-4">
+          <Accordion type="single" collapsible className="space-y-3 animate-fade-in">
             {faqs.map((faq, index) => (
-              <div 
-                key={faq.question}
-                className="bg-card rounded-2xl p-6 shadow-sm animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="bg-card rounded-2xl px-6 shadow-sm border-none"
               >
-                <h3 className="font-display text-lg text-foreground mb-2">{faq.question}</h3>
-                <p className="text-muted-foreground">{faq.answer}</p>
-              </div>
+                <AccordionTrigger className="font-display text-lg text-foreground hover:no-underline py-5">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       </section>
 

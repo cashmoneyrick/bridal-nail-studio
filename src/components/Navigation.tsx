@@ -7,18 +7,31 @@ import { Link } from "react-router-dom";
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [menuOpenScrollY, setMenuOpenScrollY] = useState<number | null>(null);
+
+  // Track scroll position when menu opens
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      setMenuOpenScrollY(window.scrollY);
+    } else {
+      setMenuOpenScrollY(null);
+    }
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
-      // Close mobile menu on scroll
-      if (isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
+      
+      // Close mobile menu only if user scrolls more than 10px from where they opened it
+      if (isMobileMenuOpen && menuOpenScrollY !== null) {
+        if (Math.abs(window.scrollY - menuOpenScrollY) > 10) {
+          setIsMobileMenuOpen(false);
+        }
       }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, menuOpenScrollY]);
 
   const navLinks = [
     { name: "Home", href: "/" },

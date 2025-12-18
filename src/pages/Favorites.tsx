@@ -1,12 +1,44 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useFavoritesStore } from "@/stores/favoritesStore";
+import { useCartStore, CartItem } from "@/stores/cartStore";
+import { toast } from "sonner";
 
 const Favorites = () => {
-  // Placeholder for favorites - in the future this would connect to Shopify customer metafields
-  const favorites: any[] = [];
+  const { items: favorites, removeFavorite } = useFavoritesStore();
+  const addItem = useCartStore(state => state.addItem);
+
+  const handleAddToCart = (product: typeof favorites[0], e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    const firstVariant = product.node.variants.edges[0]?.node;
+    if (!firstVariant) return;
+
+    const cartItem: CartItem = {
+      product,
+      variantId: firstVariant.id,
+      variantTitle: firstVariant.title,
+      price: firstVariant.price,
+      quantity: 1,
+      selectedOptions: firstVariant.selectedOptions || [],
+    };
+
+    addItem(cartItem);
+    toast.success(`${product.node.title} added to bag`, {
+      position: "top-center",
+    });
+  };
+
+  const handleRemoveFavorite = (productId: string, productTitle: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    removeFavorite(productId);
+    toast.success(`${productTitle} removed from favorites`, {
+      position: "top-center",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -22,7 +54,10 @@ const Favorites = () => {
             My Favorites
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Save your favorite nail sets and come back to them anytime
+            {favorites.length > 0 
+              ? `You have ${favorites.length} saved item${favorites.length !== 1 ? 's' : ''}`
+              : 'Save your favorite nail sets and come back to them anytime'
+            }
           </p>
         </div>
       </section>
@@ -48,8 +83,60 @@ const Favorites = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-              {/* Favorites grid would go here */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
+              {favorites.map((product) => {
+                const image = product.node.images.edges[0]?.node;
+                const price = product.node.priceRange.minVariantPrice;
+                
+                return (
+                  <Link
+                    key={product.node.id}
+                    to={`/product/${product.node.handle}`}
+                    className="group"
+                  >
+                    <div className="relative overflow-hidden rounded-2xl bg-muted/30 aspect-square mb-4">
+                      {image ? (
+                        <img
+                          src={image.url}
+                          alt={image.altText || product.node.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-secondary/20">
+                          <ShoppingBag className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                      )}
+                      
+                      {/* Remove from favorites button */}
+                      <button
+                        onClick={(e) => handleRemoveFavorite(product.node.id, product.node.title, e)}
+                        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      
+                      {/* Quick Add Button */}
+                      <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <Button 
+                          className="w-full btn-primary text-sm"
+                          onClick={(e) => handleAddToCart(product, e)}
+                        >
+                          Add to Bag
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <h3 className="font-display text-base sm:text-lg font-medium group-hover:text-primary transition-colors">
+                        {product.node.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        ${parseFloat(price.amount).toFixed(2)} {price.currencyCode}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

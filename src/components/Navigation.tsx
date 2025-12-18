@@ -3,10 +3,12 @@ import { Menu, X, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartDrawer from "@/components/CartDrawer";
 import { Link } from "react-router-dom";
+import { useFavoritesStore } from "@/stores/favoritesStore";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const favoritesCount = useFavoritesStore(state => state.items.length);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,10 +77,15 @@ const Navigation = () => {
 
             {/* Desktop Icons */}
             <div className="hidden lg:flex items-center space-x-4">
-              <Link to="/favorites">
+              <Link to="/favorites" className="relative">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10">
                   <Heart className="h-5 w-5" />
                 </Button>
+                {favoritesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                    {favoritesCount > 9 ? '9+' : favoritesCount}
+                  </span>
+                )}
               </Link>
               <CartDrawer />
               <Button variant="ghost" size="icon" className="hover:bg-primary/10">
@@ -88,10 +95,15 @@ const Navigation = () => {
 
             {/* Mobile Menu Button */}
             <div className="flex lg:hidden items-center space-x-2">
-              <Link to="/favorites">
+              <Link to="/favorites" className="relative">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10">
                   <Heart className="h-5 w-5" />
                 </Button>
+                {favoritesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                    {favoritesCount > 9 ? '9+' : favoritesCount}
+                  </span>
+                )}
               </Link>
               <CartDrawer />
               <Button

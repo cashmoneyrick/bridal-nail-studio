@@ -18,7 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag } from "lucide-react";
+import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag, Droplets, FileText, Clock, Hand, Gift, RotateCcw, Check } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -547,100 +547,155 @@ const ProductDetail = () => {
 
               {/* Product Info Accordion */}
               <div className="border-t border-border pt-6 mt-2">
-                <Accordion type="single" collapsible defaultValue="whats-included" className="space-y-2">
-                  <AccordionItem value="whats-included" className="border-none">
-                    <AccordionTrigger className="hover:no-underline py-3">
+                <Accordion type="single" collapsible defaultValue="whats-included" className="space-y-3">
+                  <AccordionItem value="whats-included" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
+                    <AccordionTrigger className="hover:no-underline py-4">
                       <span className="flex items-center gap-3 text-base font-medium">
-                        <Package className="h-5 w-5 text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Package className="h-5 w-5 text-primary" />
+                        </div>
                         What's Included
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pl-8">
-                      <ul className="space-y-2 text-sm">
-                        <li>• 24 press-on nails (full set)</li>
-                        <li>• Nail glue tube</li>
-                        <li>• Mini nail file</li>
-                        <li>• Prep pad</li>
-                        <li>• Application instructions card</li>
-                        <li>• Reusable storage case</li>
-                      </ul>
+                    <AccordionContent className="pb-4">
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        {[
+                          { icon: Sparkles, label: "24 Press-on Nails", sub: "Full set" },
+                          { icon: Droplets, label: "Nail Glue", sub: "Salon strength" },
+                          { icon: FileText, label: "Mini Nail File", sub: "For custom fit" },
+                          { icon: Hand, label: "Prep Pad", sub: "Alcohol wipe" },
+                          { icon: FileText, label: "Instructions", sub: "Easy to follow" },
+                          { icon: Gift, label: "Storage Case", sub: "Reusable" },
+                        ].map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-3 bg-background rounded-xl p-3 border border-border/50">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <item.icon className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">{item.label}</p>
+                              <p className="text-xs text-muted-foreground">{item.sub}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="how-to-apply" className="border-none">
-                    <AccordionTrigger className="hover:no-underline py-3">
+                  <AccordionItem value="how-to-apply" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
+                    <AccordionTrigger className="hover:no-underline py-4">
                       <span className="flex items-center gap-3 text-base font-medium">
-                        <PlayCircle className="h-5 w-5 text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center">
+                          <PlayCircle className="h-5 w-5 text-secondary-foreground" />
+                        </div>
                         How to Apply
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pl-8">
-                      <div className="space-y-3 text-sm">
-                        <p><strong>1.</strong> Clean and prep your nails</p>
-                        <p><strong>2.</strong> Select the right size for each finger</p>
-                        <p><strong>3.</strong> Apply adhesive and press firmly for 30 seconds</p>
+                    <AccordionContent className="pb-4">
+                      <div className="space-y-3 pt-2">
+                        {[
+                          { step: "1", title: "Prep", desc: "Clean & buff nails, push back cuticles" },
+                          { step: "2", title: "Size", desc: "Match each nail to your nail bed width" },
+                          { step: "3", title: "Apply", desc: "Press firmly for 30 seconds each" },
+                        ].map((item) => (
+                          <div key={item.step} className="flex items-center gap-4 bg-background rounded-xl p-3 border border-border/50">
+                            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                              <span className="text-sm font-bold text-primary-foreground">{item.step}</span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">{item.title}</p>
+                              <p className="text-xs text-muted-foreground">{item.desc}</p>
+                            </div>
+                          </div>
+                        ))}
                         <Link 
                           to="/how-to#application" 
-                          className="inline-flex items-center text-primary hover:underline mt-2"
+                          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline mt-2 bg-primary/10 px-4 py-2 rounded-full"
                         >
-                          View Full Tutorial
+                          <PlayCircle className="h-4 w-4" />
+                          Watch Full Tutorial
                           <ChevronRight className="h-4 w-4" />
                         </Link>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="care" className="border-none">
-                    <AccordionTrigger className="hover:no-underline py-3">
+                  <AccordionItem value="care" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
+                    <AccordionTrigger className="hover:no-underline py-4">
                       <span className="flex items-center gap-3 text-base font-medium">
-                        <ShieldCheck className="h-5 w-5 text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <ShieldCheck className="h-5 w-5 text-primary" />
+                        </div>
                         Care & Maintenance
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pl-8">
-                      <div className="space-y-2 text-sm">
-                        <p>• Avoid prolonged water exposure</p>
-                        <p>• Be gentle—don't use nails as tools</p>
-                        <p>• Apply cuticle oil daily for best results</p>
-                        <p>• With proper care, nails last 1-2 weeks</p>
-                        <Link 
-                          to="/how-to#care" 
-                          className="inline-flex items-center text-primary hover:underline mt-2"
-                        >
-                          View Care Guide
-                          <ChevronRight className="h-4 w-4" />
-                        </Link>
+                    <AccordionContent className="pb-4">
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        {[
+                          { icon: Droplets, tip: "Limit water", time: "Use gloves" },
+                          { icon: Hand, tip: "Be gentle", time: "No prying" },
+                          { icon: Heart, tip: "Cuticle oil", time: "Daily" },
+                          { icon: Clock, tip: "Lasts", time: "1-2 weeks" },
+                        ].map((item, idx) => (
+                          <div key={idx} className="bg-background rounded-xl p-3 border border-border/50 text-center">
+                            <div className="w-10 h-10 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                              <item.icon className="h-5 w-5 text-primary" />
+                            </div>
+                            <p className="text-sm font-medium text-foreground">{item.tip}</p>
+                            <p className="text-xs text-muted-foreground">{item.time}</p>
+                          </div>
+                        ))}
                       </div>
+                      <Link 
+                        to="/how-to#care" 
+                        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline mt-4"
+                      >
+                        View Full Care Guide
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
                     </AccordionContent>
                   </AccordionItem>
 
-                  <AccordionItem value="shipping" className="border-none">
-                    <AccordionTrigger className="hover:no-underline py-3">
+                  <AccordionItem value="shipping" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
+                    <AccordionTrigger className="hover:no-underline py-4">
                       <span className="flex items-center gap-3 text-base font-medium">
-                        <Truck className="h-5 w-5 text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Truck className="h-5 w-5 text-primary" />
+                        </div>
                         Shipping & Returns
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pl-8">
-                      <div className="space-y-3 text-sm">
-                        <div>
-                          <p className="font-medium text-foreground mb-1">Shipping</p>
-                          <p>• Free shipping on orders $50+</p>
-                          <p>• Standard: 5-7 business days</p>
-                          <p>• Express: 2-3 business days</p>
+                    <AccordionContent className="pb-4">
+                      <div className="space-y-4 pt-2">
+                        <div className="flex items-center gap-3 bg-primary/10 rounded-xl p-3">
+                          <Check className="h-5 w-5 text-primary" />
+                          <span className="text-sm font-medium">Free shipping on orders $50+</span>
                         </div>
-                        <div>
-                          <p className="font-medium text-foreground mb-1">Returns</p>
-                          <p>• 30-day return policy</p>
-                          <p>• Unused items in original packaging</p>
-                          <Link 
-                            to="/contact" 
-                            className="inline-flex items-center text-primary hover:underline mt-1"
-                          >
-                            Contact us with questions
-                            <ChevronRight className="h-4 w-4" />
-                          </Link>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-background rounded-xl p-4 border border-border/50 text-center">
+                            <Truck className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
+                            <p className="text-sm font-medium">Standard</p>
+                            <p className="text-xs text-muted-foreground">5-7 business days</p>
+                          </div>
+                          <div className="bg-background rounded-xl p-4 border border-border/50 text-center">
+                            <Sparkles className="h-6 w-6 mx-auto text-primary mb-2" />
+                            <p className="text-sm font-medium">Express</p>
+                            <p className="text-xs text-muted-foreground">2-3 business days</p>
+                          </div>
                         </div>
+                        <div className="flex items-start gap-3 bg-background rounded-xl p-3 border border-border/50">
+                          <RotateCcw className="h-5 w-5 text-primary mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium">30-Day Returns</p>
+                            <p className="text-xs text-muted-foreground">Unused items in original packaging</p>
+                          </div>
+                        </div>
+                        <Link 
+                          to="/contact" 
+                          className="inline-flex items-center text-sm text-primary hover:underline"
+                        >
+                          Questions? Contact us
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
                       </div>
                     </AccordionContent>
                   </AccordionItem>

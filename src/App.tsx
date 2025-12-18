@@ -15,6 +15,7 @@ import Account from "./pages/Account";
 import Auth from "./pages/Auth";
 import PerfectFitProfile from "./pages/PerfectFitProfile";
 import NotFound from "./pages/NotFound";
+import EmailPopup from "./components/EmailPopup";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <EmailPopup />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

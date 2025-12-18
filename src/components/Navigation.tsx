@@ -75,9 +75,11 @@ const Navigation = () => {
 
             {/* Desktop Icons */}
             <div className="hidden lg:flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                <Heart className="h-5 w-5" />
-              </Button>
+              <Link to="/favorites">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </Link>
               <CartDrawer />
               <Button variant="ghost" size="icon" className="hover:bg-primary/10">
                 <User className="h-5 w-5" />
@@ -86,9 +88,11 @@ const Navigation = () => {
 
             {/* Mobile Menu Button */}
             <div className="flex lg:hidden items-center space-x-2">
-              <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                <Heart className="h-5 w-5" />
-              </Button>
+              <Link to="/favorites">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </Link>
               <CartDrawer />
               <Button
                 variant="ghost"

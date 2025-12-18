@@ -22,6 +22,7 @@ import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, Package
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { ProductReviews } from "@/components/ProductReviews";
 
 // Shape icons as simple SVG components
 const ShapeIcon = ({ shape, selected }: { shape: string; selected: boolean }) => {
@@ -703,6 +704,9 @@ const ProductDetail = () => {
               </div>
             </section>
           )}
+
+          {/* Reviews Section */}
+          <ProductReviews productTitle={product.title} />
         </div>
       </main>
 

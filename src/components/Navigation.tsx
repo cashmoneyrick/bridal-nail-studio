@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import CartDrawer from "@/components/CartDrawer";
 import { Link } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const favoritesCount = useFavoritesStore(state => state.items.length);
+  const customer = useAuthStore(state => state.customer);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,8 +91,14 @@ const Navigation = () => {
               </Link>
               <CartDrawer />
               <Link to="/account">
-                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                  <User className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10 relative">
+                  {customer ? (
+                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                      {customer.firstName?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  ) : (
+                    <User className="h-5 w-5" />
+                  )}
                 </Button>
               </Link>
             </div>
@@ -144,8 +152,19 @@ const Navigation = () => {
             <div className="pt-4">
               <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">
-                  <User className="h-5 w-5 mr-3" />
-                  My Account
+                  {customer ? (
+                    <>
+                      <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center mr-3">
+                        {customer.firstName?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                      {customer.firstName || 'My Account'}
+                    </>
+                  ) : (
+                    <>
+                      <User className="h-5 w-5 mr-3" />
+                      Sign In
+                    </>
+                  )}
                 </Button>
               </Link>
             </div>

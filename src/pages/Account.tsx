@@ -156,9 +156,11 @@ const Account = () => {
                 <p className="text-sm text-muted-foreground mb-4">
                   Once you know your sizes from our sizing kit, save them here so we can create your perfect press-ons every time.
                 </p>
-                <Button variant="secondary" className="bg-background hover:bg-background/80">
-                  Set Up My Sizes
-                </Button>
+                <Link to="/account/perfect-fit">
+                  <Button variant="secondary" className="bg-background hover:bg-background/80">
+                    Set Up My Sizes
+                  </Button>
+                </Link>
               </CardContent>
             </div>
           </Card>

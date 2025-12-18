@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { 
@@ -8,12 +7,15 @@ import {
   Sparkles, 
   Shield, 
   Package,
-  ChevronDown,
   Heart,
-  AlertCircle,
+  RefreshCw,
+  Play,
+  CheckCircle,
+  ArrowRight,
+  Star,
+  Zap,
   Scissors,
-  FileText,
-  RefreshCw
+  FileText
 } from "lucide-react";
 import {
   Accordion,
@@ -21,6 +23,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Link } from "react-router-dom";
 
 const applicationSteps = [
   {
@@ -28,36 +31,43 @@ const applicationSteps = [
     icon: Hand,
     title: "Prep Your Nails",
     description: "Start with clean, dry nails. Gently push back cuticles and lightly buff the nail surface for better adhesion. Wipe with alcohol to remove any oils.",
+    tip: "Pro tip: Use the wooden stick included in your kit for cuticle care",
   },
   {
     number: "02",
     icon: FileText,
     title: "Select Your Size",
-    description: "Match each press-on nail to your natural nail width. The nail should fit from sidewall to sidewall without touching your skin. Use your Perfect Fit Profile for faster sizing.",
+    description: "Match each press-on nail to your natural nail width. The nail should fit from sidewall to sidewall without touching your skin.",
+    tip: "Use your Perfect Fit Profile for faster sizing",
   },
   {
     number: "03",
     icon: Droplets,
     title: "Apply Adhesive",
     description: "For adhesive tabs: peel and place on your natural nail. For nail glue: apply a thin layer to both your natural nail and the press-on nail.",
+    tip: "Less is more with glue—a thin layer creates the strongest bond",
   },
   {
     number: "04",
     icon: Clock,
     title: "Press & Hold",
-    description: "Starting at the cuticle, press the nail firmly at a slight angle, then press down. Hold for 30-60 seconds with steady pressure to ensure a secure bond.",
+    description: "Starting at the cuticle, press the nail firmly at a slight angle, then press down. Hold for 30-60 seconds with steady pressure.",
+    tip: "Apply pressure from center outward to remove air bubbles",
   },
   {
     number: "05",
     icon: Sparkles,
     title: "Final Touches",
-    description: "After all nails are applied, avoid water for at least 1 hour. Gently file any edges if needed. Apply cuticle oil around the edges for a polished look.",
+    description: "After all nails are applied, avoid water for at least 1 hour. Gently file any edges if needed. Apply cuticle oil for a polished look.",
+    tip: "Wait 2 hours before showering for maximum longevity",
   },
 ];
 
 const removalMethods = [
   {
-    title: "Oil Soak Method (Gentlest)",
+    title: "Oil Soak Method",
+    badge: "Gentlest",
+    icon: Droplets,
     steps: [
       "Fill a small bowl with warm water and add cuticle oil or olive oil",
       "Soak your nails for 10-15 minutes",
@@ -68,6 +78,8 @@ const removalMethods = [
   },
   {
     title: "Warm Water Method",
+    badge: "Most Popular",
+    icon: Heart,
     steps: [
       "Soak your hands in warm soapy water for 15-20 minutes",
       "The adhesive will soften as it absorbs moisture",
@@ -77,7 +89,9 @@ const removalMethods = [
     ]
   },
   {
-    title: "Acetone Method (For Glue Application)",
+    title: "Acetone Method",
+    badge: "For Glue Only",
+    icon: Scissors,
     steps: [
       "Use only if you applied nails with glue, not adhesive tabs",
       "Soak cotton balls in acetone and place on each nail",
@@ -113,14 +127,17 @@ const careTips = [
 
 const storageTips = [
   {
+    icon: Package,
     title: "Storing Unused Sets",
     description: "Keep press-on nails in their original packaging or a clean, dry container. Store away from direct sunlight and heat to prevent warping or discoloration."
   },
   {
+    icon: RefreshCw,
     title: "Reusing Your Nails",
     description: "After gentle removal, clean any adhesive residue with alcohol. Let nails dry completely, then store flat in a labeled container for future use."
   },
   {
+    icon: Sparkles,
     title: "Adhesive Tab Storage",
     description: "Keep adhesive tabs in a cool, dry place. Avoid touching the sticky side before use. Tabs work best when fresh, so use older packs first."
   }
@@ -161,66 +178,88 @@ const faqItems = [
   }
 ];
 
+const quickStats = [
+  { value: "5-7", label: "Days with tabs" },
+  { value: "14+", label: "Days with glue" },
+  { value: "5 min", label: "Application time" },
+  { value: "100%", label: "Reusable" },
+];
+
 const HowTo = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-28 pb-16 sm:pt-32 sm:pb-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-4">
-              Tutorials & Tips
-            </p>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-medium mb-6">
-              How To
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10" />
+        
+        {/* Decorative elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        
+        {/* Floating badges */}
+        <div className="absolute top-32 right-[15%] hidden lg:flex items-center gap-2 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 shadow-lg animate-fade-in" style={{ animationDelay: "0.5s" }}>
+          <Play className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium">Video tutorials</span>
+        </div>
+        
+        <div className="absolute bottom-32 left-[15%] hidden lg:flex items-center gap-2 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 shadow-lg animate-fade-in" style={{ animationDelay: "0.7s" }}>
+          <Star className="w-4 h-4 text-primary fill-primary" />
+          <span className="text-sm font-medium">Expert tips included</span>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-8 animate-fade-in">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Complete Guide</span>
+            </div>
+            
+            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-medium mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+              Master the Art of
+              <span className="block text-primary">Perfect Press-Ons</span>
             </h1>
-            <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
-              Master the art of press-on nails with our step-by-step guides. From application to removal, we've got everything you need for a flawless manicure.
+            
+            <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto mb-10 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              From application to removal, learn everything you need to know for a flawless, long-lasting manicure that looks salon-quality every time.
             </p>
+            
+            {/* Quick nav buttons */}
+            <div className="flex flex-wrap justify-center gap-3 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+              <a href="#application" className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-all duration-300">
+                Application Guide
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </a>
+              <a href="#removal" className="inline-flex items-center gap-2 bg-background border border-border px-6 py-3 rounded-full font-medium hover:bg-muted transition-all duration-300">
+                Removal Guide
+              </a>
+              <a href="#faq" className="inline-flex items-center gap-2 bg-background border border-border px-6 py-3 rounded-full font-medium hover:bg-muted transition-all duration-300">
+                FAQ
+              </a>
+            </div>
           </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-xs text-muted-foreground tracking-wider">SCROLL</span>
+          <div className="w-px h-8 bg-gradient-to-b from-primary to-transparent" />
         </div>
       </section>
 
-      {/* Application Guide */}
-      <section id="application" className="section-padding bg-muted/30 scroll-mt-24">
+      {/* Quick Stats Bar */}
+      <section className="border-y border-border bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 sm:mb-16">
-            <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
-              Step by Step
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium">
-              Application Guide
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6">
-            {applicationSteps.map((step, index) => (
-              <div key={step.number} className="relative text-center group">
-                {/* Connector Line (desktop only) */}
-                {index < applicationSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-16 left-[60%] w-[80%] h-px bg-border" />
-                )}
-
-                <div className="relative">
-                  {/* Number Badge */}
-                  <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                    {step.number}
-                  </div>
-
-                  {/* Icon */}
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 rounded-full bg-background flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-300 shadow-sm">
-                    <step.icon className="w-8 h-8 sm:w-10 sm:h-10 text-foreground/70 group-hover:text-primary transition-colors duration-300" strokeWidth={1.5} />
-                  </div>
-
-                  {/* Text */}
-                  <h3 className="font-display text-lg sm:text-xl font-medium mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {step.description}
-                  </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
+            {quickStats.map((stat, index) => (
+              <div key={index} className="py-8 text-center">
+                <div className="font-display text-3xl sm:text-4xl font-medium text-primary mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {stat.label}
                 </div>
               </div>
             ))}
@@ -228,73 +267,143 @@ const HowTo = () => {
         </div>
       </section>
 
-      {/* Removal Guide */}
-      <section className="section-padding">
+      {/* Application Guide */}
+      <section id="application" className="py-20 sm:py-28 scroll-mt-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
-                Safe & Gentle
-              </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4">
-                Removal Guide
-              </h2>
-              <p className="text-muted-foreground">
-                Never pull or force off your press-on nails. Follow these gentle methods to protect your natural nails.
-              </p>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+              <Hand className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Step by Step</span>
             </div>
+            <h2 className="font-display text-4xl sm:text-5xl font-medium mb-4">
+              Application Guide
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Follow these 5 simple steps for a salon-quality application that lasts
+            </p>
+          </div>
 
-            <Accordion type="single" collapsible className="space-y-4">
-              {removalMethods.map((method, index) => (
-                <AccordionItem 
-                  key={index} 
-                  value={`removal-${index}`}
-                  className="bg-muted/30 rounded-2xl border-none px-6"
-                >
-                  <AccordionTrigger className="text-left font-display text-lg hover:no-underline py-6">
-                    {method.title}
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-6">
-                    <ol className="space-y-3">
-                      {method.steps.map((step, stepIndex) => (
-                        <li key={stepIndex} className="flex gap-3 text-muted-foreground">
-                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm flex items-center justify-center">
-                            {stepIndex + 1}
-                          </span>
-                          <span>{step}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+          <div className="max-w-5xl mx-auto space-y-6">
+            {applicationSteps.map((step, index) => (
+              <div 
+                key={step.number} 
+                className="group relative bg-gradient-to-r from-muted/50 to-transparent rounded-3xl p-6 sm:p-8 hover:from-primary/5 transition-all duration-500"
+              >
+                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                  {/* Number & Icon */}
+                  <div className="flex sm:flex-col items-center gap-4">
+                    <div className="relative">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-background border border-border flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/5 transition-all duration-300 shadow-sm">
+                        <step.icon className="w-7 h-7 sm:w-8 sm:h-8 text-foreground/70 group-hover:text-primary transition-colors duration-300" strokeWidth={1.5} />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-medium flex items-center justify-center">
+                        {index + 1}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <h3 className="font-display text-xl sm:text-2xl font-medium mb-3 group-hover:text-primary transition-colors">
+                      {step.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed mb-4">
+                      {step.description}
+                    </p>
+                    <div className="inline-flex items-center gap-2 bg-accent/50 text-accent-foreground px-4 py-2 rounded-full text-sm">
+                      <Zap className="w-4 h-4 text-primary" />
+                      {step.tip}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connector line */}
+                {index < applicationSteps.length - 1 && (
+                  <div className="hidden sm:block absolute left-[3.25rem] top-full w-px h-6 bg-gradient-to-b from-border to-transparent" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Removal Guide */}
+      <section id="removal" className="py-20 sm:py-28 bg-muted/30 scroll-mt-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+              <Heart className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Safe & Gentle</span>
+            </div>
+            <h2 className="font-display text-4xl sm:text-5xl font-medium mb-4">
+              Removal Guide
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Never pull or force off your press-on nails. Choose the method that works best for you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {removalMethods.map((method, index) => (
+              <div 
+                key={index}
+                className="group bg-background rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 border border-transparent hover:border-primary/20"
+              >
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <method.icon className="w-7 h-7 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-xs font-medium bg-accent/50 text-accent-foreground px-3 py-1 rounded-full">
+                    {method.badge}
+                  </span>
+                </div>
+                
+                <h3 className="font-display text-xl font-medium mb-6 group-hover:text-primary transition-colors">
+                  {method.title}
+                </h3>
+                
+                <ol className="space-y-4">
+                  {method.steps.map((step, stepIndex) => (
+                    <li key={stepIndex} className="flex gap-3 text-sm">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                        {stepIndex + 1}
+                      </span>
+                      <span className="text-muted-foreground leading-relaxed">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Care & Maintenance */}
-      <section id="care" className="section-padding bg-muted/30 scroll-mt-24">
+      <section id="care" className="py-20 sm:py-28 scroll-mt-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
-              Daily Care
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Daily Care</span>
+            </div>
+            <h2 className="font-display text-4xl sm:text-5xl font-medium mb-4">
               Care & Maintenance
             </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Keep your press-ons looking fresh with these simple daily habits
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {careTips.map((tip, index) => (
               <div 
                 key={index}
-                className="bg-background rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="group relative bg-gradient-to-b from-muted/50 to-background rounded-3xl p-8 text-center hover:from-primary/5 transition-all duration-500 border border-transparent hover:border-primary/20"
               >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <tip.icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-background border border-border flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/5 transition-all duration-300 shadow-sm">
+                  <tip.icon className="w-7 h-7 text-foreground/70 group-hover:text-primary transition-colors duration-300" strokeWidth={1.5} />
                 </div>
-                <h3 className="font-display text-lg font-medium mb-2">
+                <h3 className="font-display text-lg font-medium mb-3 group-hover:text-primary transition-colors">
                   {tip.title}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
@@ -307,52 +416,75 @@ const HowTo = () => {
       </section>
 
       {/* Storage Tips */}
-      <section className="section-padding">
+      <section className="py-20 sm:py-28 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
-                Keep Them Fresh
-              </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-medium">
-                Storage Tips
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {storageTips.map((tip, index) => (
-                <div 
-                  key={index}
-                  className="bg-muted/30 rounded-2xl p-6"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <Package className="w-5 h-5 text-primary" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="font-display text-lg font-medium mb-3">
-                    {tip.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {tip.description}
-                  </p>
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+                  <Package className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">Keep Them Fresh</span>
                 </div>
-              ))}
+                <h2 className="font-display text-4xl sm:text-5xl font-medium mb-6">
+                  Storage Tips
+                </h2>
+                <p className="text-muted-foreground text-lg mb-8">
+                  Proper storage ensures your press-ons stay in perfect condition for future use. Your nails are an investment—treat them right!
+                </p>
+                
+                <div className="space-y-6">
+                  {storageTips.map((tip, index) => (
+                    <div key={index} className="flex gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm">
+                        <tip.icon className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h3 className="font-display text-lg font-medium mb-1">
+                          {tip.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {tip.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="relative">
+                <div className="aspect-square rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center">
+                      <Package className="w-12 h-12 text-primary" strokeWidth={1} />
+                    </div>
+                    <p className="font-display text-2xl font-medium mb-2">Reuse Up To</p>
+                    <p className="font-display text-5xl font-medium text-primary mb-2">3-5x</p>
+                    <p className="text-muted-foreground">with proper care</p>
+                  </div>
+                </div>
+                
+                {/* Floating decorative elements */}
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
+                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/10 rounded-full blur-2xl" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="section-padding bg-muted/30">
+      <section id="faq" className="py-20 sm:py-28 scroll-mt-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
-                Common Questions
-              </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+                <CheckCircle className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Common Questions</span>
+              </div>
+              <h2 className="font-display text-4xl sm:text-5xl font-medium mb-4">
                 Troubleshooting FAQ
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-lg">
                 Got questions? We've got answers to the most common press-on nail concerns.
               </p>
             </div>
@@ -362,9 +494,9 @@ const HowTo = () => {
                 <AccordionItem 
                   key={index} 
                   value={`faq-${index}`}
-                  className="bg-background rounded-2xl border-none px-6 shadow-sm"
+                  className="group bg-muted/30 rounded-2xl border-none px-6 hover:bg-muted/50 transition-colors data-[state=open]:bg-muted/50"
                 >
-                  <AccordionTrigger className="text-left font-display text-base sm:text-lg hover:no-underline py-6">
+                  <AccordionTrigger className="text-left font-display text-base sm:text-lg hover:no-underline py-6 group-hover:text-primary transition-colors">
                     {item.question}
                   </AccordionTrigger>
                   <AccordionContent className="pb-6 text-muted-foreground leading-relaxed">
@@ -378,28 +510,59 @@ const HowTo = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="font-display text-2xl sm:text-3xl font-medium mb-4">
-              Ready to Get Started?
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Find your perfect size with our fit guide, then browse our collection for your next set.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a 
-                href="/account/perfect-fit" 
-                className="btn-primary inline-flex items-center justify-center"
-              >
-                Find Your Fit
-              </a>
-              <a 
-                href="/shop" 
-                className="btn-secondary inline-flex items-center justify-center"
-              >
-                Shop Now
-              </a>
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-primary/5 via-background to-accent/5 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-background/80 backdrop-blur-sm rounded-3xl p-8 sm:p-12 border border-border shadow-xl">
+              <div className="text-center">
+                <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">Ready to Start?</span>
+                </div>
+                
+                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
+                  Get Your Perfect Fit
+                </h2>
+                <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
+                  Find your perfect size with our fit guide, then browse our collection for your next stunning set.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link 
+                    to="/perfect-fit" 
+                    className="group inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium hover:bg-primary/90 transition-all duration-300"
+                  >
+                    Find Your Fit
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link 
+                    to="/shop" 
+                    className="inline-flex items-center justify-center gap-2 bg-background border-2 border-border px-8 py-4 rounded-full font-medium hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+                  >
+                    Shop Collection
+                  </Link>
+                </div>
+                
+                {/* Trust badges */}
+                <div className="flex flex-wrap justify-center gap-6 mt-10 pt-8 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle className="w-4 h-4 text-primary" />
+                    Free shipping over $50
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle className="w-4 h-4 text-primary" />
+                    Easy returns
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle className="w-4 h-4 text-primary" />
+                    24/7 support
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -88,35 +88,26 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <>
-            {/* Backdrop with blur - fixed position, non-scrolling */}
-            <div 
-              className="lg:hidden fixed inset-0 top-16 sm:top-20 bg-background/80 backdrop-blur-xl z-40"
-              style={{ WebkitBackdropFilter: 'blur(24px)', backdropFilter: 'blur(24px)' }}
-            />
-            
-            {/* Content - scrollable on top of backdrop */}
-            <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 z-50 overflow-y-auto">
-              <div className="px-4 py-6 space-y-4">
-                {navLinks.map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="block py-3 text-lg font-medium text-foreground/80 hover:text-foreground hover:pl-2 transition-all duration-200 border-b border-border/50"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.name}
-                  </a>
-                ))}
-                <div className="pt-4">
-                  <Button variant="ghost" className="w-full justify-start">
-                    <User className="h-5 w-5 mr-3" />
-                    My Account
-                  </Button>
-                </div>
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-lg border-b border-border animate-fade-in">
+            <div className="px-4 py-6 space-y-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="block py-3 text-lg font-medium text-foreground/80 hover:text-foreground hover:pl-2 transition-all duration-200 border-b border-border/50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </a>
+              ))}
+              <div className="pt-4">
+                <Button variant="ghost" className="w-full justify-start">
+                  <User className="h-5 w-5 mr-3" />
+                  My Account
+                </Button>
               </div>
             </div>
-          </>
+          </div>
         )}
       </nav>
     </header>

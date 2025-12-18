@@ -88,11 +88,8 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div 
-            className="lg:hidden fixed inset-0 top-16 sm:top-20 bg-background/98 backdrop-blur-lg border-b border-border animate-fade-in overflow-y-auto"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <div className="px-4 py-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-lg border-b border-border">
+            <div className="px-4 py-6 space-y-4">
               {navLinks.map((link) => (
                 <a
                   key={link.name}

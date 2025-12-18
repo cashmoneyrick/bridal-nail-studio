@@ -16,6 +16,16 @@ const Navigation = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isMobileMenuOpen]);
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
@@ -91,8 +101,11 @@ const Navigation = () => {
 
       {/* Mobile Menu - Outside header for proper blur */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 sm:top-20 z-40 bg-background/98 backdrop-blur-lg">
-          <div className="px-4 py-6 space-y-4">
+        <div 
+          className="lg:hidden fixed inset-0 top-16 sm:top-20 z-40 bg-background/98 backdrop-blur-lg"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <div className="px-4 py-6 space-y-4" onClick={(e) => e.stopPropagation()}>
             {navLinks.map((link) => (
               <a
                 key={link.name}

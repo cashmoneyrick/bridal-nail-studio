@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageCircle, X, Send, Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,14 +18,37 @@ const QUICK_REPLIES = [
   { label: "Returns", message: "What is your return policy?" },
 ];
 
+const STORAGE_KEY = "yourprettysets-chat-history";
+const DEFAULT_MESSAGE: Message = { 
+  role: "assistant", 
+  content: "Hi! 👋 I'm here to help with any questions about YourPrettySets. What can I help you with?" 
+};
+
+const loadMessages = (): Message[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error("Failed to load chat history:", e);
+  }
+  return [DEFAULT_MESSAGE];
+};
+
 const FaqChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hi! 👋 I'm here to help with any questions about YourPrettySets. What can I help you with?" }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(loadMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showQuickReplies, setShowQuickReplies] = useState(true);
+  const [showQuickReplies, setShowQuickReplies] = useState(() => loadMessages().length <= 1);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;

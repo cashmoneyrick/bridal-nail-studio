@@ -109,7 +109,7 @@ const Navigation = () => {
       {/* Mobile Menu - Outside header for proper blur */}
       {isMobileMenuOpen && (
         <div 
-          className="lg:hidden fixed inset-0 top-16 sm:top-20 z-40 bg-background/98 backdrop-blur-lg"
+          className="lg:hidden fixed inset-0 top-16 sm:top-20 z-40 bg-background/98 backdrop-blur-lg animate-slide-down"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <div className="px-4 py-6 space-y-4" onClick={(e) => e.stopPropagation()}>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,6 +11,13 @@ interface Message {
   content: string;
 }
 
+const QUICK_REPLIES = [
+  { label: "Shipping Info", message: "What are your shipping options and delivery times?" },
+  { label: "How to Apply", message: "How do I apply press-on nails properly?" },
+  { label: "Sizing Help", message: "How do I find my nail size?" },
+  { label: "Returns", message: "What is your return policy?" },
+];
+
 const FaqChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -18,25 +25,25 @@ const FaqChatbot = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(true);
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText: string) => {
+    if (!messageText.trim() || isLoading) return;
 
-    const userMessage = input.trim();
+    setShowQuickReplies(false);
     setInput("");
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
+    setMessages(prev => [...prev, { role: "user", content: messageText }]);
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke("faq-chat", {
-        body: { message: userMessage },
+        body: { message: messageText },
       });
 
       if (error) throw error;
 
       setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Chat error:", error);
       toast({
         title: "Couldn't send message",
@@ -52,6 +59,23 @@ const FaqChatbot = () => {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage(input);
+  };
+
+  const handleQuickReply = (message: string) => {
+    sendMessage(message);
+  };
+
+  const handleEscalate = () => {
+    setMessages(prev => [...prev, { 
+      role: "assistant", 
+      content: "No problem! Our team is happy to help. You can reach us at:\n\n📧 **hello@yourprettysets.com**\n\nWe typically respond within 24 hours. You can also visit our Contact page for more options!" 
+    }]);
+    setShowQuickReplies(false);
+  };
+
   return (
     <>
       {/* Chat Button */}
@@ -64,7 +88,7 @@ const FaqChatbot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-48px)] h-[500px] max-h-[calc(100vh-100px)] bg-background rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-scale-in">
+        <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-48px)] h-[520px] max-h-[calc(100vh-100px)] bg-background rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-scale-in">
           {/* Header */}
           <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
             <div>
@@ -88,7 +112,7 @@ const FaqChatbot = () => {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
+                    className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground rounded-br-md"
                         : "bg-muted text-foreground rounded-bl-md"
@@ -105,11 +129,40 @@ const FaqChatbot = () => {
                   </div>
                 </div>
               )}
+
+              {/* Quick Replies */}
+              {showQuickReplies && !isLoading && (
+                <div className="pt-2">
+                  <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {QUICK_REPLIES.map((reply, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleQuickReply(reply.message)}
+                        className="text-xs px-3 py-1.5 rounded-full border border-border bg-background hover:bg-muted transition-colors"
+                      >
+                        {reply.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
 
+          {/* Escalate to Human */}
+          <div className="px-4 pb-2">
+            <button
+              onClick={handleEscalate}
+              className="w-full flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Talk to a human instead
+            </button>
+          </div>
+
           {/* Input */}
-          <form onSubmit={sendMessage} className="p-4 border-t border-border">
+          <form onSubmit={handleSubmit} className="p-4 pt-2 border-t border-border">
             <div className="flex gap-2">
               <Input
                 value={input}

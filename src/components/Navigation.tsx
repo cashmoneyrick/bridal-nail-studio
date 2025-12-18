@@ -88,12 +88,15 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 z-40">
-            {/* Backdrop layer - separate from content for consistent blur */}
-            <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" />
+          <>
+            {/* Backdrop with blur - fixed position, non-scrolling */}
+            <div 
+              className="lg:hidden fixed inset-0 top-16 sm:top-20 bg-background/80 backdrop-blur-xl z-40"
+              style={{ WebkitBackdropFilter: 'blur(24px)', backdropFilter: 'blur(24px)' }}
+            />
             
-            {/* Content layer - scrollable */}
-            <div className="relative h-full overflow-y-auto">
+            {/* Content - scrollable on top of backdrop */}
+            <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 z-50 overflow-y-auto">
               <div className="px-4 py-6 space-y-4">
                 {navLinks.map((link) => (
                   <a
@@ -113,7 +116,7 @@ const Navigation = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
       </nav>
     </header>

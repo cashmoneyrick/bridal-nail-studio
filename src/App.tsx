@@ -8,6 +8,7 @@ import ProductDetail from "./pages/ProductDetail";
 import CustomStudio from "./pages/CustomStudio";
 import Shop from "./pages/Shop";
 import NailClub from "./pages/NailClub";
+import HowTo from "./pages/HowTo";
 import Favorites from "./pages/Favorites";
 import Account from "./pages/Account";
 import Auth from "./pages/Auth";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/custom-studio" element={<CustomStudio />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/club" element={<NailClub />} />
+          <Route path="/how-to" element={<HowTo />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/account" element={<Account />} />
           <Route path="/account/perfect-fit" element={<PerfectFitProfile />} />

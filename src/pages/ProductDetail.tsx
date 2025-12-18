@@ -785,6 +785,24 @@ const ProductDetail = () => {
           </DialogHeader>
           
           <div className="space-y-6 pt-4">
+            {/* Video Placeholder */}
+            <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-2xl overflow-hidden group cursor-pointer">
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
+                  <PlayCircle className="h-8 w-8 text-primary-foreground fill-primary-foreground" />
+                </div>
+                <p className="text-sm font-medium text-foreground">Video Tutorial Coming Soon</p>
+                <p className="text-xs text-muted-foreground mt-1">Follow the steps below for now</p>
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted-foreground/20">
+                <div className="h-full w-1/3 bg-primary/50 rounded-r" />
+              </div>
+              <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
+                2:30
+              </div>
+            </div>
+
             {/* Steps */}
             {[
               {

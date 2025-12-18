@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { fetchProductByHandle, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,7 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   
   const addItem = useCartStore(state => state.addItem);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -377,6 +378,7 @@ const ProductDetail = () => {
               <Button 
                 variant="secondary"
                 className="w-full py-6 text-base rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                onClick={() => navigate(`/custom-studio?base=${handle}`)}
               >
                 <Sparkles className="h-5 w-5 mr-2" />
                 Create Custom Version

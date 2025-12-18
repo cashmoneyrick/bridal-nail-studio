@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Hand, Loader2, Check, LogIn } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Save, Hand, Check, Plus, Trash2, Edit2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { useAuthStore } from "@/stores/authStore";
-import { updateCustomerNailSizes, type NailSizes } from "@/lib/shopify-auth";
+import { useNailProfilesStore, NailSizes, NailProfile } from "@/stores/nailProfilesStore";
 
 // Finger names for each hand
 const LEFT_HAND_FINGERS = ['Pinky', 'Ring', 'Middle', 'Index', 'Thumb'];
@@ -32,58 +32,66 @@ const DEFAULT_SIZES: NailSizes = {
 };
 
 const PerfectFitProfile = () => {
-  const navigate = useNavigate();
-  const { customer, accessToken, refreshCustomer } = useAuthStore();
+  const { profiles, addProfile, updateProfile, deleteProfile, selectProfile, selectedProfileId } = useNailProfilesStore();
+  
+  const [editingProfile, setEditingProfile] = useState<NailProfile | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [profileName, setProfileName] = useState('');
   const [sizes, setSizes] = useState<NailSizes>(DEFAULT_SIZES);
-  const [isSaving, setIsSaving] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Load saved sizes from customer metafields
-  useEffect(() => {
-    if (customer?.nailSizes) {
-      setSizes(customer.nailSizes);
-    }
-    setIsLoading(false);
-  }, [customer]);
+  const startNewProfile = () => {
+    setIsCreating(true);
+    setEditingProfile(null);
+    setProfileName('');
+    setSizes(DEFAULT_SIZES);
+  };
+
+  const startEditProfile = (profile: NailProfile) => {
+    setEditingProfile(profile);
+    setIsCreating(false);
+    setProfileName(profile.name);
+    setSizes(profile.sizes);
+  };
+
+  const cancelEditing = () => {
+    setEditingProfile(null);
+    setIsCreating(false);
+    setProfileName('');
+    setSizes(DEFAULT_SIZES);
+  };
 
   const handleSizeChange = (finger: keyof NailSizes, value: string) => {
     setSizes(prev => ({ ...prev, [finger]: value }));
-    setHasChanges(true);
   };
 
-  const handleSave = async () => {
-    if (!accessToken) {
-      toast.error("Please sign in to save your sizes", { position: "top-center" });
-      navigate("/auth");
+  const handleSave = () => {
+    if (!profileName.trim()) {
+      toast.error("Please enter a profile name", { position: "top-center" });
       return;
     }
 
-    setIsSaving(true);
-    
-    try {
-      const result = await updateCustomerNailSizes(accessToken, sizes);
-      
-      if (result.success) {
-        // Refresh customer data to get updated metafields
-        await refreshCustomer();
-        setHasChanges(false);
-        toast.success("Your nail sizes have been saved to your account!", { position: "top-center" });
-      } else if (result.customerUserErrors?.length) {
-        toast.error(result.customerUserErrors[0].message, { position: "top-center" });
-      } else {
-        toast.error("Failed to save sizes. Please try again.", { position: "top-center" });
-      }
-    } catch (error) {
-      console.error("Error saving nail sizes:", error);
-      toast.error("Failed to save sizes. Please try again.", { position: "top-center" });
-    } finally {
-      setIsSaving(false);
+    if (isCreating) {
+      const id = addProfile(profileName.trim(), sizes);
+      selectProfile(id);
+      toast.success(`"${profileName}" profile created!`, { position: "top-center" });
+    } else if (editingProfile) {
+      updateProfile(editingProfile.id, profileName.trim(), sizes);
+      toast.success(`"${profileName}" profile updated!`, { position: "top-center" });
+    }
+
+    cancelEditing();
+  };
+
+  const handleDelete = (profile: NailProfile) => {
+    deleteProfile(profile.id);
+    toast.success(`"${profile.name}" profile deleted`, { position: "top-center" });
+    if (editingProfile?.id === profile.id) {
+      cancelEditing();
     }
   };
 
-  const isComplete = Object.values(sizes).every(size => size !== '');
   const filledCount = Object.values(sizes).filter(size => size !== '').length;
+  const isEditing = isCreating || editingProfile !== null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,192 +111,276 @@ const PerfectFitProfile = () => {
               <Hand className="h-8 w-8 text-primary" />
             </div>
             <h1 className="font-display text-3xl sm:text-4xl font-medium mb-3">
-              My Perfect Fit Profile
+              My Perfect Fit Profiles
             </h1>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Save your nail sizes so we can create perfectly fitted press-ons every time you order.
+              Save nail sizes for yourself and others. Perfect for ordering sets as gifts!
             </p>
-            {customer && (
-              <p className="text-sm text-primary mt-2">
-                Signed in as {customer.email}
-              </p>
-            )}
           </div>
 
-          {/* Sign in prompt if not logged in */}
-          {!customer && (
-            <Card className="mb-8 border-primary/20 bg-primary/5">
-              <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                  <div className="p-3 rounded-full bg-primary/10 shrink-0">
-                    <LogIn className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium mb-1">Sign in to save your sizes</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Create an account or sign in to save your nail sizes to your profile. Your nail artist will be able to see your sizes when preparing your order.
+          {/* Profile List */}
+          {!isEditing && (
+            <div className="space-y-4 mb-8">
+              {profiles.length === 0 ? (
+                <Card className="border-dashed">
+                  <CardContent className="py-12 text-center">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
+                      <Hand className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-display text-xl font-medium mb-2">No profiles yet</h3>
+                    <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+                      Create your first profile to save your nail sizes and make ordering faster.
                     </p>
-                  </div>
-                  <Link to="/auth">
-                    <Button className="btn-primary">Sign In</Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+                    <Button onClick={startNewProfile} className="btn-primary">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Your First Profile
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <>
+                  {profiles.map(profile => (
+                    <Card 
+                      key={profile.id} 
+                      className={`transition-colors ${selectedProfileId === profile.id ? 'border-primary bg-primary/5' : ''}`}
+                    >
+                      <CardContent className="py-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div 
+                            className="flex items-center gap-3 flex-1 cursor-pointer"
+                            onClick={() => selectProfile(profile.id)}
+                          >
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              selectedProfileId === profile.id ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                            }`}>
+                              {selectedProfileId === profile.id ? (
+                                <Check className="h-5 w-5" />
+                              ) : (
+                                <Hand className="h-5 w-5 text-muted-foreground" />
+                              )}
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{profile.name}</h3>
+                              <p className="text-xs text-muted-foreground">
+                                {Object.values(profile.sizes).filter(s => s).length}/10 sizes saved
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => startEditProfile(profile)}
+                              className="h-8 w-8"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(profile)}
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Button 
+                    onClick={startNewProfile} 
+                    variant="outline" 
+                    className="w-full rounded-xl border-dashed"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Another Profile
+                  </Button>
+                </>
+              )}
+            </div>
           )}
 
-          {/* Progress indicator */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-muted-foreground">Profile completion</span>
-              <span className="font-medium">{filledCount}/10 sizes entered</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary transition-all duration-300 rounded-full"
-                style={{ width: `${(filledCount / 10) * 100}%` }}
-              />
-            </div>
-          </div>
+          {/* Edit/Create Form */}
+          {isEditing && (
+            <div className="space-y-6">
+              {/* Cancel button */}
+              <button 
+                onClick={cancelEditing}
+                className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </button>
 
-          {/* Sizing Info Card */}
-          <Card className="mb-8 border-primary/20 bg-primary/5">
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                <div className="p-3 rounded-full bg-primary/10 shrink-0">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
+              {/* Profile Name */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="font-display text-xl">
+                    {isCreating ? 'Create New Profile' : 'Edit Profile'}
+                  </CardTitle>
+                  <CardDescription>
+                    Give this profile a name so you can easily identify it
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="profileName">Profile Name</Label>
+                    <Input
+                      id="profileName"
+                      placeholder="e.g., My Sizes, Mom, Sister, Best Friend..."
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      className="max-w-sm"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Sizing Info Card */}
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="pt-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
+                    <div className="p-3 rounded-full bg-primary/10 shrink-0">
+                      <svg viewBox="0 0 24 24" className="w-6 h-6 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-medium mb-1">How to find your sizes</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Use our sizing kit to measure each nail. Match your natural nail width to the numbered tips 
+                        and record each size below. If you're between sizes, choose the larger size for the most comfortable fit.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Progress indicator */}
+              <div>
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Profile completion</span>
+                  <span className="font-medium">{filledCount}/10 sizes entered</span>
                 </div>
-                <div>
-                  <h3 className="font-medium mb-1">How to find your sizes</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Use our sizing kit to measure each nail. Match your natural nail width to the numbered tips 
-                    and record each size below. If you're between sizes, choose the larger size for the most comfortable fit.
-                  </p>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300 rounded-full"
+                    style={{ width: `${(filledCount / 10) * 100}%` }}
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Hand Size Inputs */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Left Hand */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="font-display text-xl flex items-center gap-2">
-                  <span className="text-2xl">🤚</span>
-                  Left Hand
-                </CardTitle>
-                <CardDescription>Enter sizes from pinky to thumb</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {LEFT_HAND_FINGERS.map((finger) => {
-                  const key = `left${finger}` as keyof NailSizes;
-                  return (
-                    <div key={key} className="flex items-center justify-between gap-4">
-                      <Label className="text-sm font-medium min-w-[80px]">
-                        {finger}
-                      </Label>
-                      <Select
-                        value={sizes[key]}
-                        onValueChange={(value) => handleSizeChange(key, value)}
-                      >
-                        <SelectTrigger className="w-[120px] rounded-full">
-                          <SelectValue placeholder="Size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {SIZE_OPTIONS.map(size => (
-                            <SelectItem key={size} value={size}>
-                              Size {size}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+              {/* Hand Size Inputs */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Hand */}
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="font-display text-xl flex items-center gap-2">
+                      <span className="text-2xl">🤚</span>
+                      Left Hand
+                    </CardTitle>
+                    <CardDescription>Enter sizes from pinky to thumb</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {LEFT_HAND_FINGERS.map((finger) => {
+                      const key = `left${finger}` as keyof NailSizes;
+                      return (
+                        <div key={key} className="flex items-center justify-between gap-4">
+                          <Label className="text-sm font-medium min-w-[80px]">
+                            {finger}
+                          </Label>
+                          <Select
+                            value={sizes[key]}
+                            onValueChange={(value) => handleSizeChange(key, value)}
+                          >
+                            <SelectTrigger className="w-[120px] rounded-full">
+                              <SelectValue placeholder="Size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SIZE_OPTIONS.map(size => (
+                                <SelectItem key={size} value={size}>
+                                  Size {size}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+
+                {/* Right Hand */}
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="font-display text-xl flex items-center gap-2">
+                      <span className="text-2xl transform scale-x-[-1]">🤚</span>
+                      Right Hand
+                    </CardTitle>
+                    <CardDescription>Enter sizes from thumb to pinky</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {RIGHT_HAND_FINGERS.map((finger) => {
+                      const key = `right${finger}` as keyof NailSizes;
+                      return (
+                        <div key={key} className="flex items-center justify-between gap-4">
+                          <Label className="text-sm font-medium min-w-[80px]">
+                            {finger}
+                          </Label>
+                          <Select
+                            value={sizes[key]}
+                            onValueChange={(value) => handleSizeChange(key, value)}
+                          >
+                            <SelectTrigger className="w-[120px] rounded-full">
+                              <SelectValue placeholder="Size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SIZE_OPTIONS.map(size => (
+                                <SelectItem key={size} value={size}>
+                                  Size {size}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-muted/50 rounded-2xl">
+                <div>
+                  {filledCount === 10 ? (
+                    <div className="flex items-center gap-2 text-primary">
+                      <Check className="h-5 w-5" />
+                      <span className="font-medium">All sizes entered!</span>
                     </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* Right Hand */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="font-display text-xl flex items-center gap-2">
-                  <span className="text-2xl transform scale-x-[-1]">🤚</span>
-                  Right Hand
-                </CardTitle>
-                <CardDescription>Enter sizes from thumb to pinky</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {RIGHT_HAND_FINGERS.map((finger) => {
-                  const key = `right${finger}` as keyof NailSizes;
-                  return (
-                    <div key={key} className="flex items-center justify-between gap-4">
-                      <Label className="text-sm font-medium min-w-[80px]">
-                        {finger}
-                      </Label>
-                      <Select
-                        value={sizes[key]}
-                        onValueChange={(value) => handleSizeChange(key, value)}
-                      >
-                        <SelectTrigger className="w-[120px] rounded-full">
-                          <SelectValue placeholder="Size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {SIZE_OPTIONS.map(size => (
-                            <SelectItem key={size} value={size}>
-                              Size {size}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Save Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-muted/50 rounded-2xl">
-            <div>
-              {isComplete ? (
-                <div className="flex items-center gap-2 text-primary">
-                  <Check className="h-5 w-5" />
-                  <span className="font-medium">All sizes entered!</span>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Enter all 10 sizes for a complete profile
+                    </p>
+                  )}
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Enter all 10 sizes for a complete profile
-                </p>
-              )}
-            </div>
-            <Button 
-              onClick={handleSave}
-              disabled={isSaving || !hasChanges || !customer}
-              className="btn-primary min-w-[160px]"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
+                <Button 
+                  onClick={handleSave}
+                  disabled={!profileName.trim()}
+                  className="btn-primary min-w-[160px]"
+                >
                   <Save className="h-4 w-4 mr-2" />
-                  Save My Sizes
-                </>
-              )}
-            </Button>
-          </div>
-
-          {customer && (
-            <p className="text-xs text-center text-muted-foreground mt-4">
-              Your sizes will be saved to your Shopify account and visible to our nail artists when you place an order.
-            </p>
+                  {isCreating ? 'Create Profile' : 'Save Changes'}
+                </Button>
+              </div>
+            </div>
           )}
+
+          <p className="text-xs text-center text-muted-foreground mt-8">
+            Your profiles are saved locally on this device. Create profiles for family and friends to easily order perfect-fit sets for everyone!
+          </p>
         </div>
       </main>
 

@@ -195,11 +195,44 @@ const HowTo = () => {
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10" />
         
-        {/* Decorative elements */}
+        {/* Subtle blurred background shapes */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
         
-        {/* Floating badges - removed to avoid layout issues */}
+        {/* Floating decorative elements - corners only */}
+        <div className="absolute top-24 left-8 hidden lg:block">
+          <div className="relative">
+            <div className="w-3 h-3 rounded-full bg-primary/30 animate-pulse" />
+            <div className="absolute top-6 left-4 w-2 h-2 rounded-full bg-primary/20 animate-pulse" style={{ animationDelay: "0.5s" }} />
+            <div className="absolute top-2 left-8 w-1.5 h-1.5 rounded-full bg-primary/25 animate-pulse" style={{ animationDelay: "1s" }} />
+          </div>
+        </div>
+        
+        <div className="absolute top-32 right-12 hidden lg:block">
+          <div className="relative">
+            <div className="w-2 h-2 rounded-full bg-primary/25 animate-pulse" />
+            <div className="absolute top-4 right-3 w-3 h-3 rounded-full bg-primary/20 animate-pulse" style={{ animationDelay: "0.7s" }} />
+            <div className="absolute top-8 right-0 w-1.5 h-1.5 rounded-full bg-accent/30 animate-pulse" style={{ animationDelay: "1.2s" }} />
+          </div>
+        </div>
+        
+        <div className="absolute bottom-32 left-16 hidden lg:block">
+          <div className="relative">
+            <div className="w-2 h-2 rounded-full bg-accent/25 animate-pulse" style={{ animationDelay: "0.3s" }} />
+            <div className="absolute -top-4 left-6 w-1.5 h-1.5 rounded-full bg-primary/20 animate-pulse" style={{ animationDelay: "0.9s" }} />
+          </div>
+        </div>
+        
+        <div className="absolute bottom-40 right-20 hidden lg:block">
+          <div className="relative">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary/30 animate-pulse" style={{ animationDelay: "0.4s" }} />
+            <div className="absolute top-5 -right-2 w-2 h-2 rounded-full bg-accent/20 animate-pulse" style={{ animationDelay: "1.1s" }} />
+          </div>
+        </div>
+        
+        {/* Subtle floating lines */}
+        <div className="absolute top-40 left-[5%] hidden xl:block w-16 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div className="absolute bottom-48 right-[8%] hidden xl:block w-12 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">

@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import PerfectFitProfile from "./pages/PerfectFitProfile";
 import NotFound from "./pages/NotFound";
 import EmailPopup from "./components/EmailPopup";
+import FaqChatbot from "./components/FaqChatbot";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <EmailPopup />
+      <FaqChatbot />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

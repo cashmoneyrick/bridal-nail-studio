@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, X, Send, Mail } from "lucide-react";
+import { MessageCircle, X, Send, Mail, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -99,6 +99,11 @@ const FaqChatbot = () => {
     setShowQuickReplies(false);
   };
 
+  const handleClearChat = () => {
+    setMessages([DEFAULT_MESSAGE]);
+    setShowQuickReplies(true);
+  };
+
   return (
     <>
       {/* Chat Button */}
@@ -118,12 +123,21 @@ const FaqChatbot = () => {
               <h3 className="font-display text-lg font-semibold">Chat Support</h3>
               <p className="text-xs opacity-80">Ask us anything!</p>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="p-1.5 rounded-full hover:bg-primary-foreground/10 transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={handleClearChat}
+                className="p-1.5 rounded-full hover:bg-primary-foreground/10 transition-colors"
+                title="Clear chat"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-full hover:bg-primary-foreground/10 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}

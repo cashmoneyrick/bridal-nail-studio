@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CartDrawer from "@/components/CartDrawer";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -58,6 +60,7 @@ const Navigation = () => {
             <Button variant="ghost" size="icon" className="hover:bg-primary/10">
               <Heart className="h-5 w-5" />
             </Button>
+            <CartDrawer />
             <Button variant="ghost" size="icon" className="hover:bg-primary/10">
               <User className="h-5 w-5" />
             </Button>
@@ -68,6 +71,7 @@ const Navigation = () => {
             <Button variant="ghost" size="icon" className="hover:bg-primary/10">
               <Heart className="h-5 w-5" />
             </Button>
+            <CartDrawer />
             <Button
               variant="ghost"
               size="icon"

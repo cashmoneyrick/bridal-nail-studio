@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Hand, Loader2, Check } from "lucide-react";
+import { ArrowLeft, Save, Hand, Loader2, Check, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useAuthStore } from "@/stores/authStore";
+import { updateCustomerNailSizes, type NailSizes } from "@/lib/shopify-auth";
 
 // Finger names for each hand
 const LEFT_HAND_FINGERS = ['Pinky', 'Ring', 'Middle', 'Index', 'Thumb'];
@@ -16,19 +17,6 @@ const RIGHT_HAND_FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
 
 // Size options 00-10
 const SIZE_OPTIONS = ['00', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-
-interface NailSizes {
-  leftPinky: string;
-  leftRing: string;
-  leftMiddle: string;
-  leftIndex: string;
-  leftThumb: string;
-  rightThumb: string;
-  rightIndex: string;
-  rightMiddle: string;
-  rightRing: string;
-  rightPinky: string;
-}
 
 const DEFAULT_SIZES: NailSizes = {
   leftPinky: '',
@@ -45,18 +33,19 @@ const DEFAULT_SIZES: NailSizes = {
 
 const PerfectFitProfile = () => {
   const navigate = useNavigate();
-  const { customer } = useAuthStore();
+  const { customer, accessToken, refreshCustomer } = useAuthStore();
   const [sizes, setSizes] = useState<NailSizes>(DEFAULT_SIZES);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load saved sizes from localStorage
+  // Load saved sizes from customer metafields
   useEffect(() => {
-    const savedSizes = localStorage.getItem('yourprettysets-nail-sizes');
-    if (savedSizes) {
-      setSizes(JSON.parse(savedSizes));
+    if (customer?.nailSizes) {
+      setSizes(customer.nailSizes);
     }
-  }, []);
+    setIsLoading(false);
+  }, [customer]);
 
   const handleSizeChange = (finger: keyof NailSizes, value: string) => {
     setSizes(prev => ({ ...prev, [finger]: value }));
@@ -64,17 +53,33 @@ const PerfectFitProfile = () => {
   };
 
   const handleSave = async () => {
+    if (!accessToken) {
+      toast.error("Please sign in to save your sizes", { position: "top-center" });
+      navigate("/auth");
+      return;
+    }
+
     setIsSaving(true);
     
-    // Simulate API call - In production, this would save to Shopify Customer Metafields
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Save to localStorage for now
-    localStorage.setItem('yourprettysets-nail-sizes', JSON.stringify(sizes));
-    
-    setIsSaving(false);
-    setHasChanges(false);
-    toast.success("Your nail sizes have been saved!", { position: "top-center" });
+    try {
+      const result = await updateCustomerNailSizes(accessToken, sizes);
+      
+      if (result.success) {
+        // Refresh customer data to get updated metafields
+        await refreshCustomer();
+        setHasChanges(false);
+        toast.success("Your nail sizes have been saved to your account!", { position: "top-center" });
+      } else if (result.customerUserErrors?.length) {
+        toast.error(result.customerUserErrors[0].message, { position: "top-center" });
+      } else {
+        toast.error("Failed to save sizes. Please try again.", { position: "top-center" });
+      }
+    } catch (error) {
+      console.error("Error saving nail sizes:", error);
+      toast.error("Failed to save sizes. Please try again.", { position: "top-center" });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const isComplete = Object.values(sizes).every(size => size !== '');
@@ -109,6 +114,28 @@ const PerfectFitProfile = () => {
               </p>
             )}
           </div>
+
+          {/* Sign in prompt if not logged in */}
+          {!customer && (
+            <Card className="mb-8 border-primary/20 bg-primary/5">
+              <CardContent className="pt-6">
+                <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                  <div className="p-3 rounded-full bg-primary/10 shrink-0">
+                    <LogIn className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium mb-1">Sign in to save your sizes</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Create an account or sign in to save your nail sizes to your profile. Your nail artist will be able to see your sizes when preparing your order.
+                    </p>
+                  </div>
+                  <Link to="/auth">
+                    <Button className="btn-primary">Sign In</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Progress indicator */}
           <div className="mb-8">
@@ -157,7 +184,7 @@ const PerfectFitProfile = () => {
                 <CardDescription>Enter sizes from pinky to thumb</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {LEFT_HAND_FINGERS.map((finger, index) => {
+                {LEFT_HAND_FINGERS.map((finger) => {
                   const key = `left${finger}` as keyof NailSizes;
                   return (
                     <div key={key} className="flex items-center justify-between gap-4">
@@ -195,7 +222,7 @@ const PerfectFitProfile = () => {
                 <CardDescription>Enter sizes from thumb to pinky</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {RIGHT_HAND_FINGERS.map((finger, index) => {
+                {RIGHT_HAND_FINGERS.map((finger) => {
                   const key = `right${finger}` as keyof NailSizes;
                   return (
                     <div key={key} className="flex items-center justify-between gap-4">
@@ -224,36 +251,6 @@ const PerfectFitProfile = () => {
             </Card>
           </div>
 
-          {/* Size Reference Chart */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="font-display text-lg">Size Reference Chart</CardTitle>
-              <CardDescription>Approximate nail widths for each size</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2 text-center text-xs">
-                {SIZE_OPTIONS.map(size => (
-                  <div key={size} className="p-2 bg-muted rounded-lg">
-                    <div className="font-semibold text-foreground">{size}</div>
-                    <div className="text-muted-foreground mt-1">
-                      {size === '00' ? '5mm' : 
-                       size === '0' ? '6mm' :
-                       size === '1' ? '7mm' :
-                       size === '2' ? '8mm' :
-                       size === '3' ? '9mm' :
-                       size === '4' ? '10mm' :
-                       size === '5' ? '11mm' :
-                       size === '6' ? '12mm' :
-                       size === '7' ? '13mm' :
-                       size === '8' ? '14mm' :
-                       size === '9' ? '15mm' : '16mm'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Save Button */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-muted/50 rounded-2xl">
             <div>
@@ -270,7 +267,7 @@ const PerfectFitProfile = () => {
             </div>
             <Button 
               onClick={handleSave}
-              disabled={isSaving || !hasChanges}
+              disabled={isSaving || !hasChanges || !customer}
               className="btn-primary min-w-[160px]"
             >
               {isSaving ? (
@@ -286,6 +283,12 @@ const PerfectFitProfile = () => {
               )}
             </Button>
           </div>
+
+          {customer && (
+            <p className="text-xs text-center text-muted-foreground mt-4">
+              Your sizes will be saved to your Shopify account and visible to our nail artists when you place an order.
+            </p>
+          )}
         </div>
       </main>
 

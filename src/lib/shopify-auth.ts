@@ -16,6 +16,20 @@ export interface ShopifyCustomer {
     country: string | null;
     zip: string | null;
   } | null;
+  nailSizes?: NailSizes | null;
+}
+
+export interface NailSizes {
+  leftPinky: string;
+  leftRing: string;
+  leftMiddle: string;
+  leftIndex: string;
+  leftThumb: string;
+  rightThumb: string;
+  rightIndex: string;
+  rightMiddle: string;
+  rightRing: string;
+  rightPinky: string;
 }
 
 interface CustomerAccessToken {
@@ -92,6 +106,27 @@ const CUSTOMER_QUERY = `
         province
         country
         zip
+      }
+      metafield(namespace: "custom", key: "nail_sizes") {
+        value
+      }
+    }
+  }
+`;
+
+const CUSTOMER_UPDATE_MUTATION = `
+  mutation customerUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
+    customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
+      customer {
+        id
+        metafield(namespace: "custom", key: "nail_sizes") {
+          value
+        }
+      }
+      customerUserErrors {
+        code
+        field
+        message
       }
     }
   }
@@ -173,9 +208,52 @@ export async function fetchCustomer(
 ): Promise<ShopifyCustomer | null> {
   const response = await storefrontApiRequest<{
     data: {
-      customer: ShopifyCustomer | null;
+      customer: (Omit<ShopifyCustomer, 'nailSizes'> & { 
+        metafield: { value: string } | null 
+      }) | null;
     };
   }>(CUSTOMER_QUERY, { customerAccessToken: accessToken });
 
-  return response.data.customer;
+  if (!response.data.customer) return null;
+
+  const { metafield, ...customerData } = response.data.customer;
+  
+  return {
+    ...customerData,
+    nailSizes: metafield ? JSON.parse(metafield.value) : null,
+  };
+}
+
+export async function updateCustomerNailSizes(
+  accessToken: string,
+  nailSizes: NailSizes
+): Promise<{
+  success: boolean;
+  customerUserErrors?: CustomerUserError[];
+}> {
+  const response = await storefrontApiRequest<{
+    data: {
+      customerUpdate: {
+        customer: { id: string } | null;
+        customerUserErrors: CustomerUserError[];
+      };
+    };
+  }>(CUSTOMER_UPDATE_MUTATION, {
+    customerAccessToken: accessToken,
+    customer: {
+      metafields: [
+        {
+          namespace: "custom",
+          key: "nail_sizes",
+          type: "json",
+          value: JSON.stringify(nailSizes),
+        },
+      ],
+    },
+  });
+
+  return {
+    success: response.data.customerUpdate.customer !== null,
+    customerUserErrors: response.data.customerUpdate.customerUserErrors,
+  };
 }

@@ -47,7 +47,7 @@ const HeroSection = () => {
               Shop Collection
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Link to="/custom">
+            <Link to="/custom-studio">
               <Button 
                 variant="outline"
                 className="btn-secondary text-base min-w-[200px]"

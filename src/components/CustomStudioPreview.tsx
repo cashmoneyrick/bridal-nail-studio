@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Check, Palette, Upload, Sparkles, Heart } from "lucide-react";
 
@@ -66,9 +67,11 @@ const CustomStudioPreview = () => {
 
             {/* CTA */}
             <div className="pt-4">
-              <Button className="btn-primary text-base" size="lg">
-                Start Designing
-              </Button>
+              <Link to="/custom-studio">
+                <Button className="btn-primary text-base" size="lg">
+                  Start Designing
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { fetchProductByHandle, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore, CartItem } from "@/stores/cartStore";
+import { useFavoritesStore } from "@/stores/favoritesStore";
 import { Button } from "@/components/ui/button";
 import { Loader2, Minus, Plus, Heart, Sparkles, Tag } from "lucide-react";
 import { toast } from "sonner";
@@ -77,10 +78,22 @@ const ProductDetail = () => {
   const [selectedShape, setSelectedShape] = useState('Almond');
   const [selectedLength, setSelectedLength] = useState('Medium');
   const [sizingOption, setSizingOption] = useState<'kit' | 'known'>('kit');
-  const [isWishlisted, setIsWishlisted] = useState(false);
   
   const addItem = useCartStore(state => state.addItem);
+  const { toggleFavorite, isFavorite } = useFavoritesStore();
   const navigate = useNavigate();
+
+  const handleToggleFavorite = () => {
+    if (!product) return;
+    
+    const shopifyProduct: ShopifyProduct = { node: product };
+    const wasInFavorites = isFavorite(product.id);
+    toggleFavorite(shopifyProduct);
+    
+    toast.success(wasInFavorites ? 'Removed from favorites' : 'Added to favorites', {
+      position: "top-center",
+    });
+  };
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -261,11 +274,11 @@ const ProductDetail = () => {
                   </p>
                 </div>
                 <button 
-                  onClick={() => setIsWishlisted(!isWishlisted)}
+                  onClick={handleToggleFavorite}
                   className="p-2 rounded-full hover:bg-muted transition-colors"
                 >
                   <Heart 
-                    className={`h-6 w-6 transition-colors ${isWishlisted ? 'fill-primary text-primary' : 'text-muted-foreground'}`} 
+                    className={`h-6 w-6 transition-colors ${product && isFavorite(product.id) ? 'fill-primary text-primary' : 'text-muted-foreground'}`} 
                   />
                 </button>
               </div>

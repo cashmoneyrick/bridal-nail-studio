@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartDrawer from "@/components/CartDrawer";
@@ -7,31 +7,39 @@ import { Link } from "react-router-dom";
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [menuOpenScrollY, setMenuOpenScrollY] = useState<number | null>(null);
+  const menuOpenScrollY = useRef<number | null>(null);
 
-  // Track scroll position when menu opens
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      setMenuOpenScrollY(window.scrollY);
+  // Handle menu open/close - track scroll position with ref
+  const toggleMenu = () => {
+    if (!isMobileMenuOpen) {
+      // Opening menu - save current scroll position
+      menuOpenScrollY.current = window.scrollY;
     } else {
-      setMenuOpenScrollY(null);
+      // Closing menu - clear saved position
+      menuOpenScrollY.current = null;
     }
-  }, [isMobileMenuOpen]);
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMenu = () => {
+    menuOpenScrollY.current = null;
+    setIsMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
       
-      // Close mobile menu only if user scrolls more than 10px from where they opened it
-      if (isMobileMenuOpen && menuOpenScrollY !== null) {
-        if (Math.abs(window.scrollY - menuOpenScrollY) > 10) {
-          setIsMobileMenuOpen(false);
+      // Close mobile menu only if user scrolls more than 50px from where they opened it
+      if (isMobileMenuOpen && menuOpenScrollY.current !== null) {
+        if (Math.abs(window.scrollY - menuOpenScrollY.current) > 50) {
+          closeMenu();
         }
       }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMobileMenuOpen, menuOpenScrollY]);
+  }, [isMobileMenuOpen]);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -92,7 +100,7 @@ const Navigation = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={toggleMenu}
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -107,7 +115,7 @@ const Navigation = () => {
         {isMobileMenuOpen && (
           <div 
             className="lg:hidden fixed inset-0 top-16 sm:top-20 bg-background/98 backdrop-blur-lg border-b border-border animate-fade-in overflow-y-auto"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={closeMenu}
           >
             <div className="px-4 py-6 space-y-4" onClick={(e) => e.stopPropagation()}>
               {navLinks.map((link) => (
@@ -115,7 +123,7 @@ const Navigation = () => {
                   key={link.name}
                   href={link.href}
                   className="block py-3 text-lg font-medium text-foreground/80 hover:text-foreground hover:pl-2 transition-all duration-200 border-b border-border/50"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMenu}
                 >
                   {link.name}
                 </a>

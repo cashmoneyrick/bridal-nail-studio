@@ -3,8 +3,16 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { fetchProductByHandle, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
+import { useNailProfilesStore } from "@/stores/nailProfilesStore";
 import { Button } from "@/components/ui/button";
-import { Loader2, Minus, Plus, Heart, Sparkles, Tag } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -80,6 +88,7 @@ const ProductDetail = () => {
   const [sizingOption, setSizingOption] = useState<'kit' | 'known'>('kit');
   
   const addItem = useCartStore(state => state.addItem);
+  const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
   const { toggleFavorite, isFavorite } = useFavoritesStore();
   const navigate = useNavigate();
 
@@ -370,7 +379,7 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {/* Perfect Fit Info Card */}
+              {/* Sizing Kit Info Card */}
               {sizingOption === 'kit' && (
                 <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-3">
                   <div className="w-12 h-12 mx-auto rounded-full bg-muted flex items-center justify-center">
@@ -384,6 +393,92 @@ const ProductDetail = () => {
                   <span className="inline-block text-xs text-muted-foreground border border-border rounded-full px-3 py-1">
                     Sizing Kit will be added to order
                   </span>
+                </div>
+              )}
+
+              {/* Profile Selector - when "I know my sizes" is selected */}
+              {sizingOption === 'known' && (
+                <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-display text-lg font-medium">Select Size Profile</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Choose whose sizes to use for this order
+                      </p>
+                    </div>
+                  </div>
+
+                  {profiles.length > 0 ? (
+                    <>
+                      <Select 
+                        value={selectedProfileId || undefined} 
+                        onValueChange={(value) => selectProfile(value)}
+                      >
+                        <SelectTrigger className="w-full rounded-xl">
+                          <SelectValue placeholder="Select a profile" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {profiles.map(profile => (
+                            <SelectItem key={profile.id} value={profile.id}>
+                              <span className="flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                {profile.name}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Show selected profile sizes */}
+                      {getSelectedProfile() && (
+                        <div className="bg-muted/50 rounded-xl p-4 space-y-2">
+                          <p className="text-sm font-medium text-foreground">
+                            {getSelectedProfile()?.name}'s Sizes
+                          </p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                            <div className="space-y-1">
+                              <p className="font-medium text-foreground/70">Left Hand</p>
+                              <p>Thumb: {getSelectedProfile()?.sizes.leftThumb || '—'}</p>
+                              <p>Index: {getSelectedProfile()?.sizes.leftIndex || '—'}</p>
+                              <p>Middle: {getSelectedProfile()?.sizes.leftMiddle || '—'}</p>
+                              <p>Ring: {getSelectedProfile()?.sizes.leftRing || '—'}</p>
+                              <p>Pinky: {getSelectedProfile()?.sizes.leftPinky || '—'}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="font-medium text-foreground/70">Right Hand</p>
+                              <p>Thumb: {getSelectedProfile()?.sizes.rightThumb || '—'}</p>
+                              <p>Index: {getSelectedProfile()?.sizes.rightIndex || '—'}</p>
+                              <p>Middle: {getSelectedProfile()?.sizes.rightMiddle || '—'}</p>
+                              <p>Ring: {getSelectedProfile()?.sizes.rightRing || '—'}</p>
+                              <p>Pinky: {getSelectedProfile()?.sizes.rightPinky || '—'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <Link 
+                        to="/account/perfect-fit" 
+                        className="inline-flex items-center text-sm text-primary hover:underline"
+                      >
+                        Manage profiles
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </>
+                  ) : (
+                    <div className="text-center py-4 space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        You haven't saved any size profiles yet.
+                      </p>
+                      <Link to="/account/perfect-fit">
+                        <Button variant="outline" className="rounded-full">
+                          Create Your First Profile
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
 

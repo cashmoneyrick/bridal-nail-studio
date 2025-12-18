@@ -565,23 +565,20 @@ const ProductDetail = () => {
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <div className="grid grid-cols-2 gap-3 pt-2">
+                      <div className="grid grid-cols-3 gap-2 pt-2">
                         {[
-                          { icon: Sparkles, label: "24 Press-on Nails", sub: "Full set" },
-                          { icon: Droplets, label: "Nail Glue", sub: "Salon strength" },
-                          { icon: FileText, label: "Mini Nail File", sub: "For custom fit" },
-                          { icon: Hand, label: "Prep Pad", sub: "Alcohol wipe" },
-                          { icon: FileText, label: "Instructions", sub: "Easy to follow" },
-                          { icon: Gift, label: "Storage Case", sub: "Reusable" },
+                          { icon: Sparkles, label: "24 Nails" },
+                          { icon: Droplets, label: "Glue" },
+                          { icon: FileText, label: "File" },
+                          { icon: Hand, label: "Prep Pad" },
+                          { icon: FileText, label: "Guide" },
+                          { icon: Gift, label: "Case" },
                         ].map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3 bg-background rounded-xl p-3 border border-border/50">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <item.icon className="h-4 w-4 text-primary" />
+                          <div key={idx} className="flex flex-col items-center text-center p-3 rounded-xl bg-background border border-border/50">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                              <item.icon className="h-5 w-5 text-primary" />
                             </div>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">{item.label}</p>
-                              <p className="text-xs text-muted-foreground">{item.sub}</p>
-                            </div>
+                            <p className="text-xs font-medium text-foreground">{item.label}</p>
                           </div>
                         ))}
                       </div>

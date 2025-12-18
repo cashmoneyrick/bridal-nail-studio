@@ -88,9 +88,11 @@ const Navigation = () => {
                 )}
               </Link>
               <CartDrawer />
-              <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                <User className="h-5 w-5" />
-              </Button>
+              <Link to="/account">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -140,10 +142,12 @@ const Navigation = () => {
               </a>
             ))}
             <div className="pt-4">
-              <Button variant="ghost" className="w-full justify-start">
-                <User className="h-5 w-5 mr-3" />
-                My Account
-              </Button>
+              <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <User className="h-5 w-5 mr-3" />
+                  My Account
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

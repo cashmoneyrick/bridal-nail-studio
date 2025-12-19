@@ -12,7 +12,7 @@ import { toast } from "sonner";
 const Account = () => {
   const navigate = useNavigate();
   const favoritesCount = useFavoritesStore(state => state.items.length);
-  const { customer, logout } = useAuthStore();
+  const { user, profile, logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
@@ -64,13 +64,13 @@ const Account = () => {
             <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <User className="h-10 w-10 text-primary" />
             </div>
-            {customer ? (
+            {user ? (
               <>
                 <h1 className="font-display text-3xl sm:text-4xl font-medium mb-2">
-                  Hi, {customer.firstName || 'Beautiful'}!
+                  Hi, {profile?.first_name || 'Beautiful'}!
                 </h1>
                 <p className="text-muted-foreground">
-                  {customer.email}
+                  {user.email}
                 </p>
               </>
             ) : (
@@ -86,7 +86,7 @@ const Account = () => {
           </div>
 
           {/* Sign In Prompt - Show only when not logged in */}
-          {!customer && (
+          {!user && (
             <>
               <Card className="mb-8 border-primary/20 bg-primary/5">
                 <CardContent className="pt-6">
@@ -166,7 +166,7 @@ const Account = () => {
           </Card>
 
           {/* Sign Out Button - Show only when logged in */}
-          {customer && (
+          {user && (
             <div className="mt-8 text-center">
               <Button 
                 variant="ghost" 

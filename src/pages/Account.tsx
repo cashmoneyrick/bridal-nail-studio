@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import DiscountCodesSection from "@/components/DiscountCodesSection";
 import { Link, useNavigate } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -139,6 +140,11 @@ const Account = () => {
                 </Card>
               </Link>
             ))}
+          </div>
+
+          {/* Discount Codes Section */}
+          <div className="mt-8">
+            <DiscountCodesSection />
           </div>
 
           {/* Perfect Fit Profile Card */}

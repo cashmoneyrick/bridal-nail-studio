@@ -10,7 +10,19 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const favoritesCount = useFavoritesStore(state => state.items.length);
-  const { user, profile } = useAuthStore();
+  const { user, profile, initialized } = useAuthStore();
+
+  // Get display initial - prefer profile name, then email, then default
+  const getDisplayInitial = () => {
+    if (profile?.first_name) return profile.first_name[0].toUpperCase();
+    if (user?.email) return user.email[0].toUpperCase();
+    return 'U';
+  };
+
+  const getDisplayName = () => {
+    if (profile?.first_name) return profile.first_name;
+    return 'My Account';
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,9 +104,9 @@ const Navigation = () => {
               <CartDrawer />
               <Link to="/account">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10 relative">
-                  {user ? (
-                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
-                      {profile?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                  {user && initialized ? (
+                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center transition-all">
+                      {getDisplayInitial()}
                     </div>
                   ) : (
                     <User className="h-5 w-5" />
@@ -152,12 +164,12 @@ const Navigation = () => {
             <div className="pt-4">
               <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">
-                  {user ? (
+                  {user && initialized ? (
                     <>
-                      <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center mr-3">
-                        {profile?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                      <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center mr-3 transition-all">
+                        {getDisplayInitial()}
                       </div>
-                      {profile?.first_name || 'My Account'}
+                      {getDisplayName()}
                     </>
                   ) : (
                     <>

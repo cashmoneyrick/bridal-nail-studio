@@ -32,7 +32,7 @@ const signupSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup, recoverPassword, isLoading, user, initialize, initialized } = useAuthStore();
+  const { login, signup, recoverPassword, isLoading, user, initialized } = useAuthStore();
   
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -53,13 +53,6 @@ const Auth = () => {
   
   // Forgot password state
   const [forgotEmail, setForgotEmail] = useState("");
-
-  // Initialize auth on mount
-  useEffect(() => {
-    if (!initialized) {
-      initialize();
-    }
-  }, [initialized, initialize]);
 
   // Redirect if already logged in
   useEffect(() => {

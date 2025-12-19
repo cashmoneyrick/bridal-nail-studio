@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import NailClubSignup from "@/components/NailClubSignup";
 import { 
   Sparkles, Tag, Gift, Truck, Cake, Star, Check, ChevronDown,
   Crown, Heart, Package, ArrowRight, Quote, Shield, CreditCard, Clock
@@ -211,6 +212,19 @@ const NailClub = () => {
             <ChevronDown className="w-8 h-8 text-muted-foreground mx-auto" />
           </div>
         </div>
+      </section>
+
+      {/* Email Signup Section - High Visibility */}
+      <section className="py-16 sm:py-20 px-4 bg-gradient-to-b from-background to-muted/30">
+        <div className="max-w-2xl mx-auto text-center mb-8">
+          <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-3">
+            Not Ready for a Plan?
+          </h2>
+          <p className="text-muted-foreground">
+            Join our free email list for exclusive drops and member-only discounts.
+          </p>
+        </div>
+        <NailClubSignup />
       </section>
 
       {/* Social Proof Stats Bar */}

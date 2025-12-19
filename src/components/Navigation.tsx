@@ -104,13 +104,7 @@ const Navigation = () => {
               <CartDrawer />
               <Link to="/account">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10 relative">
-                  {user && initialized ? (
-                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center transition-all">
-                      {getDisplayInitial()}
-                    </div>
-                  ) : (
-                    <User className="h-5 w-5" />
-                  )}
+                  <User className="h-5 w-5" />
                 </Button>
               </Link>
             </div>
@@ -164,19 +158,8 @@ const Navigation = () => {
             <div className="pt-4">
               <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">
-                  {user && initialized ? (
-                    <>
-                      <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center mr-3 transition-all">
-                        {getDisplayInitial()}
-                      </div>
-                      {getDisplayName()}
-                    </>
-                  ) : (
-                    <>
-                      <User className="h-5 w-5 mr-3" />
-                      Sign In
-                    </>
-                  )}
+                  <User className="h-5 w-5 mr-3" />
+                  {user && initialized ? getDisplayName() : 'Sign In'}
                 </Button>
               </Link>
             </div>

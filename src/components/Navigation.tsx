@@ -10,7 +10,7 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const favoritesCount = useFavoritesStore(state => state.items.length);
-  const customer = useAuthStore(state => state.customer);
+  const { user, profile } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,9 +92,9 @@ const Navigation = () => {
               <CartDrawer />
               <Link to="/account">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10 relative">
-                  {customer ? (
+                  {user ? (
                     <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
-                      {customer.firstName?.[0]?.toUpperCase() || 'U'}
+                      {profile?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
                     </div>
                   ) : (
                     <User className="h-5 w-5" />
@@ -152,12 +152,12 @@ const Navigation = () => {
             <div className="pt-4">
               <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">
-                  {customer ? (
+                  {user ? (
                     <>
                       <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center mr-3">
-                        {customer.firstName?.[0]?.toUpperCase() || 'U'}
+                        {profile?.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
                       </div>
-                      {customer.firstName || 'My Account'}
+                      {profile?.first_name || 'My Account'}
                     </>
                   ) : (
                     <>

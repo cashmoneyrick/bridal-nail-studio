@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
@@ -23,7 +23,7 @@ const signupSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
   lastName: z.string().trim().min(1, "Last name is required").max(50),
   email: z.string().trim().email("Please enter a valid email address"),
-  password: z.string().min(5, "Password must be at least 5 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -32,7 +32,7 @@ const signupSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup, recoverPassword, isLoading, customer } = useAuthStore();
+  const { login, signup, recoverPassword, isLoading, user, initialize, initialized } = useAuthStore();
   
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,11 +54,19 @@ const Auth = () => {
   // Forgot password state
   const [forgotEmail, setForgotEmail] = useState("");
 
+  // Initialize auth on mount
+  useEffect(() => {
+    if (!initialized) {
+      initialize();
+    }
+  }, [initialized, initialize]);
+
   // Redirect if already logged in
-  if (customer) {
-    navigate("/account");
-    return null;
-  }
+  useEffect(() => {
+    if (initialized && user) {
+      navigate("/account");
+    }
+  }, [user, initialized, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +138,15 @@ const Auth = () => {
       toast.error(result.error || "Failed to send reset email", { position: "top-center" });
     }
   };
+
+  // Show loading while initializing
+  if (!initialized) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

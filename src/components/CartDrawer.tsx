@@ -9,8 +9,33 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ShoppingBag, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { useDiscountCodesStore } from "@/stores/discountCodesStore";
+
+// Discount calculations based on code
+const getDiscountAmount = (code: string, subtotal: number): number => {
+  switch (code) {
+    case "WELCOME15":
+      return subtotal * 0.15;
+    case "NAILCLUB20":
+      return subtotal >= 60 ? 20 : 0;
+    default:
+      // Default 10% for other codes
+      return subtotal * 0.10;
+  }
+};
+
+const getDiscountLabel = (code: string): string => {
+  switch (code) {
+    case "WELCOME15":
+      return "15% off";
+    case "NAILCLUB20":
+      return "$20 off orders $60+";
+    default:
+      return "10% off";
+  }
+};
 
 export const CartDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,8 +49,12 @@ export const CartDrawer = () => {
     getTotalPrice,
   } = useCartStore();
   
+  const { appliedCode, clearAppliedCode } = useDiscountCodesStore();
+  
   const totalItems = getTotalItems();
-  const totalPrice = getTotalPrice();
+  const subtotal = getTotalPrice();
+  const discountAmount = appliedCode ? getDiscountAmount(appliedCode, subtotal) : 0;
+  const totalPrice = subtotal - discountAmount;
 
   const handleCheckout = async () => {
     try {
@@ -134,12 +163,42 @@ export const CartDrawer = () => {
               </div>
               
               {/* Fixed checkout section */}
-              <div className="flex-shrink-0 space-y-4 pt-6 border-t mt-4 bg-background">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-medium">Subtotal</span>
-                  <span className="text-xl font-display font-semibold">
-                    ${totalPrice.toFixed(2)}
-                  </span>
+              <div className="flex-shrink-0 space-y-3 pt-6 border-t mt-4 bg-background">
+                {/* Subtotal */}
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                </div>
+                
+                {/* Applied discount */}
+                {appliedCode && discountAmount > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-3.5 w-3.5 text-primary" />
+                      <span className="text-primary font-medium">{appliedCode}</span>
+                      <span className="text-muted-foreground text-xs">({getDiscountLabel(appliedCode)})</span>
+                      <button
+                        onClick={clearAppliedCode}
+                        className="p-0.5 rounded-full hover:bg-muted transition-colors"
+                      >
+                        <X className="h-3 w-3 text-muted-foreground" />
+                      </button>
+                    </div>
+                    <span className="text-primary font-medium">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                {/* Total */}
+                <div className="flex justify-between items-center pt-2 border-t border-border/50">
+                  <span className="text-lg font-medium">Total</span>
+                  <div className="text-right">
+                    <span className="text-xl font-display font-semibold">
+                      ${totalPrice.toFixed(2)}
+                    </span>
+                    {appliedCode && discountAmount > 0 && (
+                      <p className="text-xs text-primary">You save ${discountAmount.toFixed(2)}</p>
+                    )}
+                  </div>
                 </div>
                 
                 <Button 

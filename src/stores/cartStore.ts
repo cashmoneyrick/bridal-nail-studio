@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ShopifyProduct, storefrontApiRequest, CART_CREATE_MUTATION } from '@/lib/shopify';
+import { Product } from '@/lib/products';
 
 export interface CartItem {
-  product: ShopifyProduct;
+  product: Product;
   variantId: string;
   variantTitle: string;
   price: {
@@ -19,8 +19,6 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
-  cartId: string | null;
-  checkoutUrl: string | null;
   isLoading: boolean;
   
   // Actions
@@ -28,55 +26,15 @@ interface CartStore {
   updateQuantity: (variantId: string, quantity: number) => void;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
-  setCartId: (cartId: string) => void;
-  setCheckoutUrl: (url: string) => void;
   setLoading: (loading: boolean) => void;
-  createCheckout: () => Promise<string | null>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
-}
-
-async function createStorefrontCheckout(items: CartItem[]): Promise<string> {
-  const lines = items.map(item => ({
-    quantity: item.quantity,
-    merchandiseId: item.variantId,
-  }));
-
-  const cartData = await storefrontApiRequest<{
-    data: {
-      cartCreate: {
-        cart: {
-          id: string;
-          checkoutUrl: string;
-        };
-        userErrors: Array<{ field: string; message: string }>;
-      };
-    };
-  }>(CART_CREATE_MUTATION, {
-    input: { lines },
-  });
-
-  if (cartData.data.cartCreate.userErrors.length > 0) {
-    throw new Error(`Cart creation failed: ${cartData.data.cartCreate.userErrors.map(e => e.message).join(', ')}`);
-  }
-
-  const cart = cartData.data.cartCreate.cart;
-  
-  if (!cart.checkoutUrl) {
-    throw new Error('No checkout URL returned from Shopify');
-  }
-
-  const url = new URL(cart.checkoutUrl);
-  url.searchParams.set('channel', 'online_store');
-  return url.toString();
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      cartId: null,
-      checkoutUrl: null,
       isLoading: false,
 
       addItem: (item) => {
@@ -116,29 +74,10 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => {
-        set({ items: [], cartId: null, checkoutUrl: null });
+        set({ items: [] });
       },
 
-      setCartId: (cartId) => set({ cartId }),
-      setCheckoutUrl: (checkoutUrl) => set({ checkoutUrl }),
       setLoading: (isLoading) => set({ isLoading }),
-
-      createCheckout: async () => {
-        const { items, setLoading, setCheckoutUrl } = get();
-        if (items.length === 0) return null;
-
-        setLoading(true);
-        try {
-          const checkoutUrl = await createStorefrontCheckout(items);
-          setCheckoutUrl(checkoutUrl);
-          return checkoutUrl;
-        } catch (error) {
-          console.error('Failed to create checkout:', error);
-          return null;
-        } finally {
-          setLoading(false);
-        }
-      },
 
       getTotalItems: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0);

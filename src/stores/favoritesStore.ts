@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ShopifyProduct } from '@/lib/shopify';
+import { Product } from '@/lib/products';
 
 interface FavoritesStore {
-  items: ShopifyProduct[];
+  items: Product[];
   
   // Actions
-  addFavorite: (product: ShopifyProduct) => void;
+  addFavorite: (product: Product) => void;
   removeFavorite: (productId: string) => void;
-  toggleFavorite: (product: ShopifyProduct) => void;
+  toggleFavorite: (product: Product) => void;
   isFavorite: (productId: string) => boolean;
   clearFavorites: () => void;
 }
@@ -20,7 +20,7 @@ export const useFavoritesStore = create<FavoritesStore>()(
 
       addFavorite: (product) => {
         const { items } = get();
-        const exists = items.some(item => item.node.id === product.node.id);
+        const exists = items.some(item => item.id === product.id);
         
         if (!exists) {
           set({ items: [...items, product] });
@@ -29,23 +29,23 @@ export const useFavoritesStore = create<FavoritesStore>()(
 
       removeFavorite: (productId) => {
         set({
-          items: get().items.filter(item => item.node.id !== productId)
+          items: get().items.filter(item => item.id !== productId)
         });
       },
 
       toggleFavorite: (product) => {
         const { items, addFavorite, removeFavorite } = get();
-        const exists = items.some(item => item.node.id === product.node.id);
+        const exists = items.some(item => item.id === product.id);
         
         if (exists) {
-          removeFavorite(product.node.id);
+          removeFavorite(product.id);
         } else {
           addFavorite(product);
         }
       },
 
       isFavorite: (productId) => {
-        return get().items.some(item => item.node.id === productId);
+        return get().items.some(item => item.id === productId);
       },
 
       clearFavorites: () => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { fetchProductByHandle, fetchProducts, ShopifyProduct } from "@/lib/shopify";
+import { Product, getProductByHandle, getProducts } from "@/lib/products";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useNailProfilesStore } from "@/stores/nailProfilesStore";
@@ -90,16 +90,15 @@ const NAIL_LENGTHS = ['Short', 'Medium', 'Long', 'Extra Long'];
 
 const ProductDetail = () => {
   const { handle } = useParams<{ handle: string }>();
-  const [product, setProduct] = useState<ShopifyProduct['node'] | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedShape, setSelectedShape] = useState('Almond');
   const [selectedLength, setSelectedLength] = useState('Medium');
   const [sizingOption, setSizingOption] = useState<'kit' | 'known'>('kit');
-  const [relatedProducts, setRelatedProducts] = useState<ShopifyProduct[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   
   const addItem = useCartStore(state => state.addItem);
@@ -110,9 +109,8 @@ const ProductDetail = () => {
   const handleToggleFavorite = () => {
     if (!product) return;
     
-    const shopifyProduct: ShopifyProduct = { node: product };
     const wasInFavorites = isFavorite(product.id);
-    toggleFavorite(shopifyProduct);
+    toggleFavorite(product);
     
     toast.success(wasInFavorites ? 'Removed from favorites' : 'Added to favorites', {
       position: "top-center",
@@ -120,73 +118,44 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    const loadProduct = async () => {
-      if (!handle) return;
+    if (!handle) return;
+    
+    setLoading(true);
+    // Simulate loading for smooth UX
+    const timer = setTimeout(() => {
+      const foundProduct = getProductByHandle(handle);
+      setProduct(foundProduct || null);
       
-      try {
-        setLoading(true);
-        const data = await fetchProductByHandle(handle);
-        setProduct(data);
-        
-        if (data?.variants.edges.length > 0) {
-          const firstVariant = data.variants.edges[0].node;
-          setSelectedVariant(firstVariant.id);
-          
-          const defaultOptions: Record<string, string> = {};
-          firstVariant.selectedOptions.forEach(opt => {
-            defaultOptions[opt.name] = opt.value;
-          });
-          setSelectedOptions(defaultOptions);
-        }
-      } catch (err) {
-        console.error('Failed to fetch product:', err);
-      } finally {
-        setLoading(false);
+      if (foundProduct?.variants.length > 0) {
+        setSelectedVariant(foundProduct.variants[0].id);
       }
-    };
-
-    loadProduct();
+      setLoading(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [handle]);
-
-  useEffect(() => {
-    if (!product) return;
-    
-    const matchingVariant = product.variants.edges.find(v => {
-      return v.node.selectedOptions.every(
-        opt => selectedOptions[opt.name] === opt.value
-      );
-    });
-    
-    if (matchingVariant) {
-      setSelectedVariant(matchingVariant.node.id);
-    }
-  }, [selectedOptions, product]);
 
   // Fetch related products
   useEffect(() => {
-    const loadRelatedProducts = async () => {
-      try {
-        const products = await fetchProducts(12);
-        const filtered = products.filter(p => p.node.handle !== handle);
-        setRelatedProducts(filtered.slice(0, 8));
-      } catch (err) {
-        console.error('Failed to fetch related products:', err);
-      }
-    };
-    loadRelatedProducts();
+    const allProducts = getProducts();
+    const filtered = allProducts.filter(p => p.handle !== handle);
+    setRelatedProducts(filtered.slice(0, 4));
   }, [handle]);
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
     
-    const variant = product.variants.edges.find(v => v.node.id === selectedVariant)?.node;
+    const variant = product.variants.find(v => v.id === selectedVariant);
     if (!variant) return;
 
     const cartItem: CartItem = {
-      product: { node: product },
+      product: product,
       variantId: variant.id,
       variantTitle: variant.title,
-      price: variant.price,
+      price: {
+        amount: variant.price.toString(),
+        currencyCode: variant.currencyCode,
+      },
       quantity,
       selectedOptions: variant.selectedOptions,
     };
@@ -197,8 +166,8 @@ const ProductDetail = () => {
     });
   };
 
-  const currentVariant = product?.variants.edges.find(v => v.node.id === selectedVariant)?.node;
-  const price = parseFloat(currentVariant?.price.amount || product?.priceRange.minVariantPrice.amount || '0');
+  const currentVariant = product?.variants.find(v => v.id === selectedVariant);
+  const price = currentVariant?.price || product?.price || 0;
 
   if (loading) {
     return (
@@ -227,7 +196,7 @@ const ProductDetail = () => {
     );
   }
 
-  const images = product.images.edges;
+  const images = product.images;
 
   return (
     <div className="min-h-screen bg-background">
@@ -251,8 +220,8 @@ const ProductDetail = () => {
               <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 relative">
                 {images[selectedImageIndex] ? (
                   <img
-                    src={images[selectedImageIndex].node.url}
-                    alt={images[selectedImageIndex].node.altText || product.title}
+                    src={images[selectedImageIndex]}
+                    alt={product.title}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -289,8 +258,8 @@ const ProductDetail = () => {
                       }`}
                     >
                       <img
-                        src={img.node.url}
-                        alt={img.node.altText || `${product.title} ${idx + 1}`}
+                        src={img}
+                        alt={`${product.title} ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
                     </button>
@@ -444,444 +413,267 @@ const ProductDetail = () => {
                     <>
                       <Select 
                         value={selectedProfileId || undefined} 
-                        onValueChange={(value) => selectProfile(value)}
+                        onValueChange={selectProfile}
                       >
-                        <SelectTrigger className="w-full rounded-xl">
+                        <SelectTrigger className="rounded-xl">
                           <SelectValue placeholder="Select a profile" />
                         </SelectTrigger>
                         <SelectContent>
                           {profiles.map(profile => (
                             <SelectItem key={profile.id} value={profile.id}>
-                              <span className="flex items-center gap-2">
-                                <User className="h-4 w-4" />
-                                {profile.name}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span>{profile.name}</span>
+                                {profile.isDefault && (
+                                  <span className="text-xs text-primary">(Default)</span>
+                                )}
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
 
-                      {/* Show selected profile sizes */}
                       {getSelectedProfile() && (
-                        <div className="bg-muted/50 rounded-xl p-4 space-y-2">
-                          <p className="text-sm font-medium text-foreground">
-                            {getSelectedProfile()?.name}'s Sizes
-                          </p>
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                            <div className="space-y-1">
-                              <p className="font-medium text-foreground/70">Left Hand</p>
-                              <p>Thumb: {getSelectedProfile()?.sizes.leftThumb || '—'}</p>
-                              <p>Index: {getSelectedProfile()?.sizes.leftIndex || '—'}</p>
-                              <p>Middle: {getSelectedProfile()?.sizes.leftMiddle || '—'}</p>
-                              <p>Ring: {getSelectedProfile()?.sizes.leftRing || '—'}</p>
-                              <p>Pinky: {getSelectedProfile()?.sizes.leftPinky || '—'}</p>
-                            </div>
-                            <div className="space-y-1">
-                              <p className="font-medium text-foreground/70">Right Hand</p>
-                              <p>Thumb: {getSelectedProfile()?.sizes.rightThumb || '—'}</p>
-                              <p>Index: {getSelectedProfile()?.sizes.rightIndex || '—'}</p>
-                              <p>Middle: {getSelectedProfile()?.sizes.rightMiddle || '—'}</p>
-                              <p>Ring: {getSelectedProfile()?.sizes.rightRing || '—'}</p>
-                              <p>Pinky: {getSelectedProfile()?.sizes.rightPinky || '—'}</p>
-                            </div>
+                        <div className="bg-muted/50 rounded-xl p-3">
+                          <p className="text-xs text-muted-foreground mb-2">Selected sizes:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {getSelectedProfile()?.sizes.map((size, idx) => (
+                              <span 
+                                key={idx}
+                                className="px-2 py-1 bg-background rounded text-xs font-medium"
+                              >
+                                {idx + 1}: {size}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       )}
-
-                      <Link 
-                        to="/account/perfect-fit" 
-                        className="inline-flex items-center text-sm text-primary hover:underline"
-                      >
-                        Manage profiles
-                        <ChevronRight className="h-4 w-4" />
-                      </Link>
                     </>
                   ) : (
-                    <div className="text-center py-4 space-y-3">
-                      <p className="text-sm text-muted-foreground">
-                        You haven't saved any size profiles yet.
+                    <div className="text-center py-2">
+                      <p className="text-sm text-muted-foreground mb-3">
+                        No size profiles saved yet
                       </p>
-                      <Link to="/account/perfect-fit">
-                        <Button variant="outline" className="rounded-full">
-                          Create Your First Profile
-                        </Button>
-                      </Link>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-full"
+                        onClick={() => navigate('/account/perfect-fit')}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Create Profile
+                      </Button>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Create Custom Version Button */}
-              <Button 
-                variant="secondary"
-                className="w-full py-6 text-base rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                onClick={() => navigate(`/custom-studio?base=${handle}`)}
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                Create Custom Version
-              </Button>
-
               {/* Quantity & Add to Cart */}
-              <div className="flex items-center gap-4 pt-2">
-                <div className="flex items-center gap-3 border border-border rounded-full px-4 py-2">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="w-8 text-center font-medium">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
+              <div className="space-y-4 pt-4 border-t border-border">
+                <div className="flex items-center gap-4">
+                  <label className="text-sm font-medium">Quantity</label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center font-medium">{quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={() => setQuantity(quantity + 1)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                
+
                 <Button 
-                  className="flex-1 btn-primary text-base py-6"
+                  className="w-full btn-primary text-base py-6"
                   onClick={handleAddToCart}
                   disabled={!currentVariant?.availableForSale}
                 >
-                  {currentVariant?.availableForSale ? (
-                    `Add to Cart - $${(price * quantity).toFixed(2)}`
-                  ) : (
-                    'Sold Out'
-                  )}
+                  <ShoppingBag className="h-5 w-5 mr-2" />
+                  {currentVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'} — ${(price * quantity).toFixed(2)}
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full rounded-full"
+                  onClick={() => navigate(`/custom-studio?base=${product.handle}`)}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Customize This Design
                 </Button>
               </div>
 
-              {/* Product Info Accordion */}
-              <div className="border-t border-border pt-6 mt-2">
-                <Accordion type="single" collapsible defaultValue="whats-included" className="space-y-3">
-                  <AccordionItem value="whats-included" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-3 text-base font-medium">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Package className="h-5 w-5 text-primary" />
-                        </div>
-                        What's Included
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4">
-                      <div className="grid grid-cols-3 gap-2 pt-2">
-                        {[
-                          { icon: Sparkles, label: "24 Nails" },
-                          { icon: Droplets, label: "Glue" },
-                          { icon: FileText, label: "File" },
-                          { icon: Hand, label: "Prep Pad" },
-                          { icon: FileText, label: "Guide" },
-                          { icon: Gift, label: "Case" },
-                        ].map((item, idx) => (
-                          <div key={idx} className="flex flex-col items-center text-center p-3 rounded-xl bg-background border border-border/50">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                              <item.icon className="h-5 w-5 text-primary" />
-                            </div>
-                            <p className="text-xs font-medium text-foreground">{item.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="how-to-apply" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-3 text-base font-medium">
-                        <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center">
-                          <PlayCircle className="h-5 w-5 text-secondary-foreground" />
-                        </div>
-                        How to Apply
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4">
-                      <div className="space-y-3 pt-2">
-                        {[
-                          { step: "1", title: "Prep", desc: "Clean & buff nails, push back cuticles" },
-                          { step: "2", title: "Size", desc: "Match each nail to your nail bed width" },
-                          { step: "3", title: "Apply", desc: "Press firmly for 30 seconds each" },
-                        ].map((item) => (
-                          <div key={item.step} className="flex items-center gap-4 bg-background rounded-xl p-3 border border-border/50">
-                            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                              <span className="text-sm font-bold text-primary-foreground">{item.step}</span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">{item.title}</p>
-                              <p className="text-xs text-muted-foreground">{item.desc}</p>
-                            </div>
-                          </div>
-                        ))}
-                        <button 
-                          onClick={() => setIsTutorialOpen(true)}
-                          className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline mt-2 bg-primary/10 px-4 py-2 rounded-full transition-colors hover:bg-primary/20"
-                        >
-                          <PlayCircle className="h-4 w-4" />
-                          Watch Full Tutorial
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="care" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-3 text-base font-medium">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <ShieldCheck className="h-5 w-5 text-primary" />
-                        </div>
-                        Care & Maintenance
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4">
-                      <div className="grid grid-cols-2 gap-3 pt-2">
-                        {[
-                          { icon: Droplets, tip: "Limit water", time: "Use gloves" },
-                          { icon: Hand, tip: "Be gentle", time: "No prying" },
-                          { icon: Heart, tip: "Cuticle oil", time: "Daily" },
-                          { icon: Clock, tip: "Lasts", time: "1-2 weeks" },
-                        ].map((item, idx) => (
-                          <div key={idx} className="bg-background rounded-xl p-3 border border-border/50 text-center">
-                            <div className="w-10 h-10 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                              <item.icon className="h-5 w-5 text-primary" />
-                            </div>
-                            <p className="text-sm font-medium text-foreground">{item.tip}</p>
-                            <p className="text-xs text-muted-foreground">{item.time}</p>
-                          </div>
-                        ))}
-                      </div>
-                      <Link 
-                        to="/how-to#care" 
-                        className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline mt-4"
-                      >
-                        View Full Care Guide
-                        <ChevronRight className="h-4 w-4" />
-                      </Link>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="shipping" className="border border-border rounded-2xl px-4 overflow-hidden data-[state=open]:bg-muted/30">
-                    <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-3 text-base font-medium">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Truck className="h-5 w-5 text-primary" />
-                        </div>
-                        Shipping & Returns
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4">
-                      <div className="space-y-4 pt-2">
-                        <div className="flex items-center gap-3 bg-primary/10 rounded-xl p-3">
-                          <Check className="h-5 w-5 text-primary" />
-                          <span className="text-sm font-medium">Free shipping on orders $50+</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-background rounded-xl p-4 border border-border/50 text-center">
-                            <Truck className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
-                            <p className="text-sm font-medium">Standard</p>
-                            <p className="text-xs text-muted-foreground">5-7 business days</p>
-                          </div>
-                          <div className="bg-background rounded-xl p-4 border border-border/50 text-center">
-                            <Sparkles className="h-6 w-6 mx-auto text-primary mb-2" />
-                            <p className="text-sm font-medium">Express</p>
-                            <p className="text-xs text-muted-foreground">2-3 business days</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-3 bg-background rounded-xl p-3 border border-border/50">
-                          <RotateCcw className="h-5 w-5 text-primary mt-0.5" />
-                          <div>
-                            <p className="text-sm font-medium">30-Day Returns</p>
-                            <p className="text-xs text-muted-foreground">Unused items in original packaging</p>
-                          </div>
-                        </div>
-                        <Link 
-                          to="/contact" 
-                          className="inline-flex items-center text-sm text-primary hover:underline"
-                        >
-                          Questions? Contact us
-                          <ChevronRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+              {/* Trust Badges */}
+              <div className="grid grid-cols-3 gap-4 py-4">
+                <div className="text-center">
+                  <Truck className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Free Shipping $50+</p>
+                </div>
+                <div className="text-center">
+                  <Gift className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Gift Wrapping</p>
+                </div>
+                <div className="text-center">
+                  <RotateCcw className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">Easy Returns</p>
+                </div>
               </div>
+
+              {/* Accordion Info */}
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="whats-included">
+                  <AccordionTrigger className="text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-4 w-4" />
+                      What's Included
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-primary" />
+                        10 press-on nails (full set)
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-primary" />
+                        Nail prep kit & application tools
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-primary" />
+                        Nail glue & adhesive tabs
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-primary" />
+                        Mini nail file & buffer
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-primary" />
+                        Cuticle pusher
+                      </li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="how-to-apply">
+                  <AccordionTrigger className="text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <Hand className="h-4 w-4" />
+                      How to Apply
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                      <li>Clean and prep your natural nails</li>
+                      <li>Push back cuticles gently</li>
+                      <li>Buff the surface of your nails</li>
+                      <li>Apply glue or adhesive tab</li>
+                      <li>Press and hold for 30 seconds</li>
+                    </ol>
+                    <Button 
+                      variant="link" 
+                      className="p-0 h-auto mt-2 text-primary"
+                      onClick={() => setIsTutorialOpen(true)}
+                    >
+                      <PlayCircle className="h-4 w-4 mr-1" />
+                      Watch Tutorial
+                    </Button>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="care">
+                  <AccordionTrigger className="text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <Droplets className="h-4 w-4" />
+                      Care & Maintenance
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li>• Avoid prolonged water exposure</li>
+                      <li>• Wear gloves when cleaning</li>
+                      <li>• Apply cuticle oil daily for longer wear</li>
+                      <li>• Gently file any rough edges</li>
+                      <li>• Store unused nails in a cool, dry place</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="shipping">
+                  <AccordionTrigger className="text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <Truck className="h-4 w-4" />
+                      Shipping & Returns
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-3 text-sm text-muted-foreground">
+                      <p><strong className="text-foreground">Shipping:</strong> Free standard shipping on orders over $50. Orders ship within 1-3 business days.</p>
+                      <p><strong className="text-foreground">Returns:</strong> We accept returns within 14 days of delivery for unused items in original packaging.</p>
+                      <p><strong className="text-foreground">Custom Orders:</strong> Custom nail sets are final sale and cannot be returned.</p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
 
-          {/* Product Recommendations */}
+          {/* Related Products */}
           {relatedProducts.length > 0 && (
-            <section className="mt-16 lg:mt-24">
-              <h2 className="font-display text-2xl sm:text-3xl font-medium mb-8 text-center">
-                You May Also Like
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                {relatedProducts.slice(0, 4).map((product) => {
-                  const productImage = product.node.images?.edges?.[0]?.node;
-                  const productPrice = parseFloat(product.node.priceRange.minVariantPrice.amount);
-                  const isProductFavorite = isFavorite(product.node.id);
-                  
-                  return (
-                    <Link 
-                      key={product.node.id} 
-                      to={`/product/${product.node.handle}`}
-                      className="group"
-                    >
-                      <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted/30 mb-3">
-                        {productImage ? (
-                          <img
-                            src={productImage.url}
-                            alt={productImage.altText || product.node.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-muted-foreground text-sm">No image</span>
-                          </div>
-                        )}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleFavorite(product);
-                            toast.success(isProductFavorite ? 'Removed from favorites' : 'Added to favorites', {
-                              position: "top-center",
-                            });
-                          }}
-                          className="absolute top-3 right-3 p-2 rounded-full bg-background/80 hover:bg-background transition-colors"
-                        >
-                          <Heart className={`h-4 w-4 ${isProductFavorite ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
-                        </button>
-                      </div>
-                      <h3 className="font-medium text-sm sm:text-base line-clamp-1 group-hover:text-primary transition-colors">
-                        {product.node.title}
-                      </h3>
-                      <p className="text-primary font-display">
-                        ${productPrice.toFixed(2)}
-                      </p>
-                    </Link>
-                  );
-                })}
+            <section className="mt-24">
+              <h2 className="font-display text-2xl font-medium mb-8">You May Also Like</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                {relatedProducts.map((relatedProduct) => (
+                  <Link
+                    key={relatedProduct.id}
+                    to={`/product/${relatedProduct.handle}`}
+                    className="group"
+                  >
+                    <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 mb-3">
+                      {relatedProduct.images[0] ? (
+                        <img
+                          src={relatedProduct.images[0]}
+                          alt={relatedProduct.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="font-display font-medium group-hover:text-primary transition-colors">
+                      {relatedProduct.title}
+                    </h3>
+                    <p className="text-primary">${relatedProduct.price.toFixed(2)}</p>
+                  </Link>
+                ))}
               </div>
             </section>
           )}
 
-          {/* Reviews Section */}
-          <ProductReviews productTitle={product.title} />
+          {/* Reviews */}
+          <ProductReviews productId={product.id} />
         </div>
       </main>
 
-      {/* Application Tutorial Modal */}
+      {/* Tutorial Dialog */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-display text-2xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <PlayCircle className="h-5 w-5 text-primary" />
-              </div>
-              How to Apply Your Nails
-            </DialogTitle>
+            <DialogTitle>How to Apply Your Nails</DialogTitle>
           </DialogHeader>
-          
-          <div className="space-y-6 pt-4">
-            {/* Video Placeholder */}
-            <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-2xl overflow-hidden group cursor-pointer">
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                  <PlayCircle className="h-8 w-8 text-primary-foreground fill-primary-foreground" />
-                </div>
-                <p className="text-sm font-medium text-foreground">Video Tutorial Coming Soon</p>
-                <p className="text-xs text-muted-foreground mt-1">Follow the steps below for now</p>
-              </div>
-              {/* Decorative elements */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted-foreground/20">
-                <div className="h-full w-1/3 bg-primary/50 rounded-r" />
-              </div>
-              <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
-                2:30
-              </div>
-            </div>
-
-            {/* Steps */}
-            {[
-              {
-                step: "1",
-                title: "Prep Your Nails",
-                desc: "Start with clean, dry nails. Gently push back cuticles and lightly buff the nail surface for better adhesion. Wipe with alcohol to remove any oils.",
-                icon: Hand,
-              },
-              {
-                step: "2",
-                title: "Select Your Size",
-                desc: "Match each press-on nail to your natural nail width. The nail should fit from sidewall to sidewall without touching your skin. Use your Perfect Fit Profile for faster sizing.",
-                icon: FileText,
-              },
-              {
-                step: "3",
-                title: "Apply Adhesive",
-                desc: "For adhesive tabs: peel and place on your natural nail. For nail glue: apply a thin layer to both your natural nail and the press-on nail.",
-                icon: Droplets,
-              },
-              {
-                step: "4",
-                title: "Press & Hold",
-                desc: "Starting at the cuticle, press the nail firmly at a slight angle, then press down. Hold for 30-60 seconds with steady pressure to ensure a secure bond.",
-                icon: Clock,
-              },
-              {
-                step: "5",
-                title: "Final Touches",
-                desc: "After all nails are applied, avoid water for at least 1 hour. Gently file any edges if needed. Apply cuticle oil around the edges for a polished look.",
-                icon: Sparkles,
-              },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                    <span className="text-lg font-bold text-primary-foreground">{item.step}</span>
-                  </div>
-                </div>
-                <div className="flex-1 pt-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <item.icon className="h-4 w-4 text-primary" />
-                    <h3 className="font-display text-lg font-medium">{item.title}</h3>
-                  </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-
-            {/* Pro Tips */}
-            <div className="bg-muted/50 rounded-2xl p-4 mt-6">
-              <h4 className="font-medium flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-primary" />
-                Pro Tips
-              </h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  Apply nails at night so glue can set while you sleep
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  If a nail feels too big, file the sides for a custom fit
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  Avoid hot water and steam for the first 2 hours
-                </li>
-              </ul>
-            </div>
-
-            {/* Full Guide Link */}
-            <div className="flex items-center justify-between pt-2 border-t border-border">
-              <span className="text-sm text-muted-foreground">Need more details?</span>
-              <Link 
-                to="/how-to#application" 
-                onClick={() => setIsTutorialOpen(false)}
-                className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1"
-              >
-                View Full Guide
-                <ChevronRight className="h-4 w-4" />
-              </Link>
+          <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
+            <div className="text-center">
+              <PlayCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Tutorial video coming soon!</p>
             </div>
           </div>
         </DialogContent>

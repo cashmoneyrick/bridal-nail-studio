@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
+import { Product, getProducts } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { Loader2, Filter, X, Grid3X3, LayoutList } from "lucide-react";
 import Navigation from "@/components/Navigation";
@@ -18,7 +18,7 @@ const SORT_OPTIONS = [
 ];
 
 const Shop = () => {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedShape, setSelectedShape] = useState('All');
   const [selectedLength, setSelectedLength] = useState('All');
@@ -29,36 +29,31 @@ const Shop = () => {
   const addItem = useCartStore(state => state.addItem);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchProducts(50);
-        setProducts(data);
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
+    const timer = setTimeout(() => {
+      setProducts(getProducts());
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
   }, []);
 
-  const handleQuickAdd = (product: ShopifyProduct) => {
-    const variant = product.node.variants.edges[0]?.node;
+  const handleQuickAdd = (product: Product) => {
+    const variant = product.variants[0];
     if (!variant || !variant.availableForSale) return;
 
     const cartItem: CartItem = {
       product: product,
       variantId: variant.id,
       variantTitle: variant.title,
-      price: variant.price,
+      price: {
+        amount: variant.price.toString(),
+        currencyCode: variant.currencyCode,
+      },
       quantity: 1,
       selectedOptions: variant.selectedOptions,
     };
 
     addItem(cartItem);
-    toast.success(`${product.node.title} added to bag`, {
+    toast.success(`${product.title} added to bag`, {
       position: "top-center",
     });
   };
@@ -67,11 +62,11 @@ const Shop = () => {
   const sortedProducts = [...products].sort((a, b) => {
     switch (sortBy) {
       case 'price-asc':
-        return parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount);
+        return a.price - b.price;
       case 'price-desc':
-        return parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount);
+        return b.price - a.price;
       case 'name-asc':
-        return a.node.title.localeCompare(b.node.title);
+        return a.title.localeCompare(b.title);
       default:
         return 0;
     }
@@ -234,7 +229,7 @@ const Shop = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {sortedProducts.map((product) => (
                 <ProductCard 
-                  key={product.node.id} 
+                  key={product.id} 
                   product={product} 
                   onQuickAdd={() => handleQuickAdd(product)}
                 />
@@ -244,7 +239,7 @@ const Shop = () => {
             <div className="space-y-4">
               {sortedProducts.map((product) => (
                 <ProductListItem 
-                  key={product.node.id} 
+                  key={product.id} 
                   product={product} 
                   onQuickAdd={() => handleQuickAdd(product)}
                 />
@@ -259,19 +254,18 @@ const Shop = () => {
   );
 };
 
-const ProductCard = ({ product, onQuickAdd }: { product: ShopifyProduct; onQuickAdd: () => void }) => {
-  const image = product.node.images.edges[0]?.node;
-  const price = parseFloat(product.node.priceRange.minVariantPrice.amount);
-  const isAvailable = product.node.variants.edges[0]?.node.availableForSale;
+const ProductCard = ({ product, onQuickAdd }: { product: Product; onQuickAdd: () => void }) => {
+  const image = product.images[0];
+  const isAvailable = product.variants[0]?.availableForSale;
 
   return (
     <div className="group">
-      <Link to={`/product/${product.node.handle}`}>
+      <Link to={`/product/${product.handle}`}>
         <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 mb-4 relative">
           {image ? (
             <img
-              src={image.url}
-              alt={image.altText || product.node.title}
+              src={image}
+              alt={product.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -291,12 +285,12 @@ const ProductCard = ({ product, onQuickAdd }: { product: ShopifyProduct; onQuick
       </Link>
       
       <div className="space-y-2">
-        <Link to={`/product/${product.node.handle}`}>
+        <Link to={`/product/${product.handle}`}>
           <h3 className="font-display text-lg font-medium group-hover:text-primary transition-colors line-clamp-1">
-            {product.node.title}
+            {product.title}
           </h3>
         </Link>
-        <p className="text-primary font-display text-lg">${price.toFixed(2)}</p>
+        <p className="text-primary font-display text-lg">${product.price.toFixed(2)}</p>
         
         <Button
           variant="outline"
@@ -315,19 +309,18 @@ const ProductCard = ({ product, onQuickAdd }: { product: ShopifyProduct; onQuick
   );
 };
 
-const ProductListItem = ({ product, onQuickAdd }: { product: ShopifyProduct; onQuickAdd: () => void }) => {
-  const image = product.node.images.edges[0]?.node;
-  const price = parseFloat(product.node.priceRange.minVariantPrice.amount);
-  const isAvailable = product.node.variants.edges[0]?.node.availableForSale;
+const ProductListItem = ({ product, onQuickAdd }: { product: Product; onQuickAdd: () => void }) => {
+  const image = product.images[0];
+  const isAvailable = product.variants[0]?.availableForSale;
 
   return (
     <div className="flex gap-6 p-4 bg-card border border-border rounded-2xl group hover:shadow-lg transition-shadow">
-      <Link to={`/product/${product.node.handle}`} className="flex-shrink-0">
+      <Link to={`/product/${product.handle}`} className="flex-shrink-0">
         <div className="w-32 h-32 rounded-xl overflow-hidden bg-muted/30">
           {image ? (
             <img
-              src={image.url}
-              alt={image.altText || product.node.title}
+              src={image}
+              alt={product.title}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -340,18 +333,18 @@ const ProductListItem = ({ product, onQuickAdd }: { product: ShopifyProduct; onQ
       
       <div className="flex-1 flex flex-col justify-between">
         <div>
-          <Link to={`/product/${product.node.handle}`}>
+          <Link to={`/product/${product.handle}`}>
             <h3 className="font-display text-xl font-medium group-hover:text-primary transition-colors">
-              {product.node.title}
+              {product.title}
             </h3>
           </Link>
           <p className="text-muted-foreground text-sm line-clamp-2 mt-1">
-            {product.node.description}
+            {product.description}
           </p>
         </div>
         
         <div className="flex items-center justify-between mt-4">
-          <p className="text-primary font-display text-xl">${price.toFixed(2)}</p>
+          <p className="text-primary font-display text-xl">${product.price.toFixed(2)}</p>
           <Button
             variant="outline"
             className="rounded-full"

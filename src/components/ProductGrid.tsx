@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ShopifyProduct, fetchProducts } from "@/lib/shopify";
+import { Product, getProducts } from "@/lib/products";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { Button } from "@/components/ui/button";
@@ -8,56 +8,50 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
 const ProductGrid = () => {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const addItem = useCartStore(state => state.addItem);
   const { toggleFavorite, isFavorite } = useFavoritesStore();
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchProducts(20);
-        setProducts(data);
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-        setError('Failed to load products');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
+    // Simulate loading for smooth UX
+    const timer = setTimeout(() => {
+      setProducts(getProducts());
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
   }, []);
 
-  const handleAddToCart = (product: ShopifyProduct, e: React.MouseEvent) => {
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    const firstVariant = product.node.variants.edges[0]?.node;
+    const firstVariant = product.variants[0];
     if (!firstVariant) return;
 
     const cartItem: CartItem = {
       product,
       variantId: firstVariant.id,
       variantTitle: firstVariant.title,
-      price: firstVariant.price,
+      price: {
+        amount: firstVariant.price.toString(),
+        currencyCode: firstVariant.currencyCode,
+      },
       quantity: 1,
       selectedOptions: firstVariant.selectedOptions || [],
     };
 
     addItem(cartItem);
-    toast.success(`${product.node.title} added to bag`, {
+    toast.success(`${product.title} added to bag`, {
       position: "top-center",
     });
   };
 
-  const handleToggleFavorite = (product: ShopifyProduct, e: React.MouseEvent) => {
+  const handleToggleFavorite = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    const wasInFavorites = isFavorite(product.node.id);
+    const wasInFavorites = isFavorite(product.id);
     toggleFavorite(product);
     
     toast.success(wasInFavorites ? `Removed from favorites` : `Added to favorites`, {
@@ -82,16 +76,6 @@ const ProductGrid = () => {
     );
   }
 
-  if (error) {
-    return (
-      <section className="section-padding bg-background">
-        <div className="container mx-auto text-center">
-          <p className="text-muted-foreground">{error}</p>
-        </div>
-      </section>
-    );
-  }
-
   if (products.length === 0) {
     return (
       <section className="section-padding bg-background">
@@ -105,7 +89,7 @@ const ProductGrid = () => {
             <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground text-lg">No products found</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Products will appear here once added to the store.
+              Products will appear here once added.
             </p>
           </div>
         </div>
@@ -132,20 +116,19 @@ const ProductGrid = () => {
         {/* Product Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {products.map((product) => {
-            const image = product.node.images.edges[0]?.node;
-            const price = product.node.priceRange.minVariantPrice;
+            const image = product.images[0];
             
             return (
               <Link
-                key={product.node.id}
-                to={`/product/${product.node.handle}`}
+                key={product.id}
+                to={`/product/${product.handle}`}
                 className="group"
               >
                 <div className="relative overflow-hidden rounded-2xl bg-muted/30 aspect-square mb-4">
                   {image ? (
                     <img
-                      src={image.url}
-                      alt={image.altText || product.node.title}
+                      src={image}
+                      alt={product.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
@@ -161,7 +144,7 @@ const ProductGrid = () => {
                   >
                     <Heart 
                       className={`h-5 w-5 transition-colors ${
-                        isFavorite(product.node.id) 
+                        isFavorite(product.id) 
                           ? 'fill-primary text-primary' 
                           : 'text-foreground/70'
                       }`} 
@@ -181,10 +164,10 @@ const ProductGrid = () => {
                 
                 <div className="space-y-1">
                   <h3 className="font-display text-base sm:text-lg font-medium group-hover:text-primary transition-colors">
-                    {product.node.title}
+                    {product.title}
                   </h3>
                   <p className="text-muted-foreground text-sm">
-                    ${parseFloat(price.amount).toFixed(2)} {price.currencyCode}
+                    ${product.price.toFixed(2)} {product.currencyCode}
                   </p>
                 </div>
               </Link>

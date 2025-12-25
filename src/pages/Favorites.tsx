@@ -89,7 +89,9 @@ const Favorites = () => {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
               {favorites.map((product) => {
-                const image = product.images[0];
+                const image = product.images?.[0];
+                const price = product.price ?? 0;
+                const currencyCode = product.currencyCode ?? 'USD';
                 
                 return (
                   <Link
@@ -134,7 +136,7 @@ const Favorites = () => {
                         {product.title}
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        ${product.price.toFixed(2)} {product.currencyCode}
+                        ${price.toFixed(2)} {currencyCode}
                       </p>
                     </div>
                   </Link>

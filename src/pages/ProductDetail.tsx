@@ -421,12 +421,7 @@ const ProductDetail = () => {
                         <SelectContent>
                           {profiles.map(profile => (
                             <SelectItem key={profile.id} value={profile.id}>
-                              <div className="flex items-center gap-2">
-                                <span>{profile.name}</span>
-                                {profile.isDefault && (
-                                  <span className="text-xs text-primary">(Default)</span>
-                                )}
-                              </div>
+                              <span>{profile.name}</span>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -436,9 +431,9 @@ const ProductDetail = () => {
                         <div className="bg-muted/50 rounded-xl p-3">
                           <p className="text-xs text-muted-foreground mb-2">Selected sizes:</p>
                           <div className="flex flex-wrap gap-1">
-                            {getSelectedProfile()?.sizes.map((size, idx) => (
+                            {Object.entries(getSelectedProfile()?.sizes || {}).map(([key, size], idx) => (
                               <span 
-                                key={idx}
+                                key={key}
                                 className="px-2 py-1 bg-background rounded text-xs font-medium"
                               >
                                 {idx + 1}: {size}
@@ -660,7 +655,7 @@ const ProductDetail = () => {
           )}
 
           {/* Reviews */}
-          <ProductReviews productId={product.id} />
+          <ProductReviews productTitle={product.title} />
         </div>
       </main>
 

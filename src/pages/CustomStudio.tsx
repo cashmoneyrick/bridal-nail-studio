@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { fetchProductByHandle, ShopifyProduct } from "@/lib/shopify";
+import { Product, getProductByHandle } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Upload, Sparkles, ArrowRight, X, ImagePlus } from "lucide-react";
+import { Loader2, Sparkles, ArrowRight, X, ImagePlus } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
@@ -69,7 +69,7 @@ const CustomStudio = () => {
   const [searchParams] = useSearchParams();
   const baseProductHandle = searchParams.get('base');
   
-  const [baseProduct, setBaseProduct] = useState<ShopifyProduct['node'] | null>(null);
+  const [baseProduct, setBaseProduct] = useState<Product | null>(null);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [selectedShape, setSelectedShape] = useState('Almond');
   const [selectedLength, setSelectedLength] = useState('Medium');
@@ -78,21 +78,17 @@ const CustomStudio = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
   useEffect(() => {
-    const loadBaseProduct = async () => {
-      if (!baseProductHandle) return;
-      
-      setLoadingProduct(true);
-      try {
-        const data = await fetchProductByHandle(baseProductHandle);
-        setBaseProduct(data);
-      } catch (err) {
-        console.error('Failed to load base product:', err);
-      } finally {
-        setLoadingProduct(false);
-      }
-    };
-
-    loadBaseProduct();
+    if (!baseProductHandle) return;
+    
+    setLoadingProduct(true);
+    // Simulate loading for smooth UX
+    const timer = setTimeout(() => {
+      const product = getProductByHandle(baseProductHandle);
+      setBaseProduct(product || null);
+      setLoadingProduct(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [baseProductHandle]);
 
   const toggleFinish = (finish: string) => {
@@ -166,10 +162,10 @@ const CustomStudio = () => {
                     </button>
                   </div>
                   <div className="flex gap-4">
-                    {baseProduct.images.edges[0] && (
+                    {baseProduct.images[0] && (
                       <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
                         <img 
-                          src={baseProduct.images.edges[0].node.url} 
+                          src={baseProduct.images[0]} 
                           alt={baseProduct.title}
                           className="w-full h-full object-cover"
                         />
@@ -181,7 +177,7 @@ const CustomStudio = () => {
                         {baseProduct.description}
                       </p>
                       <p className="text-primary font-display mt-1">
-                        From ${parseFloat(baseProduct.priceRange.minVariantPrice.amount).toFixed(2)}
+                        From ${baseProduct.price.toFixed(2)}
                       </p>
                     </div>
                   </div>

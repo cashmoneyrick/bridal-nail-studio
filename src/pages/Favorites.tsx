@@ -6,28 +6,32 @@ import { Link } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { toast } from "sonner";
+import { Product } from "@/lib/products";
 
 const Favorites = () => {
   const { items: favorites, removeFavorite } = useFavoritesStore();
   const addItem = useCartStore(state => state.addItem);
 
-  const handleAddToCart = (product: typeof favorites[0], e: React.MouseEvent) => {
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     
-    const firstVariant = product.node.variants.edges[0]?.node;
+    const firstVariant = product.variants[0];
     if (!firstVariant) return;
 
     const cartItem: CartItem = {
       product,
       variantId: firstVariant.id,
       variantTitle: firstVariant.title,
-      price: firstVariant.price,
+      price: {
+        amount: firstVariant.price.toString(),
+        currencyCode: firstVariant.currencyCode,
+      },
       quantity: 1,
       selectedOptions: firstVariant.selectedOptions || [],
     };
 
     addItem(cartItem);
-    toast.success(`${product.node.title} added to bag`, {
+    toast.success(`${product.title} added to bag`, {
       position: "top-center",
     });
   };
@@ -85,20 +89,19 @@ const Favorites = () => {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
               {favorites.map((product) => {
-                const image = product.node.images.edges[0]?.node;
-                const price = product.node.priceRange.minVariantPrice;
+                const image = product.images[0];
                 
                 return (
                   <Link
-                    key={product.node.id}
-                    to={`/product/${product.node.handle}`}
+                    key={product.id}
+                    to={`/product/${product.handle}`}
                     className="group"
                   >
                     <div className="relative overflow-hidden rounded-2xl bg-muted/30 aspect-square mb-4">
                       {image ? (
                         <img
-                          src={image.url}
-                          alt={image.altText || product.node.title}
+                          src={image}
+                          alt={product.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
@@ -109,7 +112,7 @@ const Favorites = () => {
                       
                       {/* Remove from favorites button */}
                       <button
-                        onClick={(e) => handleRemoveFavorite(product.node.id, product.node.title, e)}
+                        onClick={(e) => handleRemoveFavorite(product.id, product.title, e)}
                         className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-destructive hover:text-destructive-foreground"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -128,10 +131,10 @@ const Favorites = () => {
                     
                     <div className="space-y-1">
                       <h3 className="font-display text-base sm:text-lg font-medium group-hover:text-primary transition-colors">
-                        {product.node.title}
+                        {product.title}
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        ${parseFloat(price.amount).toFixed(2)} {price.currencyCode}
+                        ${product.price.toFixed(2)} {product.currencyCode}
                       </p>
                     </div>
                   </Link>

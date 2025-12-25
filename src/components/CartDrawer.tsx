@@ -9,9 +9,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ShoppingBag, Minus, Plus, Trash2, ExternalLink, Loader2, Tag, X } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, Loader2, Tag, X } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
+import { toast } from "sonner";
 
 // Discount calculations based on code
 const getDiscountAmount = (code: string, subtotal: number): number => {
@@ -44,7 +45,7 @@ export const CartDrawer = () => {
     isLoading, 
     updateQuantity, 
     removeItem, 
-    createCheckout,
+    clearCart,
     getTotalItems,
     getTotalPrice,
   } = useCartStore();
@@ -56,16 +57,11 @@ export const CartDrawer = () => {
   const discountAmount = appliedCode ? getDiscountAmount(appliedCode, subtotal) : 0;
   const totalPrice = subtotal - discountAmount;
 
-  const handleCheckout = async () => {
-    try {
-      const checkoutUrl = await createCheckout();
-      if (checkoutUrl) {
-        window.open(checkoutUrl, '_blank');
-        setIsOpen(false);
-      }
-    } catch (error) {
-      console.error('Checkout failed:', error);
-    }
+  const handleCheckout = () => {
+    toast.success("Checkout functionality coming soon!", {
+      position: "top-center",
+    });
+    setIsOpen(false);
   };
 
   return (
@@ -106,18 +102,18 @@ export const CartDrawer = () => {
                   {items.map((item) => (
                     <div key={item.variantId} className="flex gap-4 p-3 bg-muted/30 rounded-xl">
                       <div className="w-20 h-20 bg-secondary/20 rounded-lg overflow-hidden flex-shrink-0">
-                        {item.product.node.images?.edges?.[0]?.node && (
+                        {item.product.images?.[0] && (
                           <img
-                            src={item.product.node.images.edges[0].node.url}
-                            alt={item.product.node.title}
+                            src={item.product.images[0]}
+                            alt={item.product.title}
                             className="w-full h-full object-cover"
                           />
                         )}
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-display font-medium truncate">{item.product.node.title}</h4>
-                        {item.variantTitle !== "Default Title" && (
+                        <h4 className="font-display font-medium truncate">{item.product.title}</h4>
+                        {item.variantTitle !== "Default" && (
                           <p className="text-sm text-muted-foreground">
                             {item.selectedOptions.map(option => option.value).join(' / ')}
                           </p>
@@ -213,14 +209,11 @@ export const CartDrawer = () => {
                       Processing...
                     </>
                   ) : (
-                    <>
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Checkout
-                    </>
+                    'Checkout'
                   )}
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
-                  Secure checkout powered by Shopify
+                  Secure checkout
                 </p>
               </div>
             </>

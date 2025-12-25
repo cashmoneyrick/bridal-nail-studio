@@ -15,8 +15,8 @@ const Favorites = () => {
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     
+    if (!product.variants || product.variants.length === 0) return;
     const firstVariant = product.variants[0];
-    if (!firstVariant) return;
 
     const cartItem: CartItem = {
       product,

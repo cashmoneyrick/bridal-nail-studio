@@ -143,3 +143,44 @@ export const FINGER = {
 // Hand groupings
 export const LEFT_HAND: FingerIndex[] = [0, 1, 2, 3, 4];
 export const RIGHT_HAND: FingerIndex[] = [5, 6, 7, 8, 9];
+
+// Preset Color Palettes
+export interface PresetColorPalette {
+  id: string;
+  name: string;
+  description: string;
+  colors: string[]; // 2-4 hex colors per palette
+}
+
+export const COLOR_PALETTES: PresetColorPalette[] = [
+  {
+    id: 'bridal-blush',
+    name: 'Bridal Blush',
+    description: 'Soft, romantic tones perfect for your special day',
+    colors: ['#F8E8E0', '#E8D4C4', '#D4B8A8', '#C9A89A'],
+  },
+  {
+    id: 'midnight-glam',
+    name: 'Midnight Glam',
+    description: 'Bold, sultry shades for evening elegance',
+    colors: ['#1A1A2E', '#4A4E69', '#9A8C98'],
+  },
+  {
+    id: 'french-romance',
+    name: 'French Romance',
+    description: 'Classic French manicure inspired palette',
+    colors: ['#FDF5E6', '#FFE4E1', '#FFFFFF'],
+  },
+  {
+    id: 'bold-beautiful',
+    name: 'Bold & Beautiful',
+    description: 'Vibrant, statement-making colors',
+    colors: ['#C41E3A', '#FF6B6B', '#FFD93D', '#6BCB77'],
+  },
+  {
+    id: 'ocean-breeze',
+    name: 'Ocean Breeze',
+    description: 'Calming coastal-inspired hues',
+    colors: ['#A8D8EA', '#AA96DA', '#FCBAD3'],
+  },
+];

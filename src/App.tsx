@@ -15,6 +15,7 @@ import Favorites from "./pages/Favorites";
 import Account from "./pages/Account";
 import Auth from "./pages/Auth";
 import PerfectFitProfile from "./pages/PerfectFitProfile";
+import AccountSettings from "./pages/AccountSettings";
 import NotFound from "./pages/NotFound";
 import EmailPopup from "./components/EmailPopup";
 import FaqChatbot from "./components/FaqChatbot";
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/account" element={<Account />} />
             <Route path="/account/perfect-fit" element={<PerfectFitProfile />} />
+            <Route path="/settings" element={<AccountSettings />} />
             <Route path="/auth" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

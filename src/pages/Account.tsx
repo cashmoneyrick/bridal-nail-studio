@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2 } from "lucide-react";
+import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2, Bell, Ruler, ChevronRight, Gift } from "lucide-react";
 import { format, differenceInYears, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -59,249 +58,224 @@ const Account = () => {
     }
   };
 
-  const accountLinks = [
-    { 
-      icon: Package, 
-      title: "Order History", 
-      description: "View past orders and track shipments",
-      href: "/orders"
-    },
-    { 
-      icon: Heart, 
-      title: "My Favorites", 
-      description: `${favoritesCount} saved items`,
-      href: "/favorites"
-    },
-    { 
-      icon: MapPin, 
-      title: "Addresses", 
-      description: "Manage shipping addresses",
-      href: "/addresses"
-    },
-    { 
-      icon: CreditCard, 
-      title: "Payment Methods", 
-      description: "Manage saved payment methods",
-      href: "/payment"
-    },
-    { 
-      icon: Settings, 
-      title: "Account Settings", 
-      description: "Update email, password, and preferences",
-      href: "/settings"
-    },
+  const quickLinks = [
+    { icon: Package, title: "Order History", description: "View past orders", href: "/orders" },
+    { icon: MapPin, title: "Addresses", description: "Shipping addresses", href: "/addresses" },
+    { icon: Settings, title: "Account Settings", description: "Email & password", href: "/settings" },
+    { icon: CreditCard, title: "Payment Methods", description: "Saved cards", href: "/payment" },
+    { icon: Heart, title: "My Favorites", description: `${favoritesCount} saved`, href: "/favorites" },
   ];
+
+  const memberSinceDate = profile?.created_at 
+    ? format(new Date(profile.created_at), "MMMM yyyy")
+    : "Recently";
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <User className="h-10 w-10 text-primary" />
-            </div>
-            {user ? (
-              <>
-                <h1 className="font-display text-3xl sm:text-4xl font-medium mb-2">
-                  Hi, {profile?.first_name || 'Beautiful'}!
-                </h1>
-                <p className="text-muted-foreground">
-                  {user.email}
-                </p>
-              </>
-            ) : (
-              <>
-                <h1 className="font-display text-3xl sm:text-4xl font-medium mb-2">
-                  My Account
-                </h1>
-                <p className="text-muted-foreground">
-                  Manage your orders, favorites, and account settings
-                </p>
-              </>
-            )}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+          
+          {/* ========== HEADER ========== */}
+          <div className="mb-10 animate-fade-in">
+            <Card className="border-0 bg-gradient-to-r from-primary/5 via-secondary/10 to-primary/5 shadow-sm">
+              <CardContent className="py-6">
+                {user ? (
+                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20">
+                      <User className="h-8 w-8 text-primary" />
+                    </div>
+                    <div className="flex-1 text-center sm:text-left">
+                      <h1 className="font-display text-2xl sm:text-3xl font-medium text-foreground">
+                        {profile?.first_name ? `Hi, ${profile.first_name}!` : 'Welcome Back!'}
+                      </h1>
+                      <p className="text-muted-foreground text-sm mt-1">{user.email}</p>
+                    </div>
+                    <div className="text-center sm:text-right text-sm text-muted-foreground">
+                      <p>Member since</p>
+                      <p className="font-medium text-foreground">{memberSinceDate}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <h1 className="font-display text-2xl sm:text-3xl font-medium mb-2">My Account</h1>
+                    <p className="text-muted-foreground text-sm">Sign in to access your account</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sign In Prompt - Show only when not logged in */}
           {!user && (
-            <>
-              <Card className="mb-8 border-primary/20 bg-primary/5">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-4">
-                    <h2 className="font-display text-xl font-medium">
-                      Sign in to access your account
-                    </h2>
-                    <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                      Create an account or sign in to view your orders, manage your favorites, and save your perfect nail sizes.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                      <Link to="/auth">
-                        <Button className="btn-primary px-8">
-                          Sign In
-                        </Button>
-                      </Link>
-                      <Link to="/auth?tab=signup">
-                        <Button variant="outline" className="px-8">
-                          Create Account
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Separator className="my-8" />
-            </>
-          )}
-
-          {/* Membership Section - Show only when logged in */}
-          {user && (
-            <div className="mb-8 space-y-6">
-              <MembershipSection memberSince={profile?.created_at} />
-              <MonthlyDropSection testMode={testMode} />
-              <BirthdaySurpriseSection testMode={testBirthday} />
-            </div>
-          )}
-
-          {/* Quick Links Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {accountLinks.map((link) => (
-              <Link key={link.title} to={link.href}>
-                <Card className="h-full hover:border-primary/50 hover:shadow-md transition-all cursor-pointer group">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-muted group-hover:bg-primary/10 transition-colors">
-                        <link.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-base font-medium">
-                          {link.title}
-                        </CardTitle>
-                        <CardDescription className="text-sm">
-                          {link.description}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          {/* Birthday Picker - Show only when logged in and birthday not set */}
-          {user && !profile?.birthday && (
-            <Card className="mt-8">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-primary/10">
-                    <Cake className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Set Your Birthday</CardTitle>
-                    <CardDescription>
-                      Add your birthday to unlock special surprises
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full sm:w-[280px] justify-start text-left font-normal",
-                          !birthday && "text-muted-foreground",
-                          birthdayError && "border-destructive"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {birthday ? format(birthday, "MMMM d, yyyy") : <span>Pick your birthday</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={birthday}
-                        onSelect={setBirthday}
-                        defaultMonth={new Date(new Date().getFullYear() - 25, 0)}
-                        fromYear={new Date().getFullYear() - 60}
-                        toYear={new Date().getFullYear() - 13}
-                        captionLayout="dropdown-buttons"
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <p className="text-sm text-muted-foreground">
-                    Once saved, your birthday can't be changed.
+            <Card className="mb-10 border-primary/20 bg-primary/5 animate-fade-in">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <h2 className="font-display text-xl font-medium">
+                    Sign in to access your account
+                  </h2>
+                  <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                    Create an account or sign in to view your orders, manage your favorites, and save your perfect nail sizes.
                   </p>
-                  {birthdayError && (
-                    <p className="text-sm text-destructive">{birthdayError}</p>
-                  )}
-                  {birthday && (
-                    <Button 
-                      onClick={handleSaveBirthday}
-                      disabled={isSavingBirthday}
-                      className="btn-primary"
-                    >
-                      {isSavingBirthday ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Birthday"
-                      )}
-                    </Button>
-                  )}
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                    <Link to="/auth">
+                      <Button className="btn-primary px-8">Sign In</Button>
+                    </Link>
+                    <Link to="/auth?tab=signup">
+                      <Button variant="outline" className="px-8">Create Account</Button>
+                    </Link>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Discount Codes Section */}
-          <div className="mt-8">
-            <DiscountCodesSection />
-          </div>
-
-          {/* Perfect Fit Profile Card */}
-          <Card className="mt-8 overflow-hidden">
-            <div className="bg-gradient-to-r from-secondary/30 to-primary/20 p-6">
-              <CardHeader className="p-0 pb-4">
-                <CardTitle className="font-display text-xl">
-                  My Perfect Fit Profile
-                </CardTitle>
-                <CardDescription>
-                  Save your nail sizes for faster checkout
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Once you know your sizes from our sizing kit, save them here so we can create your perfect press-ons every time.
-                </p>
-                <Link to="/account/perfect-fit">
-                  <Button variant="secondary" className="bg-background hover:bg-background/80">
-                    Set Up My Sizes
-                  </Button>
-                </Link>
-              </CardContent>
-            </div>
-          </Card>
-
-          {/* Sign Out Button - Show only when logged in */}
           {user && (
-            <div className="mt-8 text-center">
-              <Button 
-                variant="ghost" 
-                className="text-muted-foreground hover:text-foreground"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
+            <>
+              {/* ========== TOP PRIORITY ROW ========== */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                {/* Discount Codes */}
+                <DiscountCodesSection />
+                
+                {/* Perfect Fit Profile */}
+                <Card className="h-full hover:shadow-md transition-all duration-300 group border-border/50 hover:border-primary/30">
+                  <CardContent className="p-6 h-full flex flex-col">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <Ruler className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-display text-lg font-medium mb-1">My Perfect Fit Profile</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Save your nail sizes for faster checkout and perfect press-ons every time.
+                        </p>
+                      </div>
+                    </div>
+                    <Link to="/account/perfect-fit" className="mt-auto">
+                      <Button variant="outline" className="w-full group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                        Set Up My Sizes
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* ========== QUICK ACTIONS GRID ========== */}
+              <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <h2 className="font-display text-lg font-medium mb-4 text-foreground/80">Quick Actions</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {quickLinks.map((link) => (
+                    <Link key={link.title} to={link.href}>
+                      <Card className="h-full hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer group border-border/50">
+                        <CardContent className="p-4 text-center">
+                          <div className="w-10 h-10 mx-auto mb-3 rounded-xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                            <link.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                          </div>
+                          <p className="font-medium text-sm text-foreground">{link.title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{link.description}</p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* ========== MEMBERSHIP SECTION ========== */}
+              <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                <MembershipSection memberSince={profile?.created_at} />
+              </div>
+
+              {/* ========== REWARDS & EXTRAS ========== */}
+              <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Gift className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Rewards & Extras</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <MonthlyDropSection testMode={testMode} />
+                  <BirthdaySurpriseSection testMode={testBirthday} />
+                </div>
+              </div>
+
+              {/* Birthday Picker - Show only when logged in and birthday not set */}
+              {!profile?.birthday && (
+                <Card className="mb-8 border-border/50 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <Cake className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base">Set Your Birthday</CardTitle>
+                        <CardDescription className="text-sm">
+                          Unlock birthday surprises
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full sm:w-[200px] justify-start text-left font-normal",
+                              !birthday && "text-muted-foreground",
+                              birthdayError && "border-destructive"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {birthday ? format(birthday, "MMM d, yyyy") : <span>Pick date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={birthday}
+                            onSelect={setBirthday}
+                            defaultMonth={new Date(new Date().getFullYear() - 25, 0)}
+                            fromYear={new Date().getFullYear() - 60}
+                            toYear={new Date().getFullYear() - 13}
+                            captionLayout="dropdown-buttons"
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {birthday && (
+                        <Button 
+                          onClick={handleSaveBirthday}
+                          disabled={isSavingBirthday}
+                          size="sm"
+                          className="btn-primary"
+                        >
+                          {isSavingBirthday ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                        </Button>
+                      )}
+                    </div>
+                    {birthdayError && (
+                      <p className="text-sm text-destructive mt-2">{birthdayError}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-2">Once saved, your birthday can't be changed.</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Sign Out */}
+              <div className="text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </main>

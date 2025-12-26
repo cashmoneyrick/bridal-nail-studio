@@ -1,8 +1,9 @@
-import { Crown, Check, Lock, Sparkles } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Crown, Check, Lock, Bell } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface MembershipSectionProps {
   memberSince?: string;
@@ -16,7 +17,7 @@ const nailLoverPerks = [
 
 const nailObsessedPerks = [
   "20% off everything",
-  "Free shipping on all orders",
+  "Free shipping",
   "Monthly nail drop",
   "Birthday surprise",
   "Priority support",
@@ -27,91 +28,87 @@ export const MembershipSection = ({ memberSince }: MembershipSectionProps) => {
     ? format(new Date(memberSince), "MMMM yyyy")
     : "Recently";
 
+  const handleNotifyMe = () => {
+    toast.success("We'll notify you when premium membership launches!", { position: "top-center" });
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Section Header */}
-      <div className="flex items-center gap-2">
-        <Crown className="h-5 w-5 text-primary" />
-        <h2 className="font-display text-xl font-semibold">My Membership</h2>
-      </div>
-
-      {/* Current Tier Card */}
-      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-display text-lg font-semibold">Nail Lover</span>
-                <Badge variant="secondary" className="text-xs">Free</Badge>
+    <Card className="border-primary/20 overflow-hidden">
+      <CardContent className="p-0">
+        {/* Main Content */}
+        <div className="p-6">
+          {/* Header Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <Crown className="h-5 w-5 text-primary" />
               </div>
-              <Badge className="bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/10">
-                Active
-              </Badge>
-            </div>
-            <div className="text-right text-sm text-muted-foreground">
-              <p>Member since</p>
-              <p className="font-medium text-foreground">{formattedDate}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* My Perks */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-medium">My Perks</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Active Perks - Nail Lover */}
-          <div className="space-y-2">
-            {nailLoverPerks.map((perk) => (
-              <div key={perk} className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                <span>{perk}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-border/50 pt-4">
-            <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
-              <Lock className="h-3 w-3" />
-              Nail Obsessed perks
-            </p>
-            {/* Locked Perks - Nail Obsessed */}
-            <div className="space-y-2">
-              {nailObsessedPerks.map((perk) => (
-                <div key={perk} className="flex items-center gap-2 text-sm text-muted-foreground/60">
-                  <Lock className="h-3.5 w-3.5 flex-shrink-0" />
-                  <span>{perk}</span>
-                  <span className="text-xs text-muted-foreground/40 ml-auto">Upgrade to unlock</span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display text-lg font-semibold">Nail Lover</h2>
+                  <Badge variant="secondary" className="text-xs">Free</Badge>
                 </div>
-              ))}
+                <p className="text-sm text-muted-foreground">Member since {formattedDate}</p>
+              </div>
+            </div>
+            <Badge className="bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/10 w-fit">
+              Active
+            </Badge>
+          </div>
+
+          {/* Perks Grid */}
+          <div className="grid sm:grid-cols-2 gap-6">
+            {/* Active Perks */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Your Perks</p>
+              <div className="space-y-2">
+                {nailLoverPerks.map((perk) => (
+                  <div key={perk} className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span>{perk}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Locked Perks */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1">
+                <Lock className="h-3 w-3" />
+                Nail Obsessed
+              </p>
+              <div className="space-y-2">
+                {nailObsessedPerks.map((perk) => (
+                  <div key={perk} className="flex items-center gap-2 text-sm text-muted-foreground/60">
+                    <Lock className="h-3 w-3 flex-shrink-0" />
+                    <span>{perk}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Upgrade Banner */}
-      <Card className="bg-gradient-to-r from-secondary/30 via-primary/10 to-secondary/30 border-primary/20">
-        <CardContent className="pt-6 pb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <h3 className="font-display font-semibold">Want more perks?</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Unlock 20% off everything, free shipping, monthly nail drops, and more!
-              </p>
+        {/* Upgrade Banner */}
+        <div className="bg-gradient-to-r from-secondary/30 via-primary/10 to-secondary/30 border-t border-primary/10 p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="font-medium text-sm text-foreground">Want 20% off everything + free shipping?</p>
+              <p className="text-xs text-muted-foreground">Be the first to know when premium launches.</p>
             </div>
-            <Button disabled className="opacity-60 cursor-not-allowed">
-              Coming Soon
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="border-primary/40 text-primary hover:bg-primary/10 gap-2"
+              onClick={handleNotifyMe}
+            >
+              <Bell className="h-4 w-4" />
+              Notify Me
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

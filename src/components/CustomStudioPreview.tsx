@@ -20,6 +20,8 @@ const CustomStudioPreview = () => {
               <img
                 src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80"
                 alt="Custom nail design process"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             </div>

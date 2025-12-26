@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2, Bell, Ruler, ChevronRight, Gift } from "lucide-react";
+import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2, Bell, Ruler, ChevronRight, Gift, Check } from "lucide-react";
 import { format, differenceInYears, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -15,6 +16,7 @@ import { BirthdaySurpriseSection } from "@/components/BirthdaySurpriseSection";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
+import { useNailProfilesStore } from "@/stores/nailProfilesStore";
 import { toast } from "sonner";
 
 const Account = () => {
@@ -24,6 +26,19 @@ const Account = () => {
   const testBirthday = searchParams.get('testBirthday') === 'true';
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, logout, updateProfile, isLoading } = useAuthStore();
+  const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
+  const selectedProfile = getSelectedProfile();
+  const filledSizesCount = selectedProfile 
+    ? Object.values(selectedProfile.sizes).filter(s => s && s.trim() !== '').length 
+    : 0;
+
+  const handleProfileChange = (profileId: string) => {
+    selectProfile(profileId);
+    const profile = profiles.find(p => p.id === profileId);
+    if (profile) {
+      toast.success(`Switched to "${profile.name}"`, { position: "top-center" });
+    }
+  };
   
   const [birthday, setBirthday] = useState<Date | undefined>(undefined);
   const [birthdayError, setBirthdayError] = useState<string | null>(null);
@@ -147,14 +162,50 @@ const Account = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-display text-lg font-medium mb-1">My Perfect Fit Profile</h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Save your nail sizes for faster checkout and perfect press-ons every time.
-                        </p>
+                        
+                        {profiles.length > 0 ? (
+                          <div className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                              {profiles.length} profile{profiles.length !== 1 ? 's' : ''} saved
+                            </p>
+                            
+                            <Select 
+                              value={selectedProfileId || ""} 
+                              onValueChange={handleProfileChange}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a profile" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {profiles.map((profile) => (
+                                  <SelectItem key={profile.id} value={profile.id}>
+                                    <span className="flex items-center gap-2">
+                                      {profile.id === selectedProfileId && (
+                                        <Check className="h-3 w-3 text-primary" />
+                                      )}
+                                      {profile.name}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            
+                            {selectedProfile && (
+                              <p className="text-xs text-muted-foreground">
+                                {filledSizesCount}/10 sizes filled
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Save your nail sizes for faster checkout and perfect press-ons every time.
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <Link to="/account/perfect-fit" className="mt-auto">
+                    <Link to="/account/perfect-fit" className="mt-auto pt-4">
                       <Button variant="outline" className="w-full group-hover:border-primary/50 group-hover:text-primary transition-colors">
-                        Set Up My Sizes
+                        {profiles.length > 0 ? 'Manage Profiles' : 'Set Up My Sizes'}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </Link>

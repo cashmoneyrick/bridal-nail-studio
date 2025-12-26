@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,10 +9,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ShoppingBag, Minus, Plus, Trash2, Loader2, Tag, X } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, Loader2, Tag, X, Check } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
+import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
+
+// Member discount: 10% off orders $50+ for Nail Lover tier
+const getMemberDiscount = (subtotal: number, isAuthenticated: boolean): number => {
+  if (!isAuthenticated) return 0;
+  if (subtotal >= 50) return subtotal * 0.10;
+  return 0;
+};
 
 // Discount calculations based on code
 const getDiscountAmount = (code: string, subtotal: number): number => {
@@ -51,10 +59,32 @@ export const CartDrawer = () => {
   } = useCartStore();
   
   const { appliedCode, clearAppliedCode } = useDiscountCodesStore();
+  const { user } = useAuthStore();
   
   const totalItems = getTotalItems();
   const subtotal = getTotalPrice();
-  const discountAmount = appliedCode ? getDiscountAmount(appliedCode, subtotal) : 0;
+  
+  // Calculate best discount (member discount vs applied code)
+  const { discountAmount, discountLabel, discountSource } = useMemo(() => {
+    const memberDiscount = getMemberDiscount(subtotal, !!user);
+    const codeDiscount = appliedCode ? getDiscountAmount(appliedCode, subtotal) : 0;
+    
+    if (memberDiscount > 0 && memberDiscount >= codeDiscount) {
+      return {
+        discountAmount: memberDiscount,
+        discountLabel: "Member: 10% off",
+        discountSource: "member" as const,
+      };
+    } else if (codeDiscount > 0) {
+      return {
+        discountAmount: codeDiscount,
+        discountLabel: `${appliedCode}: ${getDiscountLabel(appliedCode)}`,
+        discountSource: "code" as const,
+      };
+    }
+    return { discountAmount: 0, discountLabel: "", discountSource: null };
+  }, [subtotal, user, appliedCode]);
+  
   const totalPrice = subtotal - discountAmount;
 
   const handleCheckout = () => {
@@ -167,20 +197,29 @@ export const CartDrawer = () => {
                 </div>
                 
                 {/* Applied discount */}
-                {appliedCode && discountAmount > 0 && (
+                {discountAmount > 0 && (
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2">
                       <Tag className="h-3.5 w-3.5 text-primary" />
-                      <span className="text-primary font-medium">{appliedCode}</span>
-                      <span className="text-muted-foreground text-xs">({getDiscountLabel(appliedCode)})</span>
-                      <button
-                        onClick={clearAppliedCode}
-                        className="p-0.5 rounded-full hover:bg-muted transition-colors"
-                      >
-                        <X className="h-3 w-3 text-muted-foreground" />
-                      </button>
+                      <span className="text-primary font-medium">{discountLabel}</span>
+                      {discountSource === "code" && (
+                        <button
+                          onClick={clearAppliedCode}
+                          className="p-0.5 rounded-full hover:bg-muted transition-colors"
+                        >
+                          <X className="h-3 w-3 text-muted-foreground" />
+                        </button>
+                      )}
                     </div>
                     <span className="text-primary font-medium">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                {/* Auto-apply helper text */}
+                {discountAmount > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-primary/80">
+                    <Check className="h-3 w-3" />
+                    <span>Best discount applied automatically</span>
                   </div>
                 )}
                 
@@ -191,7 +230,7 @@ export const CartDrawer = () => {
                     <span className="text-xl font-display font-semibold">
                       ${totalPrice.toFixed(2)}
                     </span>
-                    {appliedCode && discountAmount > 0 && (
+                    {discountAmount > 0 && (
                       <p className="text-xs text-primary">You save ${discountAmount.toFixed(2)}</p>
                     )}
                   </div>

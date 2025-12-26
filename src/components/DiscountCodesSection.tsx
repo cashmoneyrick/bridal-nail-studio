@@ -57,7 +57,7 @@ const DiscountCodesSection = () => {
                 Sign up for our newsletter or join the Nail Club to receive exclusive discounts!
               </p>
             </div>
-            <Link to="/nail-club">
+            <Link to="/club">
               <Button variant="outline" size="sm" className="mt-2">
                 Join Nail Club
               </Button>

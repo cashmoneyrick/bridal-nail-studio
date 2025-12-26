@@ -236,7 +236,7 @@ const AccentNails = () => {
                     </div>
                   </div>
 
-                  {/* Color Override */}
+                  {/* Color Override - Fix 4: Only call setNailColor, not store color in accentConfig */}
                   {paletteColors.length > 0 ? (
                     <div className="space-y-2">
                       <label className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -250,7 +250,6 @@ const AccentNails = () => {
                               key={idx}
                               onClick={() => {
                                 setNailColor(fingerIndex as FingerIndex, color);
-                                setAccentConfig(fingerIndex as FingerIndex, { ...config, color });
                               }}
                               className={cn(
                                 'w-8 h-8 rounded-full border-2 transition-all',

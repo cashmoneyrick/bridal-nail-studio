@@ -110,28 +110,35 @@ export const ReviewSubmit = () => {
     };
   };
 
+  // Helper to create order via edge function with server-side validation
+  const createOrderViaEdgeFunction = async (requiresQuote: boolean): Promise<{ id: string } | null> => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    
+    const orderPayload = buildOrderPayload();
+    orderPayload.requires_quote = requiresQuote;
+    
+    const { data, error } = await supabase.functions.invoke('create-custom-order', {
+      body: orderPayload,
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    });
+    
+    if (error) {
+      console.error('Failed to create order via edge function:', error);
+      return null;
+    }
+    
+    return data as { id: string };
+  };
+
   const handleAddToCart = async () => {
     setIsSubmitting(true);
     
     try {
-      // Get user session
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user?.id || null;
+      // Create order via edge function with server-side validation
+      const order = await createOrderViaEdgeFunction(false);
       
-      // Build order payload
-      const orderPayload = buildOrderPayload();
-      orderPayload.user_id = userId;
-      orderPayload.requires_quote = false;
-      
-      // Insert order into database
-      const { data: order, error } = await supabase
-        .from('custom_orders')
-        .insert([orderPayload])
-        .select('id')
-        .single();
-      
-      if (error) {
-        console.error('Failed to create order:', error);
+      if (!order) {
         toast.error('Failed to create order', {
           description: 'Please try again or contact support.',
         });
@@ -257,24 +264,10 @@ export const ReviewSubmit = () => {
     setIsSubmitting(true);
     
     try {
-      // Get user session
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user?.id || null;
+      // Create order via edge function with server-side validation
+      const order = await createOrderViaEdgeFunction(true);
       
-      // First, create order to get ID for image folder
-      const orderPayload = buildOrderPayload();
-      orderPayload.user_id = userId;
-      orderPayload.requires_quote = true;
-      
-      // Insert order first to get ID
-      const { data: order, error: orderError } = await supabase
-        .from('custom_orders')
-        .insert([orderPayload])
-        .select('id')
-        .single();
-      
-      if (orderError) {
-        console.error('Failed to create order:', orderError);
+      if (!order) {
         toast.error('Failed to submit quote request', {
           description: 'Please try again or contact support.',
         });

@@ -402,14 +402,14 @@ const ProductDetail = () => {
               
               {/* Thumbnail Gallery */}
               {images.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-2">
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
                   {images.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-200 ${
+                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-200 hover:scale-105 ${
                         selectedImageIndex === idx 
-                          ? 'border-2 border-primary shadow-md ring-2 ring-primary/20' 
+                          ? 'border-2 border-primary shadow-md ring-2 ring-primary/20 scale-105' 
                           : 'border border-border/40 hover:border-primary/60 hover:shadow-sm'
                       }`}
                     >
@@ -425,7 +425,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Product Info */}
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Title & Wishlist */}
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -456,7 +456,7 @@ const ProductDetail = () => {
                 </div>
                 <button 
                   onClick={handleToggleFavorite}
-                  className="p-2.5 rounded-full hover:bg-muted transition-colors"
+                  className="p-2.5 rounded-full hover:bg-muted hover:scale-110 transition-all duration-200"
                 >
                   <Heart 
                     className={`h-6 w-6 transition-colors ${product && isFavorite(product.id) ? 'fill-primary text-primary' : 'text-muted-foreground'}`} 
@@ -465,7 +465,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Key Features */}
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 py-6 border-y border-border/50">
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-x-4 gap-y-6 py-6 border-y border-border/50">
                 {[
                   { icon: (
                     <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -731,7 +731,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-3 gap-4 py-4">
+              <div className="grid grid-cols-3 gap-4 py-4 mb-2">
                 <div className="text-center">
                   <Truck className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
                   <p className="text-xs text-muted-foreground">Free Shipping $50+</p>
@@ -747,9 +747,9 @@ const ProductDetail = () => {
               </div>
 
               {/* Accordion Info */}
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion type="single" collapsible className="w-full border-t border-border/50 pt-4">
                 <AccordionItem value="whats-included">
-                  <AccordionTrigger className="text-sm font-medium">
+                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
                     <div className="flex items-center gap-2">
                       <Package className="h-4 w-4" />
                       What's Included
@@ -782,7 +782,7 @@ const ProductDetail = () => {
                 </AccordionItem>
 
                 <AccordionItem value="how-to-apply">
-                  <AccordionTrigger className="text-sm font-medium">
+                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
                     <div className="flex items-center gap-2">
                       <Hand className="h-4 w-4" />
                       How to Apply
@@ -808,7 +808,7 @@ const ProductDetail = () => {
                 </AccordionItem>
 
                 <AccordionItem value="care">
-                  <AccordionTrigger className="text-sm font-medium">
+                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
                     <div className="flex items-center gap-2">
                       <Droplets className="h-4 w-4" />
                       Care & Maintenance
@@ -826,7 +826,7 @@ const ProductDetail = () => {
                 </AccordionItem>
 
                 <AccordionItem value="shipping">
-                  <AccordionTrigger className="text-sm font-medium">
+                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
                     <div className="flex items-center gap-2">
                       <Truck className="h-4 w-4" />
                       Shipping & Returns
@@ -850,7 +850,7 @@ const ProductDetail = () => {
           )}
 
           {/* Reviews */}
-          <section id="reviews">
+          <section id="reviews" className="scroll-mt-28 mt-8 pt-8 border-t border-border/50">
             <ProductReviews productTitle={product.title} />
           </section>
         </div>

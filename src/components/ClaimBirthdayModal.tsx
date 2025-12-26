@@ -14,6 +14,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { logError } from "@/lib/logger";
 
 interface ClaimBirthdayModalProps {
   open: boolean;
@@ -89,7 +90,7 @@ export const ClaimBirthdayModal = ({
       });
 
       if (error) {
-        console.error("Error saving birthday claim:", error);
+        logError("Error saving birthday claim:", error);
         toast.error("Failed to claim gift. Please try again.", { position: "top-center" });
         setIsSubmitting(false);
         return;
@@ -112,7 +113,7 @@ export const ClaimBirthdayModal = ({
         setSuccess(false);
       }, 2000);
     } catch (error) {
-      console.error("Error claiming discount:", error);
+      logError("Error claiming discount:", error);
       toast.error("Failed to claim gift. Please try again.", { position: "top-center" });
     } finally {
       setIsSubmitting(false);
@@ -142,7 +143,7 @@ export const ClaimBirthdayModal = ({
       });
 
       if (error) {
-        console.error("Error saving birthday claim:", error);
+        logError("Error saving birthday claim:", error);
         toast.error("Failed to claim gift. Please try again.", { position: "top-center" });
         setIsSubmitting(false);
         return;
@@ -156,7 +157,7 @@ export const ClaimBirthdayModal = ({
         setSuccess(false);
       }, 2000);
     } catch (error) {
-      console.error("Error claiming physical gift:", error);
+      logError("Error claiming physical gift:", error);
       toast.error("Failed to claim gift. Please try again.", { position: "top-center" });
     } finally {
       setIsSubmitting(false);

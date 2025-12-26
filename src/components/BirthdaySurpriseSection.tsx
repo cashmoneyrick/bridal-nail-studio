@@ -8,6 +8,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { ClaimBirthdayModal } from "./ClaimBirthdayModal";
 import { Link } from "react-router-dom";
+import { logError } from "@/lib/logger";
 
 interface BirthdayClaim {
   id: string;
@@ -49,12 +50,12 @@ export const BirthdaySurpriseSection = ({ testMode = false }: BirthdaySurprisePr
         .maybeSingle();
 
       if (error) {
-        console.error("Error fetching birthday claim:", error);
+        logError("Error fetching birthday claim:", error);
       } else {
         setCurrentClaim(data);
       }
     } catch (error) {
-      console.error("Error fetching birthday claim:", error);
+      logError("Error fetching birthday claim:", error);
     } finally {
       setIsLoading(false);
     }

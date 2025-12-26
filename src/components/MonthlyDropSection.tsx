@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { ClaimDropModal } from '@/components/ClaimDropModal';
+import { logError } from '@/lib/logger';
 
 interface DropClaim {
   id: string;
@@ -53,12 +54,12 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching claim:', error);
+        logError('Error fetching claim:', error);
       } else {
         setCurrentClaim(data as DropClaim | null);
       }
     } catch (error) {
-      console.error('Error fetching claim:', error);
+      logError('Error fetching claim:', error);
     } finally {
       setIsLoading(false);
     }

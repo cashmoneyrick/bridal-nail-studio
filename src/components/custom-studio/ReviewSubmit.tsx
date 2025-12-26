@@ -29,6 +29,7 @@ import {
   FINGER_NAMES
 } from '@/lib/pricing';
 import { Product } from '@/lib/products';
+import { logError } from '@/lib/logger';
 
 export const ReviewSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,7 +125,7 @@ export const ReviewSubmit = () => {
     });
     
     if (error) {
-      console.error('Failed to create order via edge function:', error);
+      logError('Failed to create order via edge function:', error);
       return null;
     }
     
@@ -251,7 +252,7 @@ export const ReviewSubmit = () => {
       resetStudio();
       
     } catch (err) {
-      console.error('Error adding to cart:', err);
+      logError('Error adding to cart:', err);
       toast.error('Something went wrong', {
         description: 'Please try again.',
       });
@@ -286,14 +287,17 @@ export const ReviewSubmit = () => {
       if (allBlobUrls.length > 0) {
         uploadedImageUrls = await uploadInspirationImages(allBlobUrls, order.id);
         
-        // Update order with image URLs
-        const { error: updateError } = await supabase
-          .from('custom_orders')
-          .update({ inspiration_images: uploadedImageUrls })
-          .eq('id', order.id);
+        // Update order with image URLs via edge function for server-side validation
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        
+        const { error: updateError } = await supabase.functions.invoke('update-order-images', {
+          body: { orderId: order.id, inspirationImages: uploadedImageUrls },
+          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+        });
         
         if (updateError) {
-          console.error('Failed to update order with images:', updateError);
+          logError('Failed to update order with images:', updateError);
         }
       }
       
@@ -306,7 +310,7 @@ export const ReviewSubmit = () => {
       resetStudio();
       
     } catch (err) {
-      console.error('Error submitting quote request:', err);
+      logError('Error submitting quote request:', err);
       toast.error('Something went wrong', {
         description: 'Please try again.',
       });

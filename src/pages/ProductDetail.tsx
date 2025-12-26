@@ -217,12 +217,13 @@ const ProductDetail = () => {
             {/* Images */}
             <div className="space-y-4">
               {/* Main Image */}
-              <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 relative">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 relative shadow-sm border border-border/30">
                 {images[selectedImageIndex] ? (
                   <img
                     src={images[selectedImageIndex]}
                     alt={product.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover animate-fade-in"
+                    key={selectedImageIndex}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -237,8 +238,10 @@ const ProductDetail = () => {
                       <button
                         key={idx}
                         onClick={() => setSelectedImageIndex(idx)}
-                        className={`w-2 h-2 rounded-full transition-colors ${
-                          selectedImageIndex === idx ? 'bg-primary' : 'bg-background/60'
+                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                          selectedImageIndex === idx 
+                            ? 'bg-primary scale-110' 
+                            : 'bg-background/70 hover:bg-background'
                         }`}
                       />
                     ))}
@@ -253,8 +256,10 @@ const ProductDetail = () => {
                     <button
                       key={idx}
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
-                        selectedImageIndex === idx ? 'border-primary' : 'border-transparent'
+                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-200 ${
+                        selectedImageIndex === idx 
+                          ? 'border-2 border-primary shadow-md ring-2 ring-primary/20' 
+                          : 'border border-border/40 hover:border-primary/60 hover:shadow-sm'
                       }`}
                     >
                       <img
@@ -269,20 +274,38 @@ const ProductDetail = () => {
             </div>
 
             {/* Product Info */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Title & Wishlist */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="font-display text-3xl sm:text-4xl font-medium mb-2">
+                  <h1 className="font-display text-3xl sm:text-4xl font-medium mb-2 tracking-tight">
                     {product.title}
                   </h1>
-                  <p className="text-2xl font-display text-primary">
+                  <p className="text-2xl font-display text-primary mb-3">
                     ${price.toFixed(2)}
                   </p>
+                  {/* Star Rating - clicks to scroll to reviews */}
+                  <button 
+                    onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                  >
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          className="w-4 h-4 text-amber-400 fill-amber-400"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="group-hover:underline">47 reviews</span>
+                  </button>
                 </div>
                 <button 
                   onClick={handleToggleFavorite}
-                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                  className="p-2.5 rounded-full hover:bg-muted transition-colors"
                 >
                   <Heart 
                     className={`h-6 w-6 transition-colors ${product && isFavorite(product.id) ? 'fill-primary text-primary' : 'text-muted-foreground'}`} 
@@ -290,12 +313,62 @@ const ProductDetail = () => {
                 </button>
               </div>
 
-              {/* Description */}
-              {product.description && (
-                <p className="text-muted-foreground leading-relaxed border-b border-border pb-6">
-                  {product.description}
-                </p>
-              )}
+              {/* Key Features */}
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 py-6 border-y border-border/50">
+                {[
+                  { icon: (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                      <path d="M2 2l7.586 7.586" />
+                      <circle cx="11" cy="11" r="2" />
+                    </svg>
+                  ), label: "Hand-painted" },
+                  { icon: (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9" />
+                    </svg>
+                  ), label: "Reusable" },
+                  { icon: (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  ), label: "Salon-quality" },
+                  { icon: (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                      <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg>
+                  ), label: "Full kit" },
+                  { icon: (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                      <path d="M8 14h.01" />
+                      <path d="M12 14h.01" />
+                      <path d="M16 14h.01" />
+                      <path d="M8 18h.01" />
+                      <path d="M12 18h.01" />
+                    </svg>
+                  ), label: "2 weeks wear" },
+                  { icon: (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  ), label: "10-min apply" },
+                ].map((feature, idx) => (
+                  <div key={idx} className="flex flex-col items-center text-center group cursor-default">
+                    <div className="text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
+                      {feature.icon}
+                    </div>
+                    <span className="text-xs text-muted-foreground leading-tight">{feature.label}</span>
+                  </div>
+                ))}
+              </div>
 
               {/* Shape Selector */}
               <div className="space-y-3">
@@ -655,7 +728,9 @@ const ProductDetail = () => {
           )}
 
           {/* Reviews */}
-          <ProductReviews productTitle={product.title} />
+          <section id="reviews">
+            <ProductReviews productTitle={product.title} />
+          </section>
         </div>
       </main>
 

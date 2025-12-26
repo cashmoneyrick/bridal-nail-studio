@@ -5,7 +5,38 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FAQ_SYSTEM_PROMPT = `You are a friendly and helpful customer support assistant for YourPrettySets, a luxury press-on nail boutique. 
+// Rate limiting configuration
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const MAX_REQUESTS_PER_MINUTE = 10;
+const MINUTE_IN_MS = 60 * 1000;
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  // Clean up old entries periodically
+  if (rateLimitMap.size > 1000) {
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + MINUTE_IN_MS });
+    return { allowed: true, remaining: MAX_REQUESTS_PER_MINUTE - 1 };
+  }
+  
+  if (record.count >= MAX_REQUESTS_PER_MINUTE) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  record.count++;
+  return { allowed: true, remaining: MAX_REQUESTS_PER_MINUTE - record.count };
+}
+
+const FAQ_SYSTEM_PROMPT = `You are a friendly and helpful customer support assistant for YourPrettySets, a luxury press-on nail boutique.
 
 Here are the FAQs you should know:
 
@@ -44,6 +75,18 @@ Be concise, friendly, and helpful. If you don't know something, suggest they con
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Check rate limit
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = checkRateLimit(ip);
+  
+  if (!rateLimit.allowed) {
+    console.log("Rate limit exceeded for IP:", ip.substring(0, 10) + "...");
+    return new Response(JSON.stringify({ error: "Too many requests. Please wait a minute before trying again." }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {

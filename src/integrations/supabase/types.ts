@@ -272,6 +272,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_addresses: {
+        Row: {
+          apartment_unit: string | null
+          city: string
+          country: string
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          postal_code: string
+          state: string
+          street_address: string
+          user_id: string
+        }
+        Insert: {
+          apartment_unit?: string | null
+          city: string
+          country?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          postal_code: string
+          state: string
+          street_address: string
+          user_id: string
+        }
+        Update: {
+          apartment_unit?: string | null
+          city?: string
+          country?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          postal_code?: string
+          state?: string
+          street_address?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

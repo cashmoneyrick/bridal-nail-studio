@@ -16,6 +16,7 @@ import Account from "./pages/Account";
 import Auth from "./pages/Auth";
 import PerfectFitProfile from "./pages/PerfectFitProfile";
 import AccountSettings from "./pages/AccountSettings";
+import Addresses from "./pages/Addresses";
 import NotFound from "./pages/NotFound";
 import EmailPopup from "./components/EmailPopup";
 import FaqChatbot from "./components/FaqChatbot";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/account" element={<Account />} />
             <Route path="/account/perfect-fit" element={<PerfectFitProfile />} />
             <Route path="/settings" element={<AccountSettings />} />
+            <Route path="/settings/addresses" element={<Addresses />} />
             <Route path="/auth" element={<Auth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

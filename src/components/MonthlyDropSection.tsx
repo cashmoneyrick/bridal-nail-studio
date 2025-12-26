@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Gift, Package, CheckCircle, Truck } from 'lucide-react';
+import { Gift, Package, CheckCircle, Truck, Bell } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { ClaimDropModal } from '@/components/ClaimDropModal';
 import { logError } from '@/lib/logger';
+import { toast } from 'sonner';
 
 interface DropClaim {
   id: string;
@@ -26,13 +27,10 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
   const [isLoading, setIsLoading] = useState(true);
   const [showClaimModal, setShowClaimModal] = useState(false);
 
-  // Get current month in format "2025-01"
   const currentMonth = format(new Date(), 'yyyy-MM');
   const monthName = format(new Date(), 'MMMM');
 
-  // For now, tier is always "Nail Lover" - paid tier not connected yet
-  // TODO: Replace with actual tier logic when paid subscriptions are connected
-  const isNailObsessed = testMode; // Will be true when user has paid tier
+  const isNailObsessed = testMode;
 
   useEffect(() => {
     if (user && isNailObsessed) {
@@ -70,42 +68,46 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
     fetchCurrentClaim();
   };
 
-  // Show locked state for non-paid members
+  const handleNotifyMe = () => {
+    toast.success("We'll notify you when premium membership launches!", { position: "top-center" });
+  };
+
+  // Locked state for non-paid members - compact/muted design
   if (!isNailObsessed) {
     return (
-      <Card className="border-border/50 bg-gradient-to-br from-card to-muted/30 relative overflow-hidden">
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-10" />
-        <CardHeader className="pb-4 relative z-20">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg text-muted-foreground">
-              <Package className="h-5 w-5" />
-              Monthly Drop
-            </CardTitle>
-            <Badge variant="outline" className="text-xs border-primary/50 text-primary">
-              Nail Obsessed Perk
+      <Card className="border-border/40 bg-muted/20 relative overflow-hidden h-full">
+        <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] z-10" />
+        <CardContent className="p-5 relative z-20 h-full flex flex-col">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium text-sm text-muted-foreground">Monthly Drop</span>
+            </div>
+            <Badge variant="outline" className="text-xs border-primary/40 text-primary/80">
+              Premium
             </Badge>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4 relative z-20">
-          <div className="rounded-lg overflow-hidden border border-border/30 opacity-60">
-            <div className="h-24 bg-gradient-to-br from-muted/50 via-muted/30 to-muted/20 flex items-center justify-center">
-              <Gift className="h-8 w-8 text-muted-foreground/50" />
-            </div>
-            <div className="p-3 bg-card/50">
-              <h3 className="font-medium text-muted-foreground text-sm">{monthName} Drop</h3>
-              <p className="text-xs text-muted-foreground/70">
-                Exclusive monthly set — 14 press-on tips
+          
+          <div className="flex-1 flex items-center justify-center py-4">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted/50 flex items-center justify-center">
+                <Gift className="h-5 w-5 text-muted-foreground/50" />
+              </div>
+              <p className="text-xs text-muted-foreground max-w-[180px] mx-auto">
+                Exclusive monthly nail sets for premium members
               </p>
             </div>
           </div>
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Upgrade to <span className="font-semibold text-primary">Nail Obsessed</span> to unlock monthly drops!
-            </p>
-            <Button variant="outline" className="w-full border-primary/30 text-primary hover:bg-primary/10" disabled>
-              Coming Soon
-            </Button>
-          </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="w-full border-primary/30 text-primary/80 hover:bg-primary/10 gap-2 mt-auto"
+            onClick={handleNotifyMe}
+          >
+            <Bell className="h-3.5 w-3.5" />
+            Notify Me
+          </Button>
         </CardContent>
       </Card>
     );
@@ -143,6 +145,7 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
       return (
         <Button
           onClick={() => setShowClaimModal(true)}
+          size="sm"
           className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
         >
           <Gift className="h-4 w-4 mr-2" />
@@ -153,26 +156,26 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
 
     if (currentClaim.status === 'claimed') {
       return (
-        <div className="space-y-2">
-          <Button disabled className="w-full opacity-50">
+        <div className="space-y-1">
+          <Button disabled size="sm" className="w-full opacity-50">
             <CheckCircle className="h-4 w-4 mr-2" />
             Claimed ✓
           </Button>
           <p className="text-xs text-muted-foreground text-center">
-            You're all set! Your drop will ship by the 15th.
+            Ships by the 15th
           </p>
         </div>
       );
     }
 
     return (
-      <div className="space-y-2">
-        <Button disabled className="w-full opacity-50">
+      <div className="space-y-1">
+        <Button disabled size="sm" className="w-full opacity-50">
           <Truck className="h-4 w-4 mr-2" />
           Shipped 📦
         </Button>
         <p className="text-xs text-muted-foreground text-center">
-          Your drop is on its way!
+          On its way!
         </p>
       </div>
     );
@@ -180,57 +183,48 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
 
   return (
     <>
-      <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Package className="h-5 w-5 text-primary" />
-              Your Monthly Drop
-            </CardTitle>
+      <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 h-full">
+        <CardContent className="p-5 h-full flex flex-col">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" />
+              <span className="font-medium text-sm">Your Monthly Drop</span>
+            </div>
             {testMode && (
               <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-400">
-                Preview Mode
+                Preview
               </Badge>
             )}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+
           {isLoading ? (
-            <div className="animate-pulse space-y-3">
-              <div className="h-32 bg-muted rounded-lg" />
+            <div className="animate-pulse flex-1 space-y-3">
+              <div className="h-20 bg-muted rounded-lg" />
               <div className="h-8 bg-muted rounded" />
             </div>
           ) : (
-            <>
-              {/* Drop Card */}
-              <div className="relative rounded-lg overflow-hidden border border-border/50">
-                {/* Placeholder Image */}
-                <div className="h-32 bg-gradient-to-br from-primary/30 via-primary/10 to-secondary/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <Gift className="h-10 w-10 text-primary/60 mx-auto mb-2" />
-                    <span className="text-sm text-muted-foreground">Surprise Design</span>
-                  </div>
+            <div className="flex-1 flex flex-col">
+              {/* Drop Card - Compact */}
+              <div className="flex-1 rounded-lg overflow-hidden border border-border/50 mb-3">
+                <div className="h-16 bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20 flex items-center justify-center">
+                  <Gift className="h-6 w-6 text-primary/60" />
                 </div>
-                
-                {/* Drop Info */}
-                <div className="p-4 bg-card/80 backdrop-blur-sm">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-foreground">{monthName} Drop</h3>
-                      <p className="text-sm text-muted-foreground">
-                        This month's exclusive set — 14 press-on tips in a surprise design
-                      </p>
-                    </div>
-                  </div>
+                <div className="p-3 bg-card/80">
                   <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-sm">{monthName} Drop</h3>
+                      <p className="text-xs text-muted-foreground">14 press-on tips</p>
+                    </div>
                     {getStatusBadge()}
                   </div>
                 </div>
               </div>
 
               {/* Action Button */}
-              {getActionButton()}
-            </>
+              <div className="mt-auto">
+                {getActionButton()}
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Save, Hand, Check, Plus, Trash2, Edit2, X } from "lucide-react";
+import { ArrowLeft, Save, Hand, Check, Plus, Trash2, Edit2, X, Loader2, Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useNailProfilesStore, NailSizes, NailProfile } from "@/stores/nailProfilesStore";
+import { useNailProfileSync } from "@/hooks/useNailProfileSync";
 
 // Finger names for each hand
 const LEFT_HAND_FINGERS = ['Pinky', 'Ring', 'Middle', 'Index', 'Thumb'];
@@ -32,12 +33,16 @@ const DEFAULT_SIZES: NailSizes = {
 };
 
 const PerfectFitProfile = () => {
-  const { profiles, addProfile, updateProfile, deleteProfile, selectProfile, selectedProfileId } = useNailProfilesStore();
+  const { profiles, addProfile, updateProfile, deleteProfile, selectProfile, selectedProfileId, isLoading: storeLoading } = useNailProfilesStore();
+  const { isSynced, isAuthenticated, isLoading: syncLoading } = useNailProfileSync();
   
   const [editingProfile, setEditingProfile] = useState<NailProfile | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [profileName, setProfileName] = useState('');
   const [sizes, setSizes] = useState<NailSizes>(DEFAULT_SIZES);
+  
+  const isLoading = storeLoading || syncLoading;
 
   const startNewProfile = () => {
     setIsCreating(true);
@@ -64,29 +69,39 @@ const PerfectFitProfile = () => {
     setSizes(prev => ({ ...prev, [finger]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!profileName.trim()) {
       toast.error("Please enter a profile name", { position: "top-center" });
       return;
     }
 
-    if (isCreating) {
-      const id = addProfile(profileName.trim(), sizes);
-      selectProfile(id);
-      toast.success(`"${profileName}" profile created!`, { position: "top-center" });
-    } else if (editingProfile) {
-      updateProfile(editingProfile.id, profileName.trim(), sizes);
-      toast.success(`"${profileName}" profile updated!`, { position: "top-center" });
+    setIsSaving(true);
+    try {
+      if (isCreating) {
+        const id = await addProfile(profileName.trim(), sizes);
+        await selectProfile(id);
+        toast.success(`"${profileName}" profile created!`, { position: "top-center" });
+      } else if (editingProfile) {
+        await updateProfile(editingProfile.id, profileName.trim(), sizes);
+        toast.success(`"${profileName}" profile updated!`, { position: "top-center" });
+      }
+      cancelEditing();
+    } catch (error) {
+      toast.error("Failed to save profile. Please try again.", { position: "top-center" });
+    } finally {
+      setIsSaving(false);
     }
-
-    cancelEditing();
   };
 
-  const handleDelete = (profile: NailProfile) => {
-    deleteProfile(profile.id);
-    toast.success(`"${profile.name}" profile deleted`, { position: "top-center" });
-    if (editingProfile?.id === profile.id) {
-      cancelEditing();
+  const handleDelete = async (profile: NailProfile) => {
+    try {
+      await deleteProfile(profile.id);
+      toast.success(`"${profile.name}" profile deleted`, { position: "top-center" });
+      if (editingProfile?.id === profile.id) {
+        cancelEditing();
+      }
+    } catch (error) {
+      toast.error("Failed to delete profile. Please try again.", { position: "top-center" });
     }
   };
 
@@ -118,8 +133,18 @@ const PerfectFitProfile = () => {
             </p>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <Card className="mb-8">
+              <CardContent className="py-12 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                <p className="text-muted-foreground">Syncing your profiles...</p>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Profile List */}
-          {!isEditing && (
+          {!isEditing && !isLoading && (
             <div className="space-y-4 mb-8">
               {profiles.length === 0 ? (
                 <Card className="border-dashed">
@@ -368,10 +393,14 @@ const PerfectFitProfile = () => {
                 </div>
                 <Button 
                   onClick={handleSave}
-                  disabled={!profileName.trim()}
+                  disabled={!profileName.trim() || isSaving}
                   className="btn-primary min-w-[160px]"
                 >
-                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
                   {isCreating ? 'Create Profile' : 'Save Changes'}
                 </Button>
               </div>
@@ -379,7 +408,14 @@ const PerfectFitProfile = () => {
           )}
 
           <p className="text-xs text-center text-muted-foreground mt-8">
-            Your profiles are saved locally on this device. Create profiles for family and friends to easily order perfect-fit sets for everyone!
+            {isAuthenticated && isSynced ? (
+              <span className="inline-flex items-center gap-1">
+                <Cloud className="h-3 w-3" />
+                Your profiles are synced to your account and available on all your devices.
+              </span>
+            ) : (
+              "Your profiles are saved locally. Sign in to sync them across all your devices!"
+            )}
           </p>
         </div>
       </main>

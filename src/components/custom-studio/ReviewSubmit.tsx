@@ -1,8 +1,8 @@
 import { useCustomStudioStore } from '@/stores/customStudioStore';
+import { useCartStore } from '@/stores/cartStore';
 import { PriceDisplay } from './PriceDisplay';
 import { Button } from '@/components/ui/button';
 import { 
-  Check, 
   ShoppingCart, 
   Send, 
   Sparkles, 
@@ -24,6 +24,7 @@ import {
   NAIL_ART_LABELS,
   FINGER_NAMES
 } from '@/lib/pricing';
+import { Product } from '@/lib/products';
 
 export const ReviewSubmit = () => {
   const { 
@@ -43,11 +44,91 @@ export const ReviewSubmit = () => {
     getPriceBreakdown
   } = useCustomStudioStore();
 
+  const addItem = useCartStore(state => state.addItem);
+
   const priceBreakdown = getPriceBreakdown();
   const hasCustomArtwork = customArtwork !== null;
   const selectedAccentNails = Array.from(accentNails);
 
   const handleAddToCart = () => {
+    // Generate unique variant ID for this custom design
+    const uniqueVariantId = `custom-set-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    
+    // Build selected options array from all customization choices
+    const selectedOptions: Array<{ name: string; value: string }> = [
+      { name: 'Shape', value: shape ? SHAPE_LABELS[shape] : 'Not selected' },
+      { name: 'Length', value: length ? LENGTH_LABELS[length] : 'Not selected' },
+      { name: 'Finish', value: baseFinish ? FINISH_LABELS[baseFinish] : 'Not selected' },
+      { name: 'Color Palette', value: colorPalette?.name || 'Custom' },
+    ];
+
+    // Add accent nails if selected
+    if (hasAccentNails && accentNails.size > 0) {
+      selectedOptions.push({ name: 'Accent Nails', value: `${accentNails.size} nails` });
+    }
+
+    // Add effects if selected
+    if (effects.length > 0) {
+      selectedOptions.push({ 
+        name: 'Effects', 
+        value: effects.map(e => EFFECT_LABELS[e.effect]).join(', ') 
+      });
+    }
+
+    // Add rhinestones if selected
+    if (rhinestoneTier && rhinestoneTier !== 'none') {
+      selectedOptions.push({ name: 'Rhinestones', value: RHINESTONE_LABELS[rhinestoneTier] });
+    }
+
+    // Add charms if selected
+    if (charmTier && charmTier !== 'none') {
+      selectedOptions.push({ name: 'Charms', value: CHARM_LABELS[charmTier] });
+    }
+
+    // Add predefined artwork if selected
+    if (predefinedArtwork.length > 0) {
+      selectedOptions.push({ 
+        name: 'Nail Art', 
+        value: predefinedArtwork.map(a => NAIL_ART_LABELS[a.type]).join(', ') 
+      });
+    }
+
+    // Create variant title
+    const variantTitle = `${shape ? SHAPE_LABELS[shape] : 'Custom'} • ${length ? LENGTH_LABELS[length] : ''} • ${colorPalette?.name || 'Custom Colors'}`;
+
+    // Create a product representation for the custom design
+    const customProduct: Product = {
+      id: uniqueVariantId,
+      title: 'Custom Nail Set',
+      description: `Custom ${shape ? SHAPE_LABELS[shape] : ''} ${length ? LENGTH_LABELS[length] : ''} nails with ${baseFinish ? FINISH_LABELS[baseFinish] : ''} finish`,
+      handle: 'custom-nail-set',
+      price: priceBreakdown.subtotal,
+      currencyCode: 'USD',
+      images: ['/placeholder.svg'],
+      variants: [{
+        id: uniqueVariantId,
+        title: variantTitle,
+        price: priceBreakdown.subtotal,
+        currencyCode: 'USD',
+        availableForSale: true,
+        selectedOptions: selectedOptions,
+      }],
+      options: [],
+    };
+
+    // Add to cart
+    addItem({
+      product: customProduct,
+      variantId: uniqueVariantId,
+      variantTitle: variantTitle,
+      price: {
+        amount: priceBreakdown.subtotal.toFixed(2),
+        currencyCode: 'USD',
+      },
+      quantity: 1,
+      selectedOptions: selectedOptions,
+    });
+
     toast.success('Added to cart!', {
       description: 'Your custom nail set has been added to your cart.',
     });

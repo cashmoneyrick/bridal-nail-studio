@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_orders: {
+        Row: {
+          accent_nails: Json | null
+          artwork_selections: Json | null
+          artwork_type: string | null
+          base_product_handle: string | null
+          charms_preferences: string | null
+          charms_tier: string | null
+          colors: Json | null
+          created_at: string
+          custom_artwork_description: string | null
+          effects: Json | null
+          estimated_price: number | null
+          finish: string
+          id: string
+          inspiration_images: string[] | null
+          length: string
+          notes: string | null
+          requires_quote: boolean | null
+          rhinestones_tier: string | null
+          shape: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          accent_nails?: Json | null
+          artwork_selections?: Json | null
+          artwork_type?: string | null
+          base_product_handle?: string | null
+          charms_preferences?: string | null
+          charms_tier?: string | null
+          colors?: Json | null
+          created_at?: string
+          custom_artwork_description?: string | null
+          effects?: Json | null
+          estimated_price?: number | null
+          finish: string
+          id?: string
+          inspiration_images?: string[] | null
+          length: string
+          notes?: string | null
+          requires_quote?: boolean | null
+          rhinestones_tier?: string | null
+          shape: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          accent_nails?: Json | null
+          artwork_selections?: Json | null
+          artwork_type?: string | null
+          base_product_handle?: string | null
+          charms_preferences?: string | null
+          charms_tier?: string | null
+          colors?: Json | null
+          created_at?: string
+          custom_artwork_description?: string | null
+          effects?: Json | null
+          estimated_price?: number | null
+          finish?: string
+          id?: string
+          inspiration_images?: string[] | null
+          length?: string
+          notes?: string | null
+          requires_quote?: boolean | null
+          rhinestones_tier?: string | null
+          shape?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       nail_club_subscribers: {
         Row: {
           email: string

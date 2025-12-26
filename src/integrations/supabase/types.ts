@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      drop_claims: {
+        Row: {
+          address_snapshot: Json
+          claimed_at: string
+          created_at: string
+          id: string
+          month: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          address_snapshot: Json
+          claimed_at?: string
+          created_at?: string
+          id?: string
+          month: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          address_snapshot?: Json
+          claimed_at?: string
+          created_at?: string
+          id?: string
+          month?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       nail_club_subscribers: {
         Row: {
           email: string
@@ -123,6 +153,12 @@ export type Database = {
           id: string
           last_name: string | null
           phone: string | null
+          shipping_address_line1: string | null
+          shipping_address_line2: string | null
+          shipping_city: string | null
+          shipping_country: string | null
+          shipping_state: string | null
+          shipping_zip: string | null
           updated_at: string
           user_id: string
         }
@@ -135,6 +171,12 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone?: string | null
+          shipping_address_line1?: string | null
+          shipping_address_line2?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
           updated_at?: string
           user_id: string
         }
@@ -147,6 +189,12 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone?: string | null
+          shipping_address_line1?: string | null
+          shipping_address_line2?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
           updated_at?: string
           user_id?: string
         }

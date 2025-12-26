@@ -11,13 +11,16 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import DiscountCodesSection from "@/components/DiscountCodesSection";
 import MembershipSection from "@/components/MembershipSection";
-import { Link, useNavigate } from "react-router-dom";
+import { MonthlyDropSection } from "@/components/MonthlyDropSection";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
 
 const Account = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const testMode = searchParams.get('testMode') === 'true';
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, logout, updateProfile, isLoading } = useAuthStore();
   
@@ -152,8 +155,9 @@ const Account = () => {
 
           {/* Membership Section - Show only when logged in */}
           {user && (
-            <div className="mb-8">
+            <div className="mb-8 space-y-6">
               <MembershipSection memberSince={profile?.created_at} />
+              <MonthlyDropSection testMode={testMode} />
             </div>
           )}
 

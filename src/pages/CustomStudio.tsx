@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
@@ -11,6 +11,16 @@ import CustomArtwork from '@/components/custom-studio/CustomArtwork';
 import ReviewSubmit from '@/components/custom-studio/ReviewSubmit';
 import PriceDisplay from '@/components/custom-studio/PriceDisplay';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 const CustomStudio = () => {
@@ -27,6 +37,9 @@ const CustomStudio = () => {
     baseFinish,
     colorPalette
   } = useCustomStudioStore();
+
+  // Fix 6: Add reset confirmation dialog state
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   // Compute completed steps based on store state
   const completedSteps = useMemo(() => {
@@ -61,8 +74,14 @@ const CustomStudio = () => {
     }
   };
 
+  // Fix 6: Show confirmation dialog instead of immediate reset
   const handleReset = () => {
+    setShowResetDialog(true);
+  };
+
+  const confirmReset = () => {
     resetStudio();
+    setShowResetDialog(false);
   };
 
   const renderStepContent = () => {
@@ -189,6 +208,25 @@ const CustomStudio = () => {
       </main>
 
       <Footer />
+
+      {/* Fix 6: Reset Confirmation Dialog */}
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Start over?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will clear all your customization choices and reset the design studio. 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmReset}>
+              Yes, start over
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

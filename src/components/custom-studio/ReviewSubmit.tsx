@@ -32,14 +32,18 @@ export const ReviewSubmit = () => {
     length, 
     baseFinish, 
     colorPalette,
+    nailColors,
     hasAccentNails,
     accentNails,
+    accentConfigs,
     effects,
     rhinestoneTier,
     charmTier,
+    charmPreferences,
     predefinedArtwork,
     customArtwork,
     notes,
+    inspirationImages,
     setStep,
     getPriceBreakdown
   } = useCustomStudioStore();
@@ -96,6 +100,52 @@ export const ReviewSubmit = () => {
     // Create variant title
     const variantTitle = `${shape ? SHAPE_LABELS[shape] : 'Custom'} • ${length ? LENGTH_LABELS[length] : ''} • ${colorPalette?.name || 'Custom Colors'}`;
 
+    // Fix 7: Build complete customization snapshot
+    const customizationData: Record<string, unknown> = {
+      // Base Look
+      shape,
+      length,
+      baseFinish,
+      colorPalette,
+      nailColors: { ...nailColors },
+      
+      // Accent Nails
+      hasAccentNails,
+      accentNails: Array.from(accentNails),
+      accentConfigs: { ...accentConfigs },
+      
+      // Effects & Add-ons
+      effects: effects.map(e => ({ effect: e.effect, scope: e.scope })),
+      rhinestoneTier,
+      charmTier,
+      charmPreferences,
+      
+      // Predefined Artwork
+      predefinedArtwork: predefinedArtwork.map(a => ({
+        type: a.type,
+        nails: Array.from(a.nails)
+      })),
+      
+      // Custom Artwork (if any)
+      customArtwork: customArtwork ? {
+        description: customArtwork.description,
+        nailCount: customArtwork.nails.size,
+        imageCount: customArtwork.inspirationImages.length,
+        // Note: Not storing base64 images here, just counts
+      } : null,
+      
+      // General
+      notes,
+      inspirationImageCount: inspirationImages.length,
+      
+      // Price breakdown for reference
+      priceBreakdown: priceBreakdown.items.map(item => ({
+        label: item.label,
+        amount: item.amount,
+        isQuoteRequired: item.isQuoteRequired
+      })),
+    };
+
     // Create a product representation for the custom design
     const customProduct: Product = {
       id: uniqueVariantId,
@@ -114,6 +164,7 @@ export const ReviewSubmit = () => {
         selectedOptions: selectedOptions,
       }],
       options: [],
+      customizationData, // Fix 7: Include full customization data
     };
 
     // Add to cart

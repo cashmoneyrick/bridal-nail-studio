@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Product } from '@/lib/products';
 import {
   ShapeType,
@@ -30,14 +31,12 @@ export interface ColorPalette {
 
 export interface AccentNailConfig {
   finish?: FinishType;
-  color?: string;
   effects?: EffectType[];
 }
 
 export interface EffectApplication {
   effect: EffectType;
   scope: 'all' | 'accents-only';
-  nails?: Set<FingerIndex>;
 }
 
 export interface PredefinedArtwork {
@@ -184,222 +183,272 @@ const initialState: CustomStudioState = {
   inspirationImages: [],
 };
 
-export const useCustomStudioStore = create<CustomStudioState & CustomStudioActions>((set, get) => ({
-  ...initialState,
-  
-  // Navigation
-  setStep: (step) => set({ currentStep: Math.max(0, Math.min(5, step)) }),
-  
-  nextStep: () => {
-    const { currentStep, canProceed } = get();
-    if (canProceed() && currentStep < 5) {
-      set({ currentStep: currentStep + 1 });
+const STORAGE_KEY = 'custom-studio-storage';
+
+// Custom serializer for Set objects
+const customStorage = createJSONStorage<CustomStudioState & CustomStudioActions>(() => localStorage, {
+  replacer: (_key, value) => {
+    if (value instanceof Set) {
+      return { __type: 'Set', values: Array.from(value) };
     }
+    return value;
   },
-  
-  prevStep: () => {
-    const { currentStep } = get();
-    if (currentStep > 0) {
-      set({ currentStep: currentStep - 1 });
+  reviver: (_key, value) => {
+    if (value && typeof value === 'object' && (value as Record<string, unknown>).__type === 'Set') {
+      return new Set((value as { values: unknown[] }).values);
     }
+    return value;
   },
-  
-  canProceed: () => {
-    const state = get();
-    switch (state.currentStep) {
-      case 0: // Starting Point
-        return state.entryMode === 'fresh' || state.baseProduct !== null;
-      case 1: // Base Look
-        return state.shape !== null && state.length !== null && state.baseFinish !== null;
-      case 2: // Accent Nails
-        return !state.hasAccentNails || state.accentNails.size > 0;
-      case 3: // Effects & Add-ons
-        return true; // Optional step
-      case 4: // Custom Artwork
-        return true; // Optional step
-      case 5: // Review
-        return true;
-      default:
-        return false;
+});
+
+export const useCustomStudioStore = create<CustomStudioState & CustomStudioActions>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
+      
+      // Navigation
+      setStep: (step) => set({ currentStep: Math.max(0, Math.min(5, step)) }),
+      
+      nextStep: () => {
+        const { currentStep, canProceed } = get();
+        if (canProceed() && currentStep < 5) {
+          set({ currentStep: currentStep + 1 });
+        }
+      },
+      
+      prevStep: () => {
+        const { currentStep } = get();
+        if (currentStep > 0) {
+          set({ currentStep: currentStep - 1 });
+        }
+      },
+      
+      canProceed: () => {
+        const state = get();
+        switch (state.currentStep) {
+          case 0: // Starting Point
+            return state.entryMode === 'fresh' || state.baseProduct !== null;
+          case 1: // Base Look - Fix 1: Require colorPalette
+            return !!state.shape && !!state.length && !!state.baseFinish && !!state.colorPalette;
+          case 2: // Accent Nails
+            return !state.hasAccentNails || state.accentNails.size > 0;
+          case 3: // Effects & Add-ons
+            return true; // Optional step
+          case 4: // Custom Artwork
+            return true; // Optional step
+          case 5: // Review
+            return true;
+          default:
+            return false;
+        }
+      },
+      
+      // Step 1
+      setEntryMode: (mode) => set({ entryMode: mode }),
+      setBaseProduct: (product) => set({ baseProduct: product, entryMode: product ? 'from-product' : 'fresh' }),
+      
+      // Step 2
+      setShape: (shape) => set({ shape }),
+      setLength: (length) => set({ length }),
+      setBaseFinish: (finish) => set({ baseFinish: finish }),
+      setColorPalette: (palette) => set({ colorPalette: palette }),
+      setNailColor: (finger, color) => set((state) => ({
+        nailColors: { ...state.nailColors, [finger]: color },
+      })),
+      
+      // Step 3
+      setHasAccentNails: (has) => set({ 
+        hasAccentNails: has,
+        accentNails: has ? get().accentNails : new Set(),
+        accentConfigs: has ? get().accentConfigs : {},
+      }),
+      
+      toggleAccentNail: (finger) => set((state) => {
+        const newAccentNails = new Set(state.accentNails);
+        const newAccentConfigs = { ...state.accentConfigs };
+        
+        if (newAccentNails.has(finger)) {
+          newAccentNails.delete(finger);
+          delete newAccentConfigs[finger];
+        } else {
+          newAccentNails.add(finger);
+          newAccentConfigs[finger] = {};
+        }
+        
+        return { accentNails: newAccentNails, accentConfigs: newAccentConfigs };
+      }),
+      
+      setAccentConfig: (finger, config) => set((state) => ({
+        accentConfigs: { ...state.accentConfigs, [finger]: config },
+      })),
+      
+      // Step 4
+      addEffect: (effect) => set((state) => ({
+        effects: [...state.effects.filter(e => e.effect !== effect.effect), effect],
+      })),
+      
+      removeEffect: (effectType) => set((state) => ({
+        effects: state.effects.filter(e => e.effect !== effectType),
+      })),
+      
+      updateEffectScope: (effectType, scope) => set((state) => ({
+        effects: state.effects.map(e => 
+          e.effect === effectType ? { ...e, scope } : e
+        ),
+      })),
+      
+      setRhinestoneTier: (tier) => set({ rhinestoneTier: tier }),
+      setCharmTier: (tier) => set({ charmTier: tier }),
+      setCharmPreferences: (prefs) => set({ charmPreferences: prefs }),
+      
+      // Step 5
+      addPredefinedArtwork: (artwork) => set((state) => ({
+        predefinedArtwork: [...state.predefinedArtwork.filter(a => a.type !== artwork.type), artwork],
+      })),
+      
+      removePredefinedArtwork: (type) => set((state) => ({
+        predefinedArtwork: state.predefinedArtwork.filter(a => a.type !== type),
+      })),
+      
+      setCustomArtwork: (artwork) => set({ customArtwork: artwork }),
+      
+      // General
+      setNotes: (notes) => set({ notes }),
+      
+      addInspirationImage: (url) => set((state) => ({
+        inspirationImages: [...state.inspirationImages, url],
+      })),
+      
+      removeInspirationImage: (url) => set((state) => ({
+        inspirationImages: state.inspirationImages.filter(img => img !== url),
+      })),
+      
+      // Pricing - Fix 3: Always use current accentNails.size
+      getPriceBreakdown: () => {
+        const state = get();
+        const items: PriceBreakdownItem[] = [];
+        
+        // Base price
+        if (state.baseProduct) {
+          items.push({ label: `Base: ${state.baseProduct.title}`, amount: state.baseProduct.price });
+        } else {
+          items.push({ label: 'Custom Set Base', amount: BASE_CUSTOM_SET_PRICE });
+        }
+        
+        // Shape modifier
+        const shapePrice = SHAPE_PRICES[state.shape];
+        if (shapePrice > 0) {
+          items.push({ label: `Shape: ${state.shape}`, amount: shapePrice });
+        }
+        
+        // Length modifier
+        const lengthPrice = LENGTH_PRICES[state.length];
+        if (lengthPrice > 0) {
+          items.push({ label: `Length: ${state.length}`, amount: lengthPrice });
+        }
+        
+        // Finish modifier
+        const finishPrice = FINISH_PRICES[state.baseFinish];
+        if (finishPrice > 0) {
+          items.push({ label: `Finish: ${state.baseFinish}`, amount: finishPrice });
+        }
+        
+        // Accent nail finish changes
+        const accentFinishChanges = Object.values(state.accentConfigs).filter(
+          config => config?.finish && config.finish !== state.baseFinish
+        ).length;
+        if (accentFinishChanges > 0) {
+          items.push({ 
+            label: `Accent finish changes (×${accentFinishChanges})`, 
+            amount: accentFinishChanges * ACCENT_FINISH_CHANGE_PRICE 
+          });
+        }
+        
+        // Effects - Fix 3: Always use current accentNails.size
+        for (const effectApp of state.effects) {
+          const effectPricing = EFFECTS_PRICES[effectApp.effect];
+          if (effectApp.scope === 'all') {
+            items.push({ label: `${effectApp.effect} (all nails)`, amount: effectPricing.allNails });
+          } else {
+            const nailCount = state.accentNails.size; // Always use current count
+            items.push({ 
+              label: `${effectApp.effect} (×${nailCount} nails)`, 
+              amount: nailCount * effectPricing.perNail 
+            });
+          }
+        }
+        
+        // Rhinestones
+        const rhinestonePrice = RHINESTONE_PRICES[state.rhinestoneTier];
+        if (rhinestonePrice > 0) {
+          items.push({ label: `Rhinestones: ${state.rhinestoneTier}`, amount: rhinestonePrice });
+        }
+        
+        // Charms
+        const charmPrice = CHARM_PRICES[state.charmTier];
+        if (charmPrice > 0) {
+          items.push({ label: `Charms: ${state.charmTier}`, amount: charmPrice });
+        }
+        
+        // Predefined artwork
+        for (const artwork of state.predefinedArtwork) {
+          const artPricing = NAIL_ART_PRICES[artwork.type];
+          if (artPricing.type === 'per-set') {
+            items.push({ label: `Nail art: ${artwork.type}`, amount: artPricing.price });
+          } else {
+            const nailCount = artwork.nails.size;
+            items.push({ 
+              label: `Nail art: ${artwork.type} (×${nailCount})`, 
+              amount: nailCount * artPricing.price 
+            });
+          }
+        }
+        
+        // Custom artwork (quote required)
+        if (state.customArtwork) {
+          items.push({ 
+            label: 'Custom artwork', 
+            amount: 0, 
+            isQuoteRequired: true 
+          });
+        }
+        
+        const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
+        const hasQuoteItems = items.some(item => item.isQuoteRequired);
+        
+        return { items, subtotal, hasQuoteItems };
+      },
+      
+      // Reset - Fix 5: Clear localStorage on reset
+      resetStudio: () => {
+        localStorage.removeItem(STORAGE_KEY);
+        set({ ...initialState, accentNails: new Set(), accentConfigs: {} });
+      },
+    }),
+    {
+      name: STORAGE_KEY,
+      storage: customStorage,
+      partialize: (state) => ({
+        // Exclude currentStep from persistence to avoid confusion
+        entryMode: state.entryMode,
+        baseProduct: state.baseProduct,
+        shape: state.shape,
+        length: state.length,
+        baseFinish: state.baseFinish,
+        colorPalette: state.colorPalette,
+        nailColors: state.nailColors,
+        hasAccentNails: state.hasAccentNails,
+        accentNails: state.accentNails,
+        accentConfigs: state.accentConfigs,
+        effects: state.effects,
+        rhinestoneTier: state.rhinestoneTier,
+        charmTier: state.charmTier,
+        charmPreferences: state.charmPreferences,
+        predefinedArtwork: state.predefinedArtwork,
+        customArtwork: state.customArtwork,
+        notes: state.notes,
+        inspirationImages: state.inspirationImages,
+      }) as CustomStudioState & CustomStudioActions,
     }
-  },
-  
-  // Step 1
-  setEntryMode: (mode) => set({ entryMode: mode }),
-  setBaseProduct: (product) => set({ baseProduct: product, entryMode: product ? 'from-product' : 'fresh' }),
-  
-  // Step 2
-  setShape: (shape) => set({ shape }),
-  setLength: (length) => set({ length }),
-  setBaseFinish: (finish) => set({ baseFinish: finish }),
-  setColorPalette: (palette) => set({ colorPalette: palette }),
-  setNailColor: (finger, color) => set((state) => ({
-    nailColors: { ...state.nailColors, [finger]: color },
-  })),
-  
-  // Step 3
-  setHasAccentNails: (has) => set({ 
-    hasAccentNails: has,
-    accentNails: has ? get().accentNails : new Set(),
-    accentConfigs: has ? get().accentConfigs : {},
-  }),
-  
-  toggleAccentNail: (finger) => set((state) => {
-    const newAccentNails = new Set(state.accentNails);
-    const newAccentConfigs = { ...state.accentConfigs };
-    
-    if (newAccentNails.has(finger)) {
-      newAccentNails.delete(finger);
-      delete newAccentConfigs[finger];
-    } else {
-      newAccentNails.add(finger);
-      newAccentConfigs[finger] = {};
-    }
-    
-    return { accentNails: newAccentNails, accentConfigs: newAccentConfigs };
-  }),
-  
-  setAccentConfig: (finger, config) => set((state) => ({
-    accentConfigs: { ...state.accentConfigs, [finger]: config },
-  })),
-  
-  // Step 4
-  addEffect: (effect) => set((state) => ({
-    effects: [...state.effects.filter(e => e.effect !== effect.effect), effect],
-  })),
-  
-  removeEffect: (effectType) => set((state) => ({
-    effects: state.effects.filter(e => e.effect !== effectType),
-  })),
-  
-  updateEffectScope: (effectType, scope) => set((state) => ({
-    effects: state.effects.map(e => 
-      e.effect === effectType ? { ...e, scope } : e
-    ),
-  })),
-  
-  setRhinestoneTier: (tier) => set({ rhinestoneTier: tier }),
-  setCharmTier: (tier) => set({ charmTier: tier }),
-  setCharmPreferences: (prefs) => set({ charmPreferences: prefs }),
-  
-  // Step 5
-  addPredefinedArtwork: (artwork) => set((state) => ({
-    predefinedArtwork: [...state.predefinedArtwork.filter(a => a.type !== artwork.type), artwork],
-  })),
-  
-  removePredefinedArtwork: (type) => set((state) => ({
-    predefinedArtwork: state.predefinedArtwork.filter(a => a.type !== type),
-  })),
-  
-  setCustomArtwork: (artwork) => set({ customArtwork: artwork }),
-  
-  // General
-  setNotes: (notes) => set({ notes }),
-  
-  addInspirationImage: (url) => set((state) => ({
-    inspirationImages: [...state.inspirationImages, url],
-  })),
-  
-  removeInspirationImage: (url) => set((state) => ({
-    inspirationImages: state.inspirationImages.filter(img => img !== url),
-  })),
-  
-  // Pricing
-  getPriceBreakdown: () => {
-    const state = get();
-    const items: PriceBreakdownItem[] = [];
-    
-    // Base price
-    if (state.baseProduct) {
-      items.push({ label: `Base: ${state.baseProduct.title}`, amount: state.baseProduct.price });
-    } else {
-      items.push({ label: 'Custom Set Base', amount: BASE_CUSTOM_SET_PRICE });
-    }
-    
-    // Shape modifier
-    const shapePrice = SHAPE_PRICES[state.shape];
-    if (shapePrice > 0) {
-      items.push({ label: `Shape: ${state.shape}`, amount: shapePrice });
-    }
-    
-    // Length modifier
-    const lengthPrice = LENGTH_PRICES[state.length];
-    if (lengthPrice > 0) {
-      items.push({ label: `Length: ${state.length}`, amount: lengthPrice });
-    }
-    
-    // Finish modifier
-    const finishPrice = FINISH_PRICES[state.baseFinish];
-    if (finishPrice > 0) {
-      items.push({ label: `Finish: ${state.baseFinish}`, amount: finishPrice });
-    }
-    
-    // Accent nail finish changes
-    const accentFinishChanges = Object.values(state.accentConfigs).filter(
-      config => config?.finish && config.finish !== state.baseFinish
-    ).length;
-    if (accentFinishChanges > 0) {
-      items.push({ 
-        label: `Accent finish changes (×${accentFinishChanges})`, 
-        amount: accentFinishChanges * ACCENT_FINISH_CHANGE_PRICE 
-      });
-    }
-    
-    // Effects
-    for (const effectApp of state.effects) {
-      const effectPricing = EFFECTS_PRICES[effectApp.effect];
-      if (effectApp.scope === 'all') {
-        items.push({ label: `${effectApp.effect} (all nails)`, amount: effectPricing.allNails });
-      } else {
-        const nailCount = effectApp.nails?.size || state.accentNails.size;
-        items.push({ 
-          label: `${effectApp.effect} (×${nailCount} nails)`, 
-          amount: nailCount * effectPricing.perNail 
-        });
-      }
-    }
-    
-    // Rhinestones
-    const rhinestonePrice = RHINESTONE_PRICES[state.rhinestoneTier];
-    if (rhinestonePrice > 0) {
-      items.push({ label: `Rhinestones: ${state.rhinestoneTier}`, amount: rhinestonePrice });
-    }
-    
-    // Charms
-    const charmPrice = CHARM_PRICES[state.charmTier];
-    if (charmPrice > 0) {
-      items.push({ label: `Charms: ${state.charmTier}`, amount: charmPrice });
-    }
-    
-    // Predefined artwork
-    for (const artwork of state.predefinedArtwork) {
-      const artPricing = NAIL_ART_PRICES[artwork.type];
-      if (artPricing.type === 'per-set') {
-        items.push({ label: `Nail art: ${artwork.type}`, amount: artPricing.price });
-      } else {
-        const nailCount = artwork.nails.size;
-        items.push({ 
-          label: `Nail art: ${artwork.type} (×${nailCount})`, 
-          amount: nailCount * artPricing.price 
-        });
-      }
-    }
-    
-    // Custom artwork (quote required)
-    if (state.customArtwork) {
-      items.push({ 
-        label: 'Custom artwork', 
-        amount: 0, 
-        isQuoteRequired: true 
-      });
-    }
-    
-    const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
-    const hasQuoteItems = items.some(item => item.isQuoteRequired);
-    
-    return { items, subtotal, hasQuoteItems };
-  },
-  
-  // Reset
-  resetStudio: () => set({ ...initialState, accentNails: new Set(), accentConfigs: {} }),
-}));
+  )
+);

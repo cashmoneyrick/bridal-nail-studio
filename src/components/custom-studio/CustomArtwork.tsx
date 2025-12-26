@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
 import { NailArtType, FingerIndex, NAIL_ART_PRICES, NAIL_ART_LABELS, FINGER_NAMES, LEFT_HAND, RIGHT_HAND } from '@/lib/pricing';
 import { Palette, Upload, Sparkles, Flower2, PenTool, PartyPopper, X, ImageIcon } from 'lucide-react';
@@ -194,9 +194,28 @@ export const CustomArtwork = () => {
   const [customEnabled, setCustomEnabled] = useState(!!customArtwork);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Fix 8: Track object URLs for cleanup
+  const objectUrlsRef = useRef<Set<string>>(new Set());
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      objectUrlsRef.current.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
+
   const handleCustomToggle = (enabled: boolean) => {
     setCustomEnabled(enabled);
     if (!enabled) {
+      // Revoke any existing object URLs when disabling
+      customArtwork?.inspirationImages.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+          objectUrlsRef.current.delete(url);
+        }
+      });
       setCustomArtwork(null);
     } else if (!customArtwork) {
       setCustomArtwork({
@@ -230,21 +249,23 @@ export const CustomArtwork = () => {
     });
   };
 
+  // Fix 8: Use URL.createObjectURL instead of FileReader.readAsDataURL
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
+    const newUrls: string[] = [];
+    
     Array.from(files).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string;
-        setCustomArtwork({
-          description: customArtwork?.description || '',
-          inspirationImages: [...(customArtwork?.inspirationImages || []), imageUrl],
-          nails: customArtwork?.nails || new Set<FingerIndex>()
-        });
-      };
-      reader.readAsDataURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      objectUrlsRef.current.add(objectUrl);
+      newUrls.push(objectUrl);
+    });
+
+    setCustomArtwork({
+      description: customArtwork?.description || '',
+      inspirationImages: [...(customArtwork?.inspirationImages || []), ...newUrls],
+      nails: customArtwork?.nails || new Set<FingerIndex>()
     });
     
     // Reset input
@@ -253,7 +274,16 @@ export const CustomArtwork = () => {
     }
   };
 
+  // Fix 8: Revoke object URL when removing image
   const handleRemoveImage = (index: number) => {
+    const imageUrl = customArtwork?.inspirationImages?.[index];
+    
+    // Revoke object URL to prevent memory leak
+    if (imageUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(imageUrl);
+      objectUrlsRef.current.delete(imageUrl);
+    }
+    
     const newImages = [...(customArtwork?.inspirationImages || [])];
     newImages.splice(index, 1);
     setCustomArtwork({

@@ -10,6 +10,8 @@ export interface Product {
   images: string[];
   variants: ProductVariant[];
   options: ProductOption[];
+  // Fix 7: Add optional customization data for custom studio orders
+  customizationData?: Record<string, unknown>;
 }
 
 export interface ProductVariant {

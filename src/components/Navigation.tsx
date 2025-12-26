@@ -102,10 +102,12 @@ const Navigation = () => {
                 )}
               </Link>
               <CartDrawer />
-              <Link to="/account">
-                <Button variant="ghost" size="icon" className="hover:bg-primary/10 relative">
-                  <User className="h-5 w-5" />
-                </Button>
+              <Link 
+                to={user && initialized ? "/account" : "/auth"}
+                className="flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"
+              >
+                <User className="h-4 w-4" />
+                {user && initialized ? 'My Account' : 'Sign In'}
               </Link>
             </div>
 
@@ -156,7 +158,7 @@ const Navigation = () => {
               </a>
             ))}
             <div className="pt-4">
-              <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to={user && initialized ? "/account" : "/auth"} onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">
                   <User className="h-5 w-5 mr-3" />
                   {user && initialized ? getDisplayName() : 'Sign In'}

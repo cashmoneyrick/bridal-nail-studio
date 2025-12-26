@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { logError } from "@/lib/logger";
 
 /**
  * Uploads inspiration images from blob URLs to Supabase Storage
@@ -38,7 +39,7 @@ export async function uploadInspirationImages(
         });
       
       if (error) {
-        console.error('Failed to upload image:', error);
+        logError('Failed to upload image:', error);
         continue;
       }
       
@@ -46,7 +47,7 @@ export async function uploadInspirationImages(
       // Signed URLs will be generated on-demand when viewing
       uploadedPaths.push(data.path);
     } catch (err) {
-      console.error('Error processing image upload:', err);
+      logError('Error processing image upload:', err);
     }
   }
   
@@ -67,7 +68,7 @@ export async function getSignedImageUrl(
     .createSignedUrl(path, expiresIn);
   
   if (error) {
-    console.error('Failed to create signed URL:', error);
+    logError('Failed to create signed URL:', error);
     return null;
   }
   

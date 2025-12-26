@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { logError } from '@/lib/logger';
 
 interface ClaimDropModalProps {
   open: boolean;
@@ -155,7 +156,7 @@ export const ClaimDropModal = ({
 
       onSuccess();
     } catch (error) {
-      console.error('Error claiming drop:', error);
+      logError('Error claiming drop:', error);
       toast({
         title: 'Something went wrong',
         description: 'Please try again later.',

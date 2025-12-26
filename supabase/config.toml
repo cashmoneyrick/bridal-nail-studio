@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.create-custom-order]
 verify_jwt = false
+
+[functions.update-order-images]
+verify_jwt = false

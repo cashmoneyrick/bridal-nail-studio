@@ -10,6 +10,7 @@ export interface UserProfile {
   last_name: string | null;
   email: string | null;
   phone: string | null;
+  birthday: string | null;
   accepts_marketing: boolean;
   created_at: string;
   updated_at: string;
@@ -26,10 +27,11 @@ interface AuthStore {
   // Actions
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (email: string, password: string, firstName?: string, lastName?: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, firstName?: string, lastName?: string, birthday?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   recoverPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   fetchProfile: () => Promise<void>;
+  updateProfile: (data: { birthday?: string }) => Promise<{ success: boolean; error?: string }>;
   clearError: () => void;
 }
 
@@ -98,7 +100,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  signup: async (email, password, firstName, lastName) => {
+  signup: async (email, password, firstName, lastName, birthday) => {
     set({ isLoading: true, error: null });
     try {
       const redirectUrl = `${window.location.origin}/`;
@@ -111,6 +113,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           data: {
             first_name: firstName?.trim() || null,
             last_name: lastName?.trim() || null,
+            birthday: birthday || null,
           },
         },
       });
@@ -193,6 +196,38 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set({ profile: data as UserProfile | null });
     } catch (error) {
       logError('Error fetching profile:', error);
+    }
+  },
+
+  updateProfile: async (data) => {
+    const { user, profile } = get();
+    if (!user) return { success: false, error: 'Not authenticated' };
+    
+    set({ isLoading: true });
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ birthday: data.birthday })
+        .eq('user_id', user.id);
+
+      if (error) {
+        set({ isLoading: false });
+        return { success: false, error: error.message };
+      }
+
+      // Update local profile state
+      if (profile) {
+        set({ profile: { ...profile, birthday: data.birthday || null }, isLoading: false });
+      } else {
+        await get().fetchProfile();
+        set({ isLoading: false });
+      }
+      
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Update failed';
+      set({ isLoading: false });
+      return { success: false, error: errorMessage };
     }
   },
 

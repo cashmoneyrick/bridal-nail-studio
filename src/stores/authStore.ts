@@ -39,6 +39,9 @@ interface AuthStore {
   recoverPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   fetchProfile: () => Promise<void>;
   updateProfile: (data: { birthday?: string }) => Promise<{ success: boolean; error?: string }>;
+  updateFullProfile: (data: { first_name?: string; last_name?: string }) => Promise<{ success: boolean; error?: string }>;
+  updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   clearError: () => void;
 }
 
@@ -233,6 +236,104 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Update failed';
+      set({ isLoading: false });
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  updateFullProfile: async (data) => {
+    const { user, profile } = get();
+    if (!user) return { success: false, error: 'Not authenticated' };
+    
+    set({ isLoading: true });
+    try {
+      const updateData: { first_name?: string; last_name?: string } = {};
+      if (data.first_name !== undefined) updateData.first_name = data.first_name;
+      if (data.last_name !== undefined) updateData.last_name = data.last_name;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updateData)
+        .eq('user_id', user.id);
+
+      if (error) {
+        set({ isLoading: false });
+        return { success: false, error: error.message };
+      }
+
+      // Update local profile state
+      if (profile) {
+        set({ 
+          profile: { 
+            ...profile, 
+            first_name: data.first_name ?? profile.first_name,
+            last_name: data.last_name ?? profile.last_name
+          }, 
+          isLoading: false 
+        });
+      } else {
+        await get().fetchProfile();
+        set({ isLoading: false });
+      }
+      
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Update failed';
+      set({ isLoading: false });
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  updatePassword: async (newPassword) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+      if (error) {
+        set({ isLoading: false, error: error.message });
+        return { success: false, error: error.message };
+      }
+
+      set({ isLoading: false });
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Password update failed';
+      set({ isLoading: false, error: errorMessage });
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  deleteAccount: async () => {
+    const { user } = get();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    set({ isLoading: true });
+    try {
+      // Delete profile first (this will cascade due to RLS)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (profileError) {
+        set({ isLoading: false });
+        return { success: false, error: profileError.message };
+      }
+
+      // Sign out the user
+      await supabase.auth.signOut();
+      
+      set({ 
+        user: null, 
+        session: null,
+        profile: null,
+        isLoading: false,
+        error: null 
+      });
+      
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Account deletion failed';
       set({ isLoading: false });
       return { success: false, error: errorMessage };
     }

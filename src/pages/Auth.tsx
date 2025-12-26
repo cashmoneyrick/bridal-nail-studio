@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { useAuthStore } from "@/stores/authStore";
-import { Link } from "react-router-dom";
 
 // Validation schemas
 const loginSchema = z.object({
@@ -29,6 +25,12 @@ const signupSchema = z.object({
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
+
+const benefits = [
+  "Save your nail sizes",
+  "Track orders & favorites",
+  "Exclusive member discounts",
+];
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -141,27 +143,70 @@ const Auth = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-md">
-          {/* Back link */}
-          <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
+  const inputStyles = "rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary bg-background";
 
-          {showForgotPassword ? (
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="font-display text-2xl">Reset Password</CardTitle>
-                <CardDescription>
-                  Enter your email and we'll send you a reset link
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+  return (
+    <div className="min-h-screen flex bg-background">
+      {/* Left Panel - Hidden on mobile */}
+      <div className="hidden lg:flex lg:w-[40%] relative overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ 
+            backgroundImage: `url('https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80')` 
+          }}
+        />
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/60 to-primary/30" />
+        
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-end p-10 text-primary-foreground">
+          {/* Testimonial */}
+          <blockquote className="font-display text-2xl xl:text-3xl leading-relaxed mb-8">
+            "Join 10,000+ happy customers who found their perfect set"
+          </blockquote>
+          
+          {/* Benefits */}
+          <ul className="space-y-3">
+            {benefits.map((benefit, index) => (
+              <li key={index} className="flex items-center gap-3 text-primary-foreground/90">
+                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                  <Check className="h-3 w-3" />
+                </div>
+                <span className="text-sm font-medium">{benefit}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Right Panel */}
+      <div className="flex-1 lg:w-[60%] flex flex-col">
+        {/* Mobile Decorative Header */}
+        <div className="lg:hidden h-24 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent" />
+        
+        {/* Centered Form Container */}
+        <div className="flex-1 flex items-center justify-center px-6 py-8 lg:py-12">
+          <div className="w-full max-w-md">
+            {/* Brand Logo */}
+            <Link to="/" className="block text-center mb-8">
+              <h1 className="font-display text-3xl lg:text-4xl text-foreground">
+                YourPrettySets
+              </h1>
+              <p className="text-muted-foreground text-sm mt-1">Premium Press-On Nails</p>
+            </Link>
+
+            {showForgotPassword ? (
+              /* Forgot Password Form */
+              <div className="space-y-6">
+                <div className="text-center space-y-2">
+                  <h2 className="font-display text-2xl text-foreground">Reset Password</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Enter your email and we'll send you a reset link
+                  </p>
+                </div>
+                
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="forgot-email">Email</Label>
@@ -171,13 +216,13 @@ const Auth = () => {
                       placeholder="you@example.com"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      className="rounded-full"
+                      className={inputStyles}
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
-                    className="w-full btn-primary"
+                    className="w-full btn-primary rounded-xl h-11"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -199,24 +244,17 @@ const Auth = () => {
                     Back to Login
                   </Button>
                 </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="font-display text-2xl">Welcome</CardTitle>
-                <CardDescription>
-                  Sign in to your account or create a new one
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+              </div>
+            ) : (
+              /* Main Auth Form */
+              <div className="space-y-6">
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "signup")}>
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
-                    <TabsTrigger value="login">Sign In</TabsTrigger>
-                    <TabsTrigger value="signup">Create Account</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 mb-6 rounded-xl h-11">
+                    <TabsTrigger value="login" className="rounded-lg">Sign In</TabsTrigger>
+                    <TabsTrigger value="signup" className="rounded-lg">Create Account</TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="login">
+                  <TabsContent value="login" className="mt-0">
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="login-email">Email</Label>
@@ -226,7 +264,7 @@ const Auth = () => {
                           placeholder="you@example.com"
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
-                          className={`rounded-full ${loginErrors.email ? 'border-destructive' : ''}`}
+                          className={`${inputStyles} ${loginErrors.email ? 'border-destructive' : ''}`}
                         />
                         {loginErrors.email && (
                           <p className="text-sm text-destructive">{loginErrors.email}</p>
@@ -242,12 +280,12 @@ const Auth = () => {
                             placeholder="••••••••"
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
-                            className={`rounded-full pr-10 ${loginErrors.password ? 'border-destructive' : ''}`}
+                            className={`${inputStyles} pr-10 ${loginErrors.password ? 'border-destructive' : ''}`}
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                           >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -269,7 +307,7 @@ const Auth = () => {
                       
                       <Button 
                         type="submit" 
-                        className="w-full btn-primary"
+                        className="w-full btn-primary rounded-xl h-11"
                         disabled={isLoading}
                       >
                         {isLoading ? (
@@ -284,7 +322,7 @@ const Auth = () => {
                     </form>
                   </TabsContent>
                   
-                  <TabsContent value="signup">
+                  <TabsContent value="signup" className="mt-0">
                     <form onSubmit={handleSignup} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -294,7 +332,7 @@ const Auth = () => {
                             placeholder="Jane"
                             value={signupFirstName}
                             onChange={(e) => setSignupFirstName(e.target.value)}
-                            className={`rounded-full ${signupErrors.firstName ? 'border-destructive' : ''}`}
+                            className={`${inputStyles} ${signupErrors.firstName ? 'border-destructive' : ''}`}
                           />
                           {signupErrors.firstName && (
                             <p className="text-sm text-destructive">{signupErrors.firstName}</p>
@@ -308,7 +346,7 @@ const Auth = () => {
                             placeholder="Doe"
                             value={signupLastName}
                             onChange={(e) => setSignupLastName(e.target.value)}
-                            className={`rounded-full ${signupErrors.lastName ? 'border-destructive' : ''}`}
+                            className={`${inputStyles} ${signupErrors.lastName ? 'border-destructive' : ''}`}
                           />
                           {signupErrors.lastName && (
                             <p className="text-sm text-destructive">{signupErrors.lastName}</p>
@@ -324,7 +362,7 @@ const Auth = () => {
                           placeholder="you@example.com"
                           value={signupEmail}
                           onChange={(e) => setSignupEmail(e.target.value)}
-                          className={`rounded-full ${signupErrors.email ? 'border-destructive' : ''}`}
+                          className={`${inputStyles} ${signupErrors.email ? 'border-destructive' : ''}`}
                         />
                         {signupErrors.email && (
                           <p className="text-sm text-destructive">{signupErrors.email}</p>
@@ -340,12 +378,12 @@ const Auth = () => {
                             placeholder="••••••••"
                             value={signupPassword}
                             onChange={(e) => setSignupPassword(e.target.value)}
-                            className={`rounded-full pr-10 ${signupErrors.password ? 'border-destructive' : ''}`}
+                            className={`${inputStyles} pr-10 ${signupErrors.password ? 'border-destructive' : ''}`}
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                           >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -363,7 +401,7 @@ const Auth = () => {
                           placeholder="••••••••"
                           value={signupConfirmPassword}
                           onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                          className={`rounded-full ${signupErrors.confirmPassword ? 'border-destructive' : ''}`}
+                          className={`${inputStyles} ${signupErrors.confirmPassword ? 'border-destructive' : ''}`}
                         />
                         {signupErrors.confirmPassword && (
                           <p className="text-sm text-destructive">{signupErrors.confirmPassword}</p>
@@ -372,7 +410,7 @@ const Auth = () => {
                       
                       <Button 
                         type="submit" 
-                        className="w-full btn-primary"
+                        className="w-full btn-primary rounded-xl h-11"
                         disabled={isLoading}
                       >
                         {isLoading ? (
@@ -391,13 +429,22 @@ const Auth = () => {
                     </form>
                   </TabsContent>
                 </Tabs>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            )}
+          </div>
         </div>
-      </main>
-
-      <Footer />
+        
+        {/* Back to Home Link */}
+        <div className="p-6">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

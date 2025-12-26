@@ -125,3 +125,21 @@ export const FINGER_NAMES = [
 ] as const;
 
 export type FingerIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+// Named finger constants for easier reference
+export const FINGER = {
+  LEFT_PINKY: 0,
+  LEFT_RING: 1,
+  LEFT_MIDDLE: 2,
+  LEFT_INDEX: 3,
+  LEFT_THUMB: 4,
+  RIGHT_THUMB: 5,
+  RIGHT_INDEX: 6,
+  RIGHT_MIDDLE: 7,
+  RIGHT_RING: 8,
+  RIGHT_PINKY: 9,
+} as const;
+
+// Hand groupings
+export const LEFT_HAND: FingerIndex[] = [0, 1, 2, 3, 4];
+export const RIGHT_HAND: FingerIndex[] = [5, 6, 7, 8, 9];

@@ -167,7 +167,7 @@ const initialState: CustomStudioState = {
   entryMode: 'fresh',
   baseProduct: null,
   shape: 'almond',
-  length: 'medium',
+  length: 'short',
   baseFinish: 'glossy',
   colorPalette: null,
   nailColors: { ...defaultNailColors },

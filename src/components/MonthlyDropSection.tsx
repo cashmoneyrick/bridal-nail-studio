@@ -31,18 +31,15 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
 
   // For now, tier is always "Nail Lover" - paid tier not connected yet
   // TODO: Replace with actual tier logic when paid subscriptions are connected
-  const isNailObsessed = false; // Will be true when user has paid tier
-
-  // Only show if user is Nail Obsessed OR testMode is enabled
-  const shouldShow = isNailObsessed || testMode;
+  const isNailObsessed = testMode; // Will be true when user has paid tier
 
   useEffect(() => {
-    if (user && shouldShow) {
+    if (user && isNailObsessed) {
       fetchCurrentClaim();
     } else {
       setIsLoading(false);
     }
-  }, [user, currentMonth, shouldShow]);
+  }, [user, currentMonth, isNailObsessed]);
 
   const fetchCurrentClaim = async () => {
     if (!user) return;
@@ -72,7 +69,46 @@ export const MonthlyDropSection = ({ testMode = false }: MonthlyDropSectionProps
     fetchCurrentClaim();
   };
 
-  if (!shouldShow) return null;
+  // Show locked state for non-paid members
+  if (!isNailObsessed) {
+    return (
+      <Card className="border-border/50 bg-gradient-to-br from-card to-muted/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-10" />
+        <CardHeader className="pb-4 relative z-20">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg text-muted-foreground">
+              <Package className="h-5 w-5" />
+              Monthly Drop
+            </CardTitle>
+            <Badge variant="outline" className="text-xs border-primary/50 text-primary">
+              Nail Obsessed Perk
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 relative z-20">
+          <div className="rounded-lg overflow-hidden border border-border/30 opacity-60">
+            <div className="h-24 bg-gradient-to-br from-muted/50 via-muted/30 to-muted/20 flex items-center justify-center">
+              <Gift className="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <div className="p-3 bg-card/50">
+              <h3 className="font-medium text-muted-foreground text-sm">{monthName} Drop</h3>
+              <p className="text-xs text-muted-foreground/70">
+                Exclusive monthly set — 14 press-on tips
+              </p>
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Upgrade to <span className="font-semibold text-primary">Nail Obsessed</span> to unlock monthly drops!
+            </p>
+            <Button variant="outline" className="w-full border-primary/30 text-primary hover:bg-primary/10" disabled>
+              Coming Soon
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getStatusBadge = () => {
     if (!currentClaim) {

@@ -31,7 +31,7 @@ const applicationSteps = [
     icon: Hand,
     title: "Prep Your Nails",
     description: "Start with clean, dry nails. Gently push back cuticles and lightly buff the nail surface for better adhesion. Wipe with alcohol to remove any oils.",
-    tip: "Pro tip: Use the wooden stick included in your kit for cuticle care",
+    tip: "Your kit includes: cuticle stick, adhesive tabs, nail glue, file, buffer & alcohol wipes",
   },
   {
     number: "02",
@@ -125,6 +125,34 @@ const careTips = [
   }
 ];
 
+const bridalTips = [
+  {
+    icon: Clock,
+    title: "Trial Run",
+    description: "Do a full application 2-3 weeks before the big day. This helps you perfect your technique and ensures the sizing is right."
+  },
+  {
+    icon: Sparkles,
+    title: "Apply 1-2 Days Before",
+    description: "For maximum longevity, apply your wedding set 1-2 days before the ceremony. This gives the adhesive time to fully bond."
+  },
+  {
+    icon: Package,
+    title: "Pack an Emergency Kit",
+    description: "Bring extra adhesive tabs, nail glue, and a few backup nails in your bridal bag. Better safe than sorry!"
+  },
+  {
+    icon: Shield,
+    title: "Skip the Acetone",
+    description: "Avoid acetone-based products before application—they can dry out your natural nails and weaken adhesion."
+  },
+  {
+    icon: Heart,
+    title: "Honeymoon Ready",
+    description: "With proper application, your press-ons will last through the ceremony, reception, and well into your honeymoon."
+  }
+];
+
 const storageTips = [
   {
     icon: Package,
@@ -150,7 +178,7 @@ const faqItems = [
   },
   {
     question: "How long should press-on nails last?",
-    answer: "With proper application and care, press-ons with adhesive tabs typically last 5-7 days, while those applied with nail glue can last up to 2 weeks. Daily activities and water exposure affect longevity."
+    answer: "With proper application and care, press-ons with adhesive tabs typically last about 1 week, while those applied with nail glue can last up to 2 weeks. Daily activities and water exposure affect longevity—treat them well and they'll treat you well."
   },
   {
     question: "The nails are too wide for my nail beds. What should I do?",
@@ -179,10 +207,10 @@ const faqItems = [
 ];
 
 const quickStats = [
-  { value: "5-7", label: "Days with tabs" },
-  { value: "14+", label: "Days with glue" },
-  { value: "5 min", label: "Application time" },
-  { value: "100%", label: "Reusable" },
+  { value: "1 week", label: "With adhesive tabs" },
+  { value: "2 weeks", label: "With nail glue" },
+  { value: "10 min", label: "Application time" },
+  { value: "∞", label: "Reusable with care" },
 ];
 
 const HowTo = () => {
@@ -222,6 +250,9 @@ const HowTo = () => {
               <a href="#application" className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-all duration-300">
                 Application Guide
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </a>
+              <a href="#bridal" className="inline-flex items-center gap-2 bg-background border border-border px-6 py-3 rounded-full font-medium hover:bg-muted transition-all duration-300">
+                Bridal Tips
               </a>
               <a href="#removal" className="inline-flex items-center gap-2 bg-background border border-border px-6 py-3 rounded-full font-medium hover:bg-muted transition-all duration-300">
                 Removal Guide
@@ -318,8 +349,45 @@ const HowTo = () => {
         </div>
       </section>
 
+      {/* Bridal Tips Section */}
+      <section id="bridal" className="py-20 sm:py-28 bg-muted/30 scroll-mt-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+              <Heart className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Say "I Do" in Style</span>
+            </div>
+            <h2 className="font-display text-4xl sm:text-5xl font-medium mb-4">
+              Bridal Tips
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Planning your wedding nails? Here's how to ensure flawless press-ons for your special day.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
+            {bridalTips.map((tip, index) => (
+              <div 
+                key={index}
+                className="group relative bg-background rounded-3xl p-6 text-center hover:shadow-lg transition-all duration-500 border border-transparent hover:border-primary/20"
+              >
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <tip.icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
+                </div>
+                <h3 className="font-display text-base font-medium mb-2 group-hover:text-primary transition-colors">
+                  {tip.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {tip.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Removal Guide */}
-      <section id="removal" className="py-20 sm:py-28 bg-muted/30 scroll-mt-24">
+      <section id="removal" className="py-20 sm:py-28 scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
@@ -448,9 +516,9 @@ const HowTo = () => {
                     <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center">
                       <Package className="w-12 h-12 text-primary" strokeWidth={1} />
                     </div>
-                    <p className="font-display text-2xl font-medium mb-2">Reuse Up To</p>
-                    <p className="font-display text-5xl font-medium text-primary mb-2">3-5x</p>
-                    <p className="text-muted-foreground">with proper care</p>
+                    <p className="font-display text-2xl font-medium mb-2">Reuse</p>
+                    <p className="font-display text-5xl font-medium text-primary mb-2">Multiple Times</p>
+                    <p className="text-muted-foreground">with proper care & storage</p>
                   </div>
                 </div>
                 
@@ -524,7 +592,7 @@ const HowTo = () => {
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link 
-                    to="/perfect-fit" 
+                    to="/account/perfect-fit" 
                     className="group inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium hover:bg-primary/90 transition-all duration-300"
                   >
                     Find Your Fit
@@ -546,7 +614,7 @@ const HowTo = () => {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle className="w-4 h-4 text-primary" />
-                    Easy returns
+                    Satisfaction guaranteed
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle className="w-4 h-4 text-primary" />

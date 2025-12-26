@@ -8,9 +8,10 @@ import { Loader2, Sparkles, Gift, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { logError } from "@/lib/logger";
 
-const emailSchema = z.string().email("Please enter a valid email address");
+const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
+const nameSchema = z.string().max(50, "Name is too long").optional();
 
-type SignupStatus = "idle" | "loading" | "success" | "already_subscribed" | "error";
+type SignupStatus = "idle" | "loading" | "success" | "already_subscribed" | "error" | "rate_limited";
 
 const NailClubSignup = () => {
   const [email, setEmail] = useState("");
@@ -35,11 +36,21 @@ const NailClubSignup = () => {
     if (cooldown) return;
 
     // Validate email
-    const result = emailSchema.safeParse(email.trim());
-    if (!result.success) {
-      setErrorMessage(result.error.errors[0].message);
+    const emailResult = emailSchema.safeParse(email.trim());
+    if (!emailResult.success) {
+      setErrorMessage(emailResult.error.errors[0].message);
       setStatus("error");
       return;
+    }
+
+    // Validate first name if provided
+    if (firstName) {
+      const nameResult = nameSchema.safeParse(firstName.trim());
+      if (!nameResult.success) {
+        setErrorMessage(nameResult.error.errors[0].message);
+        setStatus("error");
+        return;
+      }
     }
 
     setStatus("loading");
@@ -49,27 +60,39 @@ const NailClubSignup = () => {
     setTimeout(() => setCooldown(false), 3000);
 
     try {
-      const { error } = await supabase
-        .from("nail_club_subscribers")
-        .insert({
+      // Use the secure Edge Function instead of direct database access
+      const { data, error } = await supabase.functions.invoke('subscribe-newsletter', {
+        body: {
           email: email.trim().toLowerCase(),
           first_name: firstName.trim() || null,
           source: "nail_club_page",
-        });
+        },
+      });
 
       if (error) {
-        // Handle duplicate email (unique constraint violation)
-        if (error.code === "23505") {
-          setStatus("already_subscribed");
-          setShowConfetti(true);
+        logError("Signup error:", error);
+        
+        // Check for rate limiting
+        if (error.message?.includes('429') || error.message?.includes('rate')) {
+          setErrorMessage("Too many attempts. Please try again later.");
+          setStatus("rate_limited");
         } else {
-          logError("Signup error:", error);
           setErrorMessage("Something went wrong. Please try again.");
           setStatus("error");
         }
-      } else {
-        setStatus("success");
+        return;
+      }
+
+      if (data?.success) {
+        if (data.already_subscribed) {
+          setStatus("already_subscribed");
+        } else {
+          setStatus("success");
+        }
         setShowConfetti(true);
+      } else {
+        setErrorMessage(data?.error || "Something went wrong. Please try again.");
+        setStatus("error");
       }
     } catch (err) {
       logError("Unexpected error:", err);
@@ -169,9 +192,10 @@ const NailClubSignup = () => {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-                if (status === "error") setStatus("idle");
+                if (status === "error" || status === "rate_limited") setStatus("idle");
               }}
               required
+              maxLength={255}
               className="bg-background/50"
             />
           </div>
@@ -186,11 +210,12 @@ const NailClubSignup = () => {
               placeholder="Jane"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              maxLength={50}
               className="bg-background/50"
             />
           </div>
 
-          {status === "error" && (
+          {(status === "error" || status === "rate_limited") && (
             <p className="text-sm text-destructive">{errorMessage}</p>
           )}
 

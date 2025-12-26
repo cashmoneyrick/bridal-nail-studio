@@ -77,7 +77,7 @@ const Account = () => {
 
   const quickLinks = [
     { icon: Package, title: "Order History", description: "View past orders", href: "/orders" },
-    { icon: MapPin, title: "Addresses", description: "Shipping addresses", href: "/addresses" },
+    { icon: MapPin, title: "Addresses", description: "Shipping addresses", href: "/settings/addresses" },
     { icon: Settings, title: "Account Settings", description: "Email & password", href: "/settings" },
     { icon: CreditCard, title: "Payment Methods", description: "Saved cards", href: "/payment" },
     { icon: Heart, title: "My Favorites", description: `${favoritesCount} saved`, href: "/favorites" },

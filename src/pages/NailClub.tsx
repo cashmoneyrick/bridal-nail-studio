@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
@@ -6,7 +5,7 @@ import Footer from "@/components/Footer";
 import NailClubSignup from "@/components/NailClubSignup";
 import { 
   Sparkles, Tag, Gift, Truck, Cake, Star, Check, ChevronDown,
-  Crown, Heart, Package, ArrowRight, Quote, Shield, CreditCard, Clock
+  Heart, Package, ArrowRight, Quote, Shield, CreditCard, Clock
 } from "lucide-react";
 import {
   Accordion,
@@ -16,72 +15,55 @@ import {
 } from "@/components/ui/accordion";
 
 const benefits = [
+  { icon: Tag, title: "Member Pricing", description: "Enjoy 10-20% off all your favorite nail sets" },
   { icon: Sparkles, title: "Early Access", description: "Be first to shop new collections before anyone else" },
-  { icon: Tag, title: "Member Pricing", description: "Enjoy 15-20% off every single order" },
-  { icon: Gift, title: "Monthly Nail Drops", description: "Surprise mini sets delivered to your door monthly" },
-  { icon: Truck, title: "Free Shipping", description: "On all orders, no minimum required" },
-  { icon: Cake, title: "Birthday Gift", description: "Free full-size set on your special day" },
-  { icon: Star, title: "VIP Support", description: "Priority customer service whenever you need it" },
+  { icon: Gift, title: "Monthly Nail Drops", description: "Paid members get surprise nail sets delivered monthly" },
+  { icon: Truck, title: "Free Shipping", description: "Paid members enjoy free shipping on all orders" },
+  { icon: Cake, title: "Birthday Surprise", description: "Get a special gift during your birthday month" },
+  { icon: Star, title: "Priority Support", description: "Paid members get faster, VIP-level customer service" },
 ];
 
 const tiers = [
   {
     name: "Nail Lover",
-    price: { monthly: "Free", annual: "Free" },
-    period: "to join",
+    price: "Free",
+    period: "with any account",
     features: [
+      "10% off orders $50+",
       "Early access to new releases",
-      "10% member discount",
-      "Birthday gift",
       "Members-only newsletter",
     ],
-    cta: "Join Free",
+    cta: "Create Account",
+    ctaLink: "/auth",
     popular: false,
+    disabled: false,
     icon: Heart,
   },
   {
     name: "Nail Obsessed",
-    price: { monthly: "$14.99", annual: "$119.99" },
+    price: "$19.99",
     period: "/month",
-    annualPeriod: "/year",
-    savings: "Save $60/year",
     features: [
-      "Everything in Nail Lover",
-      "20% member discount",
+      "20% off everything",
       "Free shipping on all orders",
-      "Monthly surprise nail set",
-      "Early sale access",
+      "Monthly nail drop (claim in account)",
+      "Birthday surprise (after 30 days + first purchase)",
+      "Priority support",
     ],
-    cta: "Get Started",
+    cta: "Coming Soon",
+    ctaLink: null,
     popular: true,
+    disabled: true,
     icon: Package,
-  },
-  {
-    name: "Nail VIP",
-    price: { monthly: "$29.99", annual: "$239.99" },
-    period: "/month",
-    annualPeriod: "/year",
-    savings: "Save $120/year",
-    features: [
-      "Everything in Nail Obsessed",
-      "25% member discount",
-      "Priority VIP support",
-      "Exclusive limited editions",
-      "Free custom design consultation",
-      "Quarterly luxury gift box",
-    ],
-    cta: "Go VIP",
-    popular: false,
-    icon: Crown,
   },
 ];
 
 const testimonials = [
   {
     name: "Sarah M.",
-    tier: "Nail VIP",
+    tier: "Nail Obsessed",
     rating: 5,
-    quote: "The monthly drops are always so cute! I look forward to the 15th every month. Worth every penny!",
+    quote: "The monthly nail drops are always so cute! I look forward to the 15th every month. Worth every penny!",
     avatar: "SM",
   },
   {
@@ -93,16 +75,16 @@ const testimonials = [
   },
   {
     name: "Emily R.",
-    tier: "Nail VIP",
+    tier: "Nail Lover",
     rating: 5,
-    quote: "Got my birthday set last month and it was stunning! The VIP perks are incredible.",
+    quote: "Love the early access! Got the limited edition set before it sold out. The free tier is amazing!",
     avatar: "ER",
   },
   {
     name: "Amanda K.",
     tier: "Nail Obsessed",
     rating: 5,
-    quote: "Free shipping alone makes it worth it. Plus the early access to new collections is chef's kiss!",
+    quote: "Free shipping alone makes it worth it. Plus the birthday surprise was so thoughtful!",
     avatar: "AK",
   },
 ];
@@ -110,23 +92,23 @@ const testimonials = [
 const faqs = [
   {
     question: "What is the Nail Drop Club?",
-    answer: "The Nail Drop Club is our exclusive membership program offering early access to new designs, member-only discounts, monthly nail surprises, and special perks like free shipping and birthday gifts.",
+    answer: "The Nail Drop Club is our membership program with two tiers: Nail Lover (free with any account) gives you 10% off orders $50+ and early access to new releases. Nail Obsessed ($19.99/month - coming soon) adds 20% off everything, free shipping, monthly nail drops, and more!",
   },
   {
-    question: "Can I cancel anytime?",
-    answer: "Absolutely! You can cancel your membership at any time with no fees or penalties. Your benefits will continue until the end of your current billing period.",
+    question: "What do I get with the free Nail Lover tier?",
+    answer: "Nail Lover members get 10% off all orders $50 or more, early access to new releases via email, and our members-only newsletter with exclusive tips and previews.",
   },
   {
     question: "When do I get my monthly nail drop?",
-    answer: "Monthly nail drops ship on the 15th of each month. You'll receive a surprise mini set of our latest or exclusive designs right to your doorstep.",
+    answer: "For Nail Obsessed members, monthly nail drops are available to claim in your account on the 15th of each month. You'll receive a notification when your drop is ready!",
   },
   {
-    question: "How does the birthday gift work?",
-    answer: "Simply add your birthday to your profile and we'll send you a free full-size nail set during your birthday month. It's our way of celebrating you!",
+    question: "How does the birthday surprise work?",
+    answer: "Nail Obsessed members receive a special birthday surprise! Simply add your birthday to your profile. After 30 days of membership and your first purchase, you'll receive a gift during your birthday month.",
   },
   {
-    question: "Can I upgrade or downgrade my membership?",
-    answer: "Yes! You can change your membership tier at any time. When you upgrade, you'll get immediate access to your new benefits. Downgrades take effect at the start of your next billing cycle.",
+    question: "Is the Nail Obsessed tier available yet?",
+    answer: "The Nail Obsessed tier is coming soon! Sign up for the free Nail Lover tier now and we'll notify you as soon as the paid tier launches.",
   },
   {
     question: "Do my discounts stack with sale prices?",
@@ -141,8 +123,6 @@ const monthlyDropItems = [
 ];
 
 const NailClub = () => {
-  const [isAnnual, setIsAnnual] = useState(false);
-
   const scrollToPlans = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -192,9 +172,10 @@ const NailClub = () => {
           </h1>
           
           <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in" style={{ animationDelay: '300ms' }}>
-            Get first access to new designs, exclusive member pricing, and 
+            Get first access to new designs, exclusive member pricing starting at 
+            <span className="text-foreground font-medium"> 10% off</span>, and unlock 
             <span className="text-foreground font-medium"> monthly nail surprises </span>
-            delivered right to your door.
+            with our premium tier.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in" style={{ animationDelay: '400ms' }}>
@@ -315,13 +296,13 @@ const NailClub = () => {
             {/* Content side */}
             <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
               <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-                Monthly Surprise
+                Nail Obsessed Exclusive
               </span>
               <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-6">
                 What's Inside Your Drop?
               </h2>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                Every month, we curate a special selection of nail goodness just for you. 
+                Every month, Nail Obsessed members receive a special selection of nail goodness. 
                 It's like a birthday gift that comes 12 times a year!
               </p>
               
@@ -343,7 +324,7 @@ const NailClub = () => {
         </div>
       </section>
 
-      {/* Pricing Tiers - Premium Redesign */}
+      {/* Pricing Tiers - 2 Tier Layout */}
       <section id="pricing" className="py-20 sm:py-32 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 animate-fade-in">
@@ -353,33 +334,12 @@ const NailClub = () => {
             <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-4">
               Choose Your <span className="text-primary">Perfect Plan</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
               Select the membership that matches your nail obsession level
             </p>
-            
-            {/* Annual/Monthly Toggle */}
-            <div className="inline-flex items-center gap-4 bg-muted/50 rounded-full p-1.5">
-              <button
-                onClick={() => setIsAnnual(false)}
-                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
-                  !isAnnual ? 'bg-card shadow-md text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setIsAnnual(true)}
-                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                  isAnnual ? 'bg-card shadow-md text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Annual
-                <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">Save up to 33%</span>
-              </button>
-            </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
             {tiers.map((tier, index) => (
               <div
                 key={tier.name}
@@ -410,16 +370,11 @@ const NailClub = () => {
                 
                 <div className="mb-6">
                   <span className="text-5xl font-display text-foreground">
-                    {isAnnual ? tier.price.annual : tier.price.monthly}
+                    {tier.price}
                   </span>
                   <span className="text-muted-foreground">
-                    {tier.price.monthly === "Free" ? " to join" : (isAnnual ? tier.annualPeriod : tier.period)}
+                    {" "}{tier.period}
                   </span>
-                  {isAnnual && tier.savings && (
-                    <div className="mt-2">
-                      <span className="text-sm text-primary font-medium">{tier.savings}</span>
-                    </div>
-                  )}
                 </div>
                 
                 <ul className="space-y-4 mb-8">
@@ -433,16 +388,34 @@ const NailClub = () => {
                   ))}
                 </ul>
                 
-                <Button 
-                  className={`w-full rounded-full py-6 text-base font-semibold transition-all ${
-                    tier.popular 
-                      ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" 
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                  }`}
-                  size="lg"
-                >
-                  {tier.cta}
-                </Button>
+                {tier.ctaLink ? (
+                  <Link to={tier.ctaLink}>
+                    <Button 
+                      className={`w-full rounded-full py-6 text-base font-semibold transition-all ${
+                        tier.popular 
+                          ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" 
+                          : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                      }`}
+                      size="lg"
+                    >
+                      {tier.cta}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button 
+                    className={`w-full rounded-full py-6 text-base font-semibold transition-all ${
+                      tier.disabled 
+                        ? "bg-muted text-muted-foreground cursor-not-allowed opacity-60" 
+                        : tier.popular 
+                          ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" 
+                          : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                    }`}
+                    size="lg"
+                    disabled={tier.disabled}
+                  >
+                    {tier.cta}
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -510,9 +483,9 @@ const NailClub = () => {
             <div className="hidden md:block absolute top-24 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
             
             {[
-              { step: "01", icon: CreditCard, title: "Choose Your Plan", description: "Pick the membership tier that matches your nail obsession" },
-              { step: "02", icon: Shield, title: "Get Instant Access", description: "Enjoy discounts and early access to new releases right away" },
-              { step: "03", icon: Gift, title: "Receive Monthly Drops", description: "Get surprise nail sets delivered to your door each month" },
+              { step: "01", icon: CreditCard, title: "Create an Account", description: "Sign up for free and instantly become a Nail Lover member" },
+              { step: "02", icon: Shield, title: "Start Saving", description: "Enjoy 10% off orders $50+ and early access to new releases" },
+              { step: "03", icon: Gift, title: "Upgrade Anytime", description: "When Nail Obsessed launches, unlock monthly drops and more" },
             ].map((item, index) => (
               <div 
                 key={item.step} 
@@ -584,17 +557,18 @@ const NailClub = () => {
             Ready to Join the <span className="text-primary">Club?</span>
           </h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-            Start enjoying exclusive perks, member discounts, and monthly nail surprises today. 
-            Your nails will thank you.
+            Start with the free Nail Lover tier today. Get 10% off, early access, and be first to know when Nail Obsessed launches.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="rounded-full px-12 py-6 text-lg group" onClick={scrollToPlans}>
-              Join Now
-              <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-12 py-6 text-lg bg-background/50 backdrop-blur-sm">
-              Gift a Membership
+            <Link to="/auth">
+              <Button size="lg" className="rounded-full px-12 py-6 text-lg group">
+                Create Free Account
+                <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
+            <Button size="lg" variant="outline" className="rounded-full px-12 py-6 text-lg bg-background/50 backdrop-blur-sm" onClick={scrollToPlans}>
+              Compare Plans
             </Button>
           </div>
           
@@ -602,11 +576,11 @@ const NailClub = () => {
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-primary" />
-              <span>Cancel anytime</span>
+              <span>No credit card required</span>
             </div>
             <div className="flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-primary" />
-              <span>Secure checkout</span>
+              <span>Upgrade anytime</span>
             </div>
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-primary" />

@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      birthday_claims: {
+        Row: {
+          address_snapshot: Json | null
+          claimed_at: string
+          created_at: string
+          discount_code: string | null
+          gift_type: string
+          id: string
+          shipped: boolean | null
+          user_id: string
+          year: number
+          years_with_us: number
+        }
+        Insert: {
+          address_snapshot?: Json | null
+          claimed_at?: string
+          created_at?: string
+          discount_code?: string | null
+          gift_type: string
+          id?: string
+          shipped?: boolean | null
+          user_id: string
+          year: number
+          years_with_us: number
+        }
+        Update: {
+          address_snapshot?: Json | null
+          claimed_at?: string
+          created_at?: string
+          discount_code?: string | null
+          gift_type?: string
+          id?: string
+          shipped?: boolean | null
+          user_id?: string
+          year?: number
+          years_with_us?: number
+        }
+        Relationships: []
+      }
       custom_orders: {
         Row: {
           accent_nails: Json | null
@@ -150,6 +189,7 @@ export type Database = {
           created_at: string
           email: string | null
           first_name: string | null
+          has_purchased: boolean | null
           id: string
           last_name: string | null
           phone: string | null
@@ -168,6 +208,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          has_purchased?: boolean | null
           id?: string
           last_name?: string | null
           phone?: string | null
@@ -186,6 +227,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
+          has_purchased?: boolean | null
           id?: string
           last_name?: string | null
           phone?: string | null

@@ -12,6 +12,13 @@ export interface UserProfile {
   phone: string | null;
   birthday: string | null;
   accepts_marketing: boolean;
+  has_purchased: boolean;
+  shipping_address_line1: string | null;
+  shipping_address_line2: string | null;
+  shipping_city: string | null;
+  shipping_state: string | null;
+  shipping_zip: string | null;
+  shipping_country: string | null;
   created_at: string;
   updated_at: string;
 }

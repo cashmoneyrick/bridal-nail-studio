@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import DiscountCodesSection from "@/components/DiscountCodesSection";
 import MembershipSection from "@/components/MembershipSection";
 import { MonthlyDropSection } from "@/components/MonthlyDropSection";
+import { BirthdaySurpriseSection } from "@/components/BirthdaySurpriseSection";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -21,6 +22,7 @@ const Account = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const testMode = searchParams.get('testMode') === 'true';
+  const testBirthday = searchParams.get('testBirthday') === 'true';
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, logout, updateProfile, isLoading } = useAuthStore();
   
@@ -158,6 +160,7 @@ const Account = () => {
             <div className="mb-8 space-y-6">
               <MembershipSection memberSince={profile?.created_at} />
               <MonthlyDropSection testMode={testMode} />
+              <BirthdaySurpriseSection testMode={testBirthday} />
             </div>
           )}
 
@@ -186,8 +189,8 @@ const Account = () => {
             ))}
           </div>
 
-          {/* Birthday Section - Show only when logged in */}
-          {user && (
+          {/* Birthday Picker - Show only when logged in and birthday not set */}
+          {user && !profile?.birthday && (
             <Card className="mt-8">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -195,81 +198,65 @@ const Account = () => {
                     <Cake className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Birthday Surprise</CardTitle>
+                    <CardTitle className="text-lg">Set Your Birthday</CardTitle>
                     <CardDescription>
-                      Get a special gift during your birthday month
+                      Add your birthday to unlock special surprises
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                {profile?.birthday ? (
-                  // Birthday is set - show read-only
-                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                    <CalendarIcon className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">
-                        {format(parseISO(profile.birthday), "MMMM d, yyyy")}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Your birthday is locked and can't be changed
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  // Birthday not set - show date picker
-                  <div className="space-y-4">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full sm:w-[280px] justify-start text-left font-normal",
-                            !birthday && "text-muted-foreground",
-                            birthdayError && "border-destructive"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {birthday ? format(birthday, "MMMM d, yyyy") : <span>Pick your birthday</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={birthday}
-                          onSelect={setBirthday}
-                          defaultMonth={new Date(new Date().getFullYear() - 25, 0)}
-                          fromYear={new Date().getFullYear() - 60}
-                          toYear={new Date().getFullYear() - 13}
-                          captionLayout="dropdown-buttons"
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <p className="text-sm text-muted-foreground">
-                      Get a special birthday surprise on us! 🎂
-                    </p>
-                    {birthdayError && (
-                      <p className="text-sm text-destructive">{birthdayError}</p>
-                    )}
-                    {birthday && (
-                      <Button 
-                        onClick={handleSaveBirthday}
-                        disabled={isSavingBirthday}
-                        className="btn-primary"
-                      >
-                        {isSavingBirthday ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          "Save Birthday"
+                <div className="space-y-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full sm:w-[280px] justify-start text-left font-normal",
+                          !birthday && "text-muted-foreground",
+                          birthdayError && "border-destructive"
                         )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {birthday ? format(birthday, "MMMM d, yyyy") : <span>Pick your birthday</span>}
                       </Button>
-                    )}
-                  </div>
-                )}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={birthday}
+                        onSelect={setBirthday}
+                        defaultMonth={new Date(new Date().getFullYear() - 25, 0)}
+                        fromYear={new Date().getFullYear() - 60}
+                        toYear={new Date().getFullYear() - 13}
+                        captionLayout="dropdown-buttons"
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <p className="text-sm text-muted-foreground">
+                    Once saved, your birthday can't be changed.
+                  </p>
+                  {birthdayError && (
+                    <p className="text-sm text-destructive">{birthdayError}</p>
+                  )}
+                  {birthday && (
+                    <Button 
+                      onClick={handleSaveBirthday}
+                      disabled={isSavingBirthday}
+                      className="btn-primary"
+                    >
+                      {isSavingBirthday ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Birthday"
+                      )}
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           )}

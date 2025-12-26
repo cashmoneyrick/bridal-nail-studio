@@ -5,12 +5,15 @@ import {
   ShapeType,
   LengthType,
   FinishType,
+  FingerIndex,
   SHAPE_PRICES,
   LENGTH_PRICES,
   FINISH_PRICES,
   SHAPE_LABELS,
   LENGTH_LABELS,
   FINISH_LABELS,
+  COLOR_PALETTES,
+  PresetColorPalette,
 } from '@/lib/pricing';
 
 // Shape icons as simple SVG paths
@@ -48,7 +51,16 @@ const PriceBadge = ({ price }: { price: number }) => {
 };
 
 const BaseLook = () => {
-  const { shape, length, baseFinish, setShape, setLength, setBaseFinish } = useCustomStudioStore();
+  const { shape, length, baseFinish, colorPalette, setShape, setLength, setBaseFinish, setColorPalette, setNailColor } = useCustomStudioStore();
+
+  const handlePaletteSelect = (palette: PresetColorPalette) => {
+    setColorPalette({ name: palette.name, colors: palette.colors });
+    // Auto-assign colors to all 10 nails
+    for (let i = 0; i < 10; i++) {
+      const colorIndex = i % palette.colors.length;
+      setNailColor(i as FingerIndex, palette.colors[colorIndex]);
+    }
+  };
 
   const shapes: ShapeType[] = ['almond', 'square', 'oval', 'coffin', 'stiletto'];
   const lengths: LengthType[] = ['short', 'medium', 'long', 'extra-long'];
@@ -201,6 +213,52 @@ const BaseLook = () => {
                     +${price}
                   </span>
                 )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Color Palette Selector */}
+      <div className="space-y-3">
+        <h3 className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
+          Color Palette
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {COLOR_PALETTES.map((palette) => {
+            const isSelected = colorPalette?.name === palette.name;
+            return (
+              <button
+                key={palette.id}
+                onClick={() => handlePaletteSelect(palette)}
+                className={cn(
+                  'relative flex flex-col gap-3 p-4 rounded-lg border-2 transition-all text-left',
+                  isSelected
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                )}
+              >
+                {isSelected && (
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                    <Check className="w-3 h-3 text-primary-foreground" />
+                  </div>
+                )}
+                {/* Color swatches */}
+                <div className="flex gap-2">
+                  {palette.colors.map((color, index) => (
+                    <div
+                      key={index}
+                      className="w-8 h-8 rounded-full border border-border shadow-sm"
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+                <div className="space-y-1">
+                  <span className="font-medium">{palette.name}</span>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {palette.description}
+                  </p>
+                </div>
               </button>
             );
           })}

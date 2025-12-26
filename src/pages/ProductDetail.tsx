@@ -24,7 +24,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag, Droplets, FileText, Clock, Hand, Gift, RotateCcw, Check } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, ChevronLeft, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag, Droplets, FileText, Clock, Hand, Gift, RotateCcw, Check } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -87,6 +93,151 @@ const ShapeIcon = ({ shape, selected }: { shape: string; selected: boolean }) =>
 
 const NAIL_SHAPES = ['Almond', 'Coffin', 'Stiletto', 'Square', 'Oval'];
 const NAIL_LENGTHS = ['Short', 'Medium', 'Long', 'Extra Long'];
+
+// Pairs Well With Carousel Component
+interface PairsWellWithCarouselProps {
+  products: Product[];
+  addItem: (item: CartItem) => void;
+}
+
+const PairsWellWithCarousel = ({ products, addItem }: PairsWellWithCarouselProps) => {
+  const [api, setApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  useEffect(() => {
+    if (!api) return;
+    
+    const updateScrollState = () => {
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    };
+    
+    updateScrollState();
+    api.on("select", updateScrollState);
+    api.on("reInit", updateScrollState);
+    
+    return () => {
+      api.off("select", updateScrollState);
+      api.off("reInit", updateScrollState);
+    };
+  }, [api]);
+
+  const handleQuickAdd = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const variantId = `${product.id}-almond-medium`;
+    
+    addItem({
+      product,
+      variantId,
+      variantTitle: 'Almond / Medium',
+      price: {
+        amount: product.price.toString(),
+        currencyCode: 'USD',
+      },
+      quantity: 1,
+      selectedOptions: [
+        { name: 'Shape', value: 'Almond' },
+        { name: 'Length', value: 'Medium' },
+      ],
+    });
+    
+    toast.success(`${product.title} added to bag!`);
+  };
+
+  return (
+    <section className="mt-28 mb-16">
+      {/* Header with Editorial Title and Navigation */}
+      <div className="flex justify-between items-end mb-10">
+        <div>
+          <span className="text-sm uppercase tracking-widest text-muted-foreground mb-2 block">
+            Complete the look
+          </span>
+          <h2 className="font-display text-3xl font-medium">Pairs Well With</h2>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-10 w-10 border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all disabled:opacity-40"
+            onClick={() => api?.scrollPrev()}
+            disabled={!canScrollPrev}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-10 w-10 border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all disabled:opacity-40"
+            onClick={() => api?.scrollNext()}
+            disabled={!canScrollNext}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Carousel */}
+      <Carousel
+        setApi={setApi}
+        opts={{
+          align: "start",
+          loop: false,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4">
+          {products.map((product) => (
+            <CarouselItem 
+              key={product.id} 
+              className="pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/4"
+            >
+              <div className="group relative transition-transform duration-300 hover:-translate-y-1">
+                <Link to={`/product/${product.handle}`} className="block">
+                  {/* Image Container */}
+                  <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50/50 mb-4 relative shadow-sm group-hover:shadow-lg transition-shadow duration-300">
+                    {product.images[0] ? (
+                      <img
+                        src={product.images[0]}
+                        alt={product.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ShoppingBag className="h-10 w-10 text-muted-foreground/50" />
+                      </div>
+                    )}
+                    
+                    {/* Quick Add Button - appears on hover */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 rounded-full bg-background/95 backdrop-blur-sm border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-md"
+                      onClick={(e) => handleQuickAdd(e, product)}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Quick Add
+                    </Button>
+                  </div>
+                </Link>
+                
+                {/* Text Content */}
+                <Link to={`/product/${product.handle}`}>
+                  <h3 className="font-display text-base font-medium mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                    {product.title}
+                  </h3>
+                  <p className="text-primary font-medium">${product.price.toFixed(2)}</p>
+                </Link>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+    </section>
+  );
+};
 
 const ProductDetail = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -693,38 +844,9 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Related Products */}
+          {/* Pairs Well With Carousel */}
           {relatedProducts.length > 0 && (
-            <section className="mt-24">
-              <h2 className="font-display text-2xl font-medium mb-8">You May Also Like</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                {relatedProducts.map((relatedProduct) => (
-                  <Link
-                    key={relatedProduct.id}
-                    to={`/product/${relatedProduct.handle}`}
-                    className="group"
-                  >
-                    <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 mb-3">
-                      {relatedProduct.images[0] ? (
-                        <img
-                          src={relatedProduct.images[0]}
-                          alt={relatedProduct.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ShoppingBag className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="font-display font-medium group-hover:text-primary transition-colors">
-                      {relatedProduct.title}
-                    </h3>
-                    <p className="text-primary">${relatedProduct.price.toFixed(2)}</p>
-                  </Link>
-                ))}
-              </div>
-            </section>
+            <PairsWellWithCarousel products={relatedProducts} addItem={addItem} />
           )}
 
           {/* Reviews */}

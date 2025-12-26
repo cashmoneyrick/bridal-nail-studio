@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2, Bell, Ruler, ChevronRight, Gift, Check } from "lucide-react";
+import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2, Bell, Ruler, ChevronRight, Gift, Check, Cloud } from "lucide-react";
 import { format, differenceInYears, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useNailProfilesStore } from "@/stores/nailProfilesStore";
+import { useNailProfileSync } from "@/hooks/useNailProfileSync";
 import { toast } from "sonner";
 
 const Account = () => {
@@ -26,14 +27,15 @@ const Account = () => {
   const testBirthday = searchParams.get('testBirthday') === 'true';
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, logout, updateProfile, isLoading } = useAuthStore();
-  const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
+  const { profiles, selectedProfileId, selectProfile, getSelectedProfile, isLoading: profilesLoading } = useNailProfilesStore();
+  const { isSynced } = useNailProfileSync();
   const selectedProfile = getSelectedProfile();
   const filledSizesCount = selectedProfile 
     ? Object.values(selectedProfile.sizes).filter(s => s && s.trim() !== '').length 
     : 0;
 
-  const handleProfileChange = (profileId: string) => {
-    selectProfile(profileId);
+  const handleProfileChange = async (profileId: string) => {
+    await selectProfile(profileId);
     const profile = profiles.find(p => p.id === profileId);
     if (profile) {
       toast.success(`Switched to "${profile.name}"`, { position: "top-center" });
@@ -163,11 +165,24 @@ const Account = () => {
                       <div className="flex-1">
                         <h3 className="font-display text-lg font-medium mb-1">My Perfect Fit Profile</h3>
                         
-                        {profiles.length > 0 ? (
+                {profilesLoading ? (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Syncing profiles...
+                          </div>
+                        ) : profiles.length > 0 ? (
                           <div className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                              {profiles.length} profile{profiles.length !== 1 ? 's' : ''} saved
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm text-muted-foreground">
+                                {profiles.length} profile{profiles.length !== 1 ? 's' : ''} saved
+                              </p>
+                              {user && isSynced && (
+                                <span className="inline-flex items-center gap-1 text-xs text-primary/70">
+                                  <Cloud className="h-3 w-3" />
+                                  Synced
+                                </span>
+                              )}
+                            </div>
                             
                             <Select 
                               value={selectedProfileId || ""} 

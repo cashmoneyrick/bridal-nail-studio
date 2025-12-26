@@ -6,6 +6,9 @@ import {
   FINGER_NAMES,
   LEFT_HAND,
   RIGHT_HAND,
+  FINISH_LABELS,
+  ACCENT_FINISH_CHANGE_PRICE,
+  FinishType,
 } from '@/lib/pricing';
 
 // Short labels for fingers
@@ -27,8 +30,13 @@ const AccentNails = () => {
     hasAccentNails,
     accentNails,
     nailColors,
+    baseFinish,
+    colorPalette,
+    accentConfigs,
     setHasAccentNails,
     toggleAccentNail,
+    setAccentConfig,
+    setNailColor,
   } = useCustomStudioStore();
 
   const renderNail = (fingerIndex: FingerIndex) => {
@@ -151,6 +159,124 @@ const AccentNails = () => {
               Selected accents: {Array.from(accentNails).map(i => FINGER_NAMES[i]).join(', ')}
             </p>
           )}
+        </div>
+      )}
+
+      {/* Configuration Panel - Only visible when accents are selected */}
+      {hasAccentNails && accentNails.size > 0 && (
+        <div className="space-y-4 border-t pt-6">
+          <div className="space-y-2">
+            <h3 className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
+              Configure accent nails
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Customize finish and color for each accent nail.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {Array.from(accentNails).sort((a, b) => a - b).map((fingerIndex) => {
+              const config = accentConfigs[fingerIndex as FingerIndex];
+              const currentFinish = config?.finish || null;
+              const currentColor = nailColors[fingerIndex as FingerIndex] || '#E8D4C4';
+              const paletteColors = colorPalette?.colors || [];
+
+              return (
+                <div
+                  key={fingerIndex}
+                  className="p-4 rounded-lg border bg-card space-y-4"
+                >
+                  {/* Header with finger name and color swatch */}
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{FINGER_NAMES[fingerIndex]}</span>
+                    <div
+                      className="w-6 h-6 rounded-full border-2 border-border"
+                      style={{ backgroundColor: currentColor }}
+                    />
+                  </div>
+
+                  {/* Finish Override */}
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                      Finish
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setAccentConfig(fingerIndex as FingerIndex, { ...config, finish: undefined })}
+                        className={cn(
+                          'px-3 py-1.5 text-sm rounded-md border transition-all',
+                          currentFinish === null || currentFinish === undefined
+                            ? 'border-primary bg-primary/5 text-foreground'
+                            : 'border-border hover:border-primary/50 text-muted-foreground'
+                        )}
+                      >
+                        Same as base ({FINISH_LABELS[baseFinish]})
+                      </button>
+                      {(['glossy', 'matte'] as FinishType[]).map((finish) => {
+                        const isSelected = currentFinish === finish;
+                        const isDifferentFromBase = finish !== baseFinish;
+                        return (
+                          <button
+                            key={finish}
+                            onClick={() => setAccentConfig(fingerIndex as FingerIndex, { ...config, finish })}
+                            className={cn(
+                              'px-3 py-1.5 text-sm rounded-md border transition-all',
+                              isSelected
+                                ? 'border-primary bg-primary/5 text-foreground'
+                                : 'border-border hover:border-primary/50 text-muted-foreground'
+                            )}
+                          >
+                            {FINISH_LABELS[finish]}
+                            {isDifferentFromBase && (
+                              <span className="ml-1 text-xs text-primary">+${ACCENT_FINISH_CHANGE_PRICE}</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Color Override */}
+                  {paletteColors.length > 0 ? (
+                    <div className="space-y-2">
+                      <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                        Color
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {paletteColors.map((color, idx) => {
+                          const isSelected = currentColor === color;
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setNailColor(fingerIndex as FingerIndex, color);
+                                setAccentConfig(fingerIndex as FingerIndex, { ...config, color });
+                              }}
+                              className={cn(
+                                'w-8 h-8 rounded-full border-2 transition-all',
+                                isSelected
+                                  ? 'border-primary ring-2 ring-primary/30 scale-110'
+                                  : 'border-border hover:border-primary/50 hover:scale-105'
+                              )}
+                              style={{ backgroundColor: color }}
+                            >
+                              {isSelected && (
+                                <Check className="w-4 h-4 mx-auto text-primary-foreground drop-shadow-md" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">
+                      Select a color palette in Base Look to customize accent colors.
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

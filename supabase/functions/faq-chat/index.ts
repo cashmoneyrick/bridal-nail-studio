@@ -47,14 +47,43 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const body = await req.json();
+    const { message } = body;
+
+    // Validate message exists and is a string
+    if (!message || typeof message !== 'string') {
+      return new Response(JSON.stringify({ error: 'Invalid message format' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const trimmedMessage = message.trim();
+
+    // Check for empty message
+    if (trimmedMessage.length === 0) {
+      return new Response(JSON.stringify({ error: 'Message cannot be empty' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Enforce maximum length (1000 chars)
+    if (trimmedMessage.length > 1000) {
+      return new Response(JSON.stringify({ error: 'Message too long (max 1000 characters)' }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("Processing FAQ question:", message);
+    // Log only first 100 chars to prevent log injection
+    console.log("Processing FAQ question:", trimmedMessage.substring(0, 100));
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -66,7 +95,7 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: FAQ_SYSTEM_PROMPT },
-          { role: "user", content: message },
+          { role: "user", content: trimmedMessage },
         ],
       }),
     });

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { logError } from '@/lib/logger';
 
 export interface UserProfile {
   id: string;
@@ -185,13 +186,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
+        logError('Error fetching profile:', error);
         return;
       }
 
       set({ profile: data as UserProfile | null });
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logError('Error fetching profile:', error);
     }
   },
 

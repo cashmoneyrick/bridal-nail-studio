@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Sparkles, Gift, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import { logError } from "@/lib/logger";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 
@@ -62,7 +63,7 @@ const NailClubSignup = () => {
           setStatus("already_subscribed");
           setShowConfetti(true);
         } else {
-          console.error("Signup error:", error);
+          logError("Signup error:", error);
           setErrorMessage("Something went wrong. Please try again.");
           setStatus("error");
         }
@@ -71,7 +72,7 @@ const NailClubSignup = () => {
         setShowConfetti(true);
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      logError("Unexpected error:", err);
       setErrorMessage("Something went wrong. Please try again.");
       setStatus("error");
     }

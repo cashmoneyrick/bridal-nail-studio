@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { logError } from "@/lib/logger";
 
 interface Message {
   role: "user" | "assistant";
@@ -34,7 +35,7 @@ const loadMessages = (): Message[] => {
       }
     }
   } catch (e) {
-    console.error("Failed to load chat history:", e);
+    logError("Failed to load chat history:", e);
   }
   return [DEFAULT_MESSAGE];
 };
@@ -67,7 +68,7 @@ const FaqChatbot = () => {
 
       setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
     } catch (error: unknown) {
-      console.error("Chat error:", error);
+      logError("Chat error:", error);
       toast({
         title: "Couldn't send message",
         description: "Please try again in a moment.",

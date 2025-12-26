@@ -116,6 +116,7 @@ export type Database = {
       profiles: {
         Row: {
           accepts_marketing: boolean | null
+          birthday: string | null
           created_at: string
           email: string | null
           first_name: string | null
@@ -127,6 +128,7 @@ export type Database = {
         }
         Insert: {
           accepts_marketing?: boolean | null
+          birthday?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -138,6 +140,7 @@ export type Database = {
         }
         Update: {
           accepts_marketing?: boolean | null
+          birthday?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null

@@ -1,7 +1,12 @@
-import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut } from "lucide-react";
+import { useState } from "react";
+import { User, Heart, Package, MapPin, CreditCard, Settings, LogOut, CalendarIcon, Cake, Loader2 } from "lucide-react";
+import { format, differenceInYears, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import DiscountCodesSection from "@/components/DiscountCodesSection";
@@ -13,12 +18,39 @@ import { toast } from "sonner";
 const Account = () => {
   const navigate = useNavigate();
   const favoritesCount = useFavoritesStore(state => state.items.length);
-  const { user, profile, logout } = useAuthStore();
+  const { user, profile, logout, updateProfile, isLoading } = useAuthStore();
+  
+  const [birthday, setBirthday] = useState<Date | undefined>(undefined);
+  const [birthdayError, setBirthdayError] = useState<string | null>(null);
+  const [isSavingBirthday, setIsSavingBirthday] = useState(false);
 
   const handleLogout = () => {
     logout();
     toast.success("You've been signed out", { position: "top-center" });
     navigate("/");
+  };
+
+  const handleSaveBirthday = async () => {
+    if (!birthday) return;
+    
+    setBirthdayError(null);
+    const age = differenceInYears(new Date(), birthday);
+    
+    if (age < 13 || age > 60) {
+      setBirthdayError("You must be between 13 and 60 years old");
+      return;
+    }
+    
+    setIsSavingBirthday(true);
+    const birthdayStr = format(birthday, "yyyy-MM-dd");
+    const result = await updateProfile({ birthday: birthdayStr });
+    setIsSavingBirthday(false);
+    
+    if (result.success) {
+      toast.success("Birthday saved! You'll receive a special surprise! 🎂", { position: "top-center" });
+    } else {
+      toast.error(result.error || "Failed to save birthday", { position: "top-center" });
+    }
   };
 
   const accountLinks = [
@@ -141,6 +173,94 @@ const Account = () => {
               </Link>
             ))}
           </div>
+
+          {/* Birthday Section - Show only when logged in */}
+          {user && (
+            <Card className="mt-8">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Cake className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Birthday Surprise</CardTitle>
+                    <CardDescription>
+                      Get a special gift during your birthday month
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {profile?.birthday ? (
+                  // Birthday is set - show read-only
+                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                    <CalendarIcon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">
+                        {format(parseISO(profile.birthday), "MMMM d, yyyy")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Your birthday is locked and can't be changed
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  // Birthday not set - show date picker
+                  <div className="space-y-4">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full sm:w-[280px] justify-start text-left font-normal",
+                            !birthday && "text-muted-foreground",
+                            birthdayError && "border-destructive"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {birthday ? format(birthday, "MMMM d, yyyy") : <span>Pick your birthday</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={birthday}
+                          onSelect={setBirthday}
+                          defaultMonth={new Date(new Date().getFullYear() - 25, 0)}
+                          fromYear={new Date().getFullYear() - 60}
+                          toYear={new Date().getFullYear() - 13}
+                          captionLayout="dropdown-buttons"
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <p className="text-sm text-muted-foreground">
+                      Get a special birthday surprise on us! 🎂
+                    </p>
+                    {birthdayError && (
+                      <p className="text-sm text-destructive">{birthdayError}</p>
+                    )}
+                    {birthday && (
+                      <Button 
+                        onClick={handleSaveBirthday}
+                        disabled={isSavingBirthday}
+                        className="btn-primary"
+                      >
+                        {isSavingBirthday ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Birthday"
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Discount Codes Section */}
           <div className="mt-8">

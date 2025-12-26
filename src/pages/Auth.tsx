@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, ArrowLeft, Check } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft, Check, CalendarIcon } from "lucide-react";
+import { format, differenceInYears } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -51,6 +55,7 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+  const [signupBirthday, setSignupBirthday] = useState<Date | undefined>(undefined);
   const [signupErrors, setSignupErrors] = useState<Record<string, string>>({});
   
   // Forgot password state
@@ -107,7 +112,17 @@ const Auth = () => {
       return;
     }
 
-    const result = await signup(signupEmail, signupPassword, signupFirstName, signupLastName);
+    // Validate birthday if provided (must be 13-60 years old)
+    if (signupBirthday) {
+      const age = differenceInYears(new Date(), signupBirthday);
+      if (age < 13 || age > 60) {
+        setSignupErrors({ birthday: "You must be between 13 and 60 years old" });
+        return;
+      }
+    }
+
+    const birthdayStr = signupBirthday ? format(signupBirthday, "yyyy-MM-dd") : undefined;
+    const result = await signup(signupEmail, signupPassword, signupFirstName, signupLastName, birthdayStr);
     if (result.success) {
       toast.success("Account created! Welcome to YourPrettySets", { position: "top-center" });
       navigate("/account");
@@ -405,6 +420,44 @@ const Auth = () => {
                         />
                         {signupErrors.confirmPassword && (
                           <p className="text-sm text-destructive">{signupErrors.confirmPassword}</p>
+                        )}
+                      </div>
+                      
+                      {/* Birthday Field (Optional) */}
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-birthday">Birthday (Optional)</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                `w-full justify-start text-left font-normal ${inputStyles}`,
+                                !signupBirthday && "text-muted-foreground",
+                                signupErrors.birthday && "border-destructive"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {signupBirthday ? format(signupBirthday, "MMMM d, yyyy") : <span>Pick a date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={signupBirthday}
+                              onSelect={setSignupBirthday}
+                              defaultMonth={new Date(new Date().getFullYear() - 25, 0)}
+                              fromYear={new Date().getFullYear() - 60}
+                              toYear={new Date().getFullYear() - 13}
+                              captionLayout="dropdown-buttons"
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <p className="text-xs text-muted-foreground">
+                          Get a special birthday surprise on us! 🎂
+                        </p>
+                        {signupErrors.birthday && (
+                          <p className="text-sm text-destructive">{signupErrors.birthday}</p>
                         )}
                       </div>
                       

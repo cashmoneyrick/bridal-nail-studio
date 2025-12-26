@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import DiscountCodesSection from "@/components/DiscountCodesSection";
+import MembershipSection from "@/components/MembershipSection";
 import { Link, useNavigate } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -147,6 +148,13 @@ const Account = () => {
               </Card>
               <Separator className="my-8" />
             </>
+          )}
+
+          {/* Membership Section - Show only when logged in */}
+          {user && (
+            <div className="mb-8">
+              <MembershipSection memberSince={profile?.created_at} />
+            </div>
           )}
 
           {/* Quick Links Grid */}

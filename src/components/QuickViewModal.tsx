@@ -7,12 +7,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Minus, Plus, ShoppingBag, ExternalLink } from "lucide-react";
-import { useCartStore, CartItem } from "@/stores/cartStore";
-import { toast } from "sonner";
-
-const NAIL_SHAPES = ['Almond', 'Coffin', 'Stiletto', 'Square', 'Oval'];
-const NAIL_LENGTHS = ['Short', 'Medium', 'Long', 'Extra Long'];
+import { ArrowRight, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -20,233 +15,177 @@ interface QuickViewModalProps {
   onClose: () => void;
 }
 
-const ShapeIcon = ({ shape, isSelected }: { shape: string; isSelected: boolean }) => {
-  const baseClass = `w-8 h-12 transition-colors duration-200 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`;
-  
-  switch (shape) {
-    case 'Almond':
-      return (
-        <svg viewBox="0 0 24 36" className={baseClass} fill="currentColor">
-          <path d="M12 2 C6 8, 4 16, 4 24 C4 30, 7 34, 12 34 C17 34, 20 30, 20 24 C20 16, 18 8, 12 2Z" />
-        </svg>
-      );
-    case 'Coffin':
-      return (
-        <svg viewBox="0 0 24 36" className={baseClass} fill="currentColor">
-          <path d="M5 2 L5 26 C5 30, 8 34, 12 34 C16 34, 19 30, 19 26 L19 2 L15 2 L14 8 L10 8 L9 2 Z" />
-        </svg>
-      );
-    case 'Stiletto':
-      return (
-        <svg viewBox="0 0 24 36" className={baseClass} fill="currentColor">
-          <path d="M12 34 C8 34, 5 30, 5 24 L5 2 L19 2 L19 24 C19 30, 16 34, 12 34 L12 2" />
-        </svg>
-      );
-    case 'Square':
-      return (
-        <svg viewBox="0 0 24 36" className={baseClass} fill="currentColor">
-          <path d="M4 2 L4 28 C4 31, 6 34, 12 34 C18 34, 20 31, 20 28 L20 2 Z" />
-        </svg>
-      );
-    case 'Oval':
-      return (
-        <svg viewBox="0 0 24 36" className={baseClass} fill="currentColor">
-          <ellipse cx="12" cy="18" rx="8" ry="16" />
-        </svg>
-      );
-    default:
-      return null;
-  }
-};
-
 const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
-  const [selectedShape, setSelectedShape] = useState('Almond');
-  const [selectedLength, setSelectedLength] = useState('Medium');
-  const [quantity, setQuantity] = useState(1);
-  
-  const addItem = useCartStore(state => state.addItem);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Reset state when product changes
+  // Reset to first image when product changes
   useEffect(() => {
     if (product) {
-      setSelectedShape('Almond');
-      setSelectedLength('Medium');
-      setQuantity(1);
+      setCurrentImageIndex(0);
     }
   }, [product]);
 
   if (!product) return null;
 
-  const image = product.images[0];
-  const isAvailable = product.variants[0]?.availableForSale;
+  const images = product.images.length > 0 ? product.images : [];
+  const hasMultipleImages = images.length > 1;
+  const currentImage = images[currentImageIndex];
 
-  const handleAddToBag = () => {
-    if (!product || !isAvailable) return;
-
-    const variantId = `${product.id}-${selectedShape.toLowerCase()}-${selectedLength.toLowerCase()}`;
-
-    const cartItem: CartItem = {
-      product,
-      variantId,
-      variantTitle: `${selectedShape} / ${selectedLength}`,
-      price: {
-        amount: product.price.toString(),
-        currencyCode: product.currencyCode,
-      },
-      quantity,
-      selectedOptions: [
-        { name: 'Shape', value: selectedShape },
-        { name: 'Length', value: selectedLength },
-      ],
-    };
-
-    addItem(cartItem);
-    toast.success(`${product.title} added to bag`, {
-      position: "top-center",
-    });
-    onClose();
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
-  const incrementQuantity = () => setQuantity(q => Math.min(q + 1, 10));
-  const decrementQuantity = () => setQuantity(q => Math.max(q - 1, 1));
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl p-0 rounded-2xl overflow-hidden border-border/50 bg-background">
+      <DialogContent className="max-w-4xl p-0 rounded-3xl overflow-hidden border-0 bg-background/95 backdrop-blur-xl shadow-2xl">
         <DialogTitle className="sr-only">Quick View: {product.title}</DialogTitle>
-        <div className="grid md:grid-cols-2">
-          {/* Product Image */}
-          <div className="aspect-square bg-muted/20 relative">
-            {image ? (
-              <img
-                src={image}
-                alt={product.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-muted-foreground">No image</span>
+        
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background shadow-lg transition-all duration-300 hover:scale-105"
+        >
+          <X className="h-5 w-5 text-foreground/70" />
+        </button>
+
+        <div className="grid md:grid-cols-[1.2fr,1fr]">
+          {/* Image Gallery */}
+          <div className="relative bg-muted/10">
+            {/* Main Image */}
+            <div className="aspect-square relative overflow-hidden">
+              {currentImage ? (
+                <img
+                  src={currentImage}
+                  alt={`${product.title} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover transition-opacity duration-300"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                  <span className="text-muted-foreground">No image available</span>
+                </div>
+              )}
+
+              {/* Badge */}
+              {product.badge && (
+                <div className="absolute top-4 left-4">
+                  <span className={`
+                    px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase
+                    ${product.badge === 'New' 
+                      ? 'bg-primary text-primary-foreground shadow-md' 
+                      : 'bg-foreground/90 text-background shadow-md'
+                    }
+                  `}>
+                    {product.badge}
+                  </span>
+                </div>
+              )}
+
+              {/* Navigation Arrows */}
+              {hasMultipleImages && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background hover:scale-105 transition-all duration-300"
+                  >
+                    <ChevronLeft className="h-5 w-5 text-foreground/70" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background hover:scale-105 transition-all duration-300"
+                  >
+                    <ChevronRight className="h-5 w-5 text-foreground/70" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail Navigation */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-background/80 backdrop-blur-sm rounded-full">
+                {images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`
+                      w-12 h-12 rounded-lg overflow-hidden border-2 transition-all duration-300
+                      ${currentImageIndex === index 
+                        ? 'border-primary shadow-md scale-105' 
+                        : 'border-transparent opacity-70 hover:opacity-100'
+                      }
+                    `}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
               </div>
             )}
-            {/* Badge */}
-            {product.badge && (
-              <div className="absolute top-4 left-4">
-                <span className={`
-                  px-3 py-1 rounded-full text-xs font-medium
-                  ${product.badge === 'New' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-foreground text-background'
-                  }
-                `}>
-                  {product.badge}
-                </span>
+
+            {/* Dot Indicators (for mobile or when thumbnails would be too small) */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 md:hidden">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`
+                      w-2.5 h-2.5 rounded-full transition-all duration-300
+                      ${currentImageIndex === index 
+                        ? 'bg-primary w-6' 
+                        : 'bg-foreground/30 hover:bg-foreground/50'
+                      }
+                    `}
+                  />
+                ))}
               </div>
             )}
           </div>
 
           {/* Product Details */}
-          <div className="p-6 md:p-8 flex flex-col">
-            <div className="flex-1">
-              <h2 className="font-display text-2xl md:text-3xl font-medium mb-2">
-                {product.title}
-              </h2>
-              <p className="text-primary font-display text-2xl mb-6">
-                ${product.price.toFixed(2)}
+          <div className="p-8 md:p-10 flex flex-col justify-center">
+            <div className="space-y-6">
+              {/* Product Title */}
+              <div>
+                <h2 className="font-display text-3xl md:text-4xl font-medium leading-tight mb-3">
+                  {product.title}
+                </h2>
+                <p className="text-primary font-display text-2xl md:text-3xl">
+                  ${product.price.toFixed(2)}
+                </p>
+              </div>
+
+              {/* Description */}
+              <p className="text-muted-foreground text-base leading-relaxed font-light">
+                {product.description}
               </p>
 
-              {/* Shape Selector */}
-              <div className="mb-6">
-                <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground block mb-3">
-                  Shape
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {NAIL_SHAPES.map((shape) => (
-                    <button
-                      key={shape}
-                      onClick={() => setSelectedShape(shape)}
-                      className={`
-                        flex flex-col items-center gap-1 p-2 rounded-xl border transition-all duration-300
-                        ${selectedShape === shape
-                          ? 'border-primary bg-primary/5 shadow-sm'
-                          : 'border-border/70 hover:border-primary/50'
-                        }
-                      `}
-                    >
-                      <ShapeIcon shape={shape} isSelected={selectedShape === shape} />
-                      <span className={`text-xs font-medium ${selectedShape === shape ? 'text-primary' : 'text-muted-foreground'}`}>
-                        {shape}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+              {/* Decorative divider */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                <div className="flex-1 h-px bg-gradient-to-l from-border to-transparent" />
               </div>
 
-              {/* Length Selector */}
-              <div className="mb-6">
-                <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground block mb-3">
-                  Length
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {NAIL_LENGTHS.map((length) => (
-                    <button
-                      key={length}
-                      onClick={() => setSelectedLength(length)}
-                      className={`
-                        px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 border
-                        ${selectedLength === length
-                          ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                          : 'bg-background border-border/70 text-foreground/70 hover:border-primary/50 hover:text-foreground'
-                        }
-                      `}
-                    >
-                      {length}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quantity Picker */}
-              <div className="mb-6">
-                <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground block mb-3">
-                  Quantity
-                </label>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={decrementQuantity}
-                    disabled={quantity <= 1}
-                    className="w-10 h-10 rounded-full border border-border/70 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="font-medium text-lg w-8 text-center">{quantity}</span>
-                  <button
-                    onClick={incrementQuantity}
-                    disabled={quantity >= 10}
-                    className="w-10 h-10 rounded-full border border-border/70 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-3 pt-4 border-t border-border/50">
-              <Button
-                onClick={handleAddToBag}
-                disabled={!isAvailable}
-                className="w-full rounded-full h-12 text-base font-medium"
-              >
-                <ShoppingBag className="h-5 w-5 mr-2" />
-                {isAvailable ? 'Add to Bag' : 'Sold Out'}
-              </Button>
+              {/* View Full Details CTA */}
               <Link
                 to={`/product/${product.handle}`}
                 onClick={onClose}
-                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+                className="block"
               >
-                View Full Details
-                <ExternalLink className="h-4 w-4" />
+                <Button
+                  className="w-full rounded-full h-14 text-base font-medium group"
+                  size="lg"
+                >
+                  View Full Details
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </Link>
             </div>
           </div>

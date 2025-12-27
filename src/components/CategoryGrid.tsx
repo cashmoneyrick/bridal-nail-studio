@@ -1,4 +1,11 @@
-import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
 
 const categories = [
   {
@@ -21,6 +28,9 @@ const categories = [
   },
 ];
 
+// Duplicate for smooth infinite looping
+const extendedCategories = [...categories, ...categories];
+
 const CategoryGrid = () => {
   return (
     <section className="section-padding bg-background">
@@ -28,110 +38,79 @@ const CategoryGrid = () => {
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
-            Discover Your Perfect Set
+            Explore Our Collections
           </h2>
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
             From minimalist chic to daring artistry, find nails that match your unique style
           </p>
         </div>
 
-        {/* Bento Grid - Asymmetric Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6">
-          {/* First card - Large, spans 2 rows on desktop */}
-          <a
-            href={categories[0].href}
-            className="group relative overflow-hidden rounded-2xl aspect-[3/4] md:row-span-2 md:aspect-auto md:min-h-[500px] cursor-pointer"
+        {/* Center-Focused Carousel */}
+        <div className="relative px-4 md:px-16">
+          <Carousel
+            opts={{
+              align: "center",
+              loop: true,
+            }}
+            className="w-full"
           >
-            <div className="absolute inset-0">
-              <img
-                src={categories[0].image}
-                alt={categories[0].title}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
-                <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
-                  {categories[0].title}
-                </h3>
-                <p className="text-white/70 text-sm sm:text-base mb-4">
-                  {categories[0].description}
-                </p>
-                <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Shop Now
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </div>
-            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
-          </a>
-
-          {/* Second card - Top right */}
-          <a
-            href={categories[1].href}
-            className="group relative overflow-hidden rounded-2xl aspect-[3/4] md:aspect-[4/3] cursor-pointer"
-          >
-            <div className="absolute inset-0">
-              <img
-                src={categories[1].image}
-                alt={categories[1].title}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
-                <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
-                  {categories[1].title}
-                </h3>
-                <p className="text-white/70 text-sm sm:text-base mb-4">
-                  {categories[1].description}
-                </p>
-                <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Shop Now
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </div>
-            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
-          </a>
-
-          {/* Third card - Bottom right */}
-          <a
-            href={categories[2].href}
-            className="group relative overflow-hidden rounded-2xl aspect-[3/4] md:aspect-[4/3] cursor-pointer"
-          >
-            <div className="absolute inset-0">
-              <img
-                src={categories[2].image}
-                alt={categories[2].title}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
-            </div>
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
-                <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
-                  {categories[2].title}
-                </h3>
-                <p className="text-white/70 text-sm sm:text-base mb-4">
-                  {categories[2].description}
-                </p>
-                <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Shop Now
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </div>
-            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
-          </a>
+            {/* Left fade gradient */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 md:w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            
+            <CarouselContent className="-ml-4 md:-ml-6">
+              {extendedCategories.map((category, index) => (
+                <CarouselItem 
+                  key={index} 
+                  className="pl-4 md:pl-6 basis-4/5 md:basis-[28%]"
+                >
+                  <a 
+                    href={category.href} 
+                    className="group block relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer"
+                  >
+                    {/* Image */}
+                    <img 
+                      src={category.image} 
+                      alt={category.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
+                    
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
+                    
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-6">
+                      <h3 className="font-display text-xl md:text-2xl font-medium text-white mb-4">
+                        {category.title}
+                      </h3>
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="w-fit bg-white/90 text-foreground hover:bg-white border-0"
+                      >
+                        Shop Collection
+                      </Button>
+                    </div>
+                    
+                    {/* Hover border */}
+                    <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
+                  </a>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            
+            {/* Right fade gradient */}
+            <div className="absolute right-0 top-0 bottom-0 w-12 md:w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            
+            {/* Navigation arrows - positioned outside on desktop */}
+            <CarouselPrevious 
+              className="left-0 md:-left-4 h-10 w-10 border-border/60 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
+            />
+            <CarouselNext 
+              className="right-0 md:-right-4 h-10 w-10 border-border/60 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
+            />
+          </Carousel>
         </div>
       </div>
     </section>

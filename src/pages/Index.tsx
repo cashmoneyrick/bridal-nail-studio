@@ -12,8 +12,8 @@ const Index = () => {
       <Navigation />
       <main className="relative z-10">
         <HeroSection />
-        <ProductGrid />
         <CategoryGrid />
+        <ProductGrid />
         <CustomStudioPreview />
         <ThreeStepProcess />
       </main>

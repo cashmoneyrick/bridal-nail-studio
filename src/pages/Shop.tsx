@@ -116,24 +116,26 @@ const Shop = () => {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Collection Filter Pills */}
-          <div className="flex justify-center mb-12 -mt-4">
-            <div className="inline-flex flex-wrap justify-center gap-3 p-2 bg-card/60 backdrop-blur-sm rounded-full border border-border/40 shadow-sm">
-              {COLLECTIONS.map((collection) => (
-                <button
-                  key={collection}
-                  onClick={() => setSelectedCollection(collection)}
-                  className={`
-                    px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap
-                    transition-all duration-300
-                    ${selectedCollection === collection
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-foreground/60 hover:text-foreground hover:bg-background/80'
-                    }
-                  `}
-                >
-                  {collection}
-                </button>
-              ))}
+          <div className="mb-12 -mt-4">
+            <div className="flex md:justify-center overflow-x-auto scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
+              <div className="inline-flex flex-nowrap md:flex-wrap md:justify-center gap-3 md:p-2 md:bg-card/60 md:backdrop-blur-sm md:rounded-full md:border md:border-border/40 md:shadow-sm">
+                {COLLECTIONS.map((collection) => (
+                  <button
+                    key={collection}
+                    onClick={() => setSelectedCollection(collection)}
+                    className={`
+                      flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap
+                      transition-all duration-300
+                      ${selectedCollection === collection
+                        ? 'bg-primary text-primary-foreground shadow-md'
+                        : 'text-foreground/60 hover:text-foreground hover:bg-background/80'
+                      }
+                    `}
+                  >
+                    {collection}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

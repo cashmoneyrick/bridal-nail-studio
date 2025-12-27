@@ -272,7 +272,7 @@ const HowTo = () => {
       {/* Quick Stats Bar */}
       <section className="border-y border-border bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-0 sm:divide-x sm:divide-border">
             {quickStats.map((stat, index) => (
               <div key={index} className="py-5 sm:py-8 text-center">
                 <div className="font-display text-2xl sm:text-3xl md:text-4xl font-medium text-primary mb-0.5 sm:mb-1">

@@ -33,19 +33,19 @@ const HeroSection = () => {
         <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up">
           {/* Tagline */}
           <p className="text-sm sm:text-base font-medium tracking-[0.3em] uppercase text-foreground/70">
-            Handcrafted Luxury Press-Ons
+            Valentine's Collection 2025
           </p>
 
           {/* Main Headline */}
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-tight text-balance">
-            Nails That Tell
-            <span className="block italic text-primary">Your Story</span>
+            Love Letters
+            <span className="block italic text-primary">On Your Fingertips</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-base sm:text-lg md:text-xl text-foreground/70 max-w-xl mx-auto font-light leading-relaxed">
-            Bespoke press-on nails designed for your most memorable moments. 
-            From everyday elegance to bridal perfection.
+            Celebrate romance with our handcrafted Valentine's press-on nails. 
+            Hearts, roses, and love notes—designed to make every moment magical.
           </p>
 
           {/* CTA Buttons */}
@@ -55,7 +55,7 @@ const HeroSection = () => {
               size="lg"
               onClick={scrollToShop}
             >
-              Shop Collection
+              Shop Valentine's Sets
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Link to="/custom-studio">
@@ -64,7 +64,7 @@ const HeroSection = () => {
                 className="btn-secondary text-base min-w-[200px]"
                 size="lg"
               >
-                Create Custom Set
+                Design Your Love Story
               </Button>
             </Link>
           </div>
@@ -72,7 +72,8 @@ const HeroSection = () => {
           {/* Valentine's Day Badge */}
           <div className="pt-6 animate-fade-in">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full text-sm text-foreground/80">
-              <span>Valentine's Gift Sets Available</span>
+              <span>💌</span>
+              <span>Limited Edition Valentine's Sets</span>
               <span>💝</span>
             </span>
           </div>

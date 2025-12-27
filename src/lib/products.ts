@@ -2,6 +2,7 @@
 
 import roseQuartzImage from "@/assets/rose-quartz-dreams.jpeg";
 import midnightLuxeImage from "@/assets/midnight-luxe.jpeg";
+import frenchEleganceImage from "@/assets/french-elegance.jpeg";
 
 export interface Product {
   id: string;
@@ -80,7 +81,7 @@ export const sampleProducts: Product[] = [
     handle: "french-elegance",
     price: 28.00,
     currencyCode: "USD",
-    images: ["/placeholder.svg"],
+    images: [frenchEleganceImage],
     variants: [
       {
         id: "v3",

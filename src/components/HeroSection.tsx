@@ -58,8 +58,16 @@ const HeroSection = () => {
             </Link>
           </div>
 
+          {/* Valentine's Day Badge */}
+          <div className="pt-6 animate-fade-in">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full text-sm text-foreground/80">
+              <span>Valentine's Gift Sets Available</span>
+              <span>💝</span>
+            </span>
+          </div>
+
           {/* Trust Badge */}
-          <div className="pt-8 sm:pt-12">
+          <div className="pt-4 sm:pt-6">
             <p className="text-xs sm:text-sm text-foreground/50 tracking-wide">
               ★★★★★ Loved by 2,000+ happy customers
             </p>

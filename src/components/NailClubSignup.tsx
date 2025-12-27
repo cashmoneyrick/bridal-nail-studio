@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles, Gift, Mail } from "lucide-react";
+import { Loader2, Sparkles, Gift, Mail, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { logError } from "@/lib/logger";
 
@@ -155,12 +155,13 @@ const NailClubSignup = () => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-8">
+      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-secondary/10 backdrop-blur-sm border border-border/50 rounded-2xl p-8">
         <div className="text-center mb-6">
           <div className="w-12 h-12 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
             <Mail className="w-6 h-6 text-primary" />
           </div>
-          <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-2">
+          <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-2 flex items-center justify-center gap-2">
+            <Heart className="w-5 h-5 text-primary" />
             Join the Nail Club
           </h3>
           <p className="text-muted-foreground text-sm">

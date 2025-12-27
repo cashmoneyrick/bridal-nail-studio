@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Check, Palette, Upload, Sparkles, Heart } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 
 const features = [
-  { icon: Upload, text: "Upload your inspiration photos" },
-  { icon: Palette, text: "Choose your perfect shape & length" },
-  { icon: Sparkles, text: "Select finishes & embellishments" },
-  { icon: Heart, text: "Save your designs for later" },
+  "Upload your inspiration photos",
+  "Choose your perfect shape & length",
+  "Select finishes & embellishments",
+  "Save your designs for later",
 ];
 
 const CustomStudioPreview = () => {
@@ -26,14 +26,12 @@ const CustomStudioPreview = () => {
               />
             </div>
             {/* Floating Card */}
-            <div className="absolute -bottom-6 -right-6 sm:bottom-8 sm:right-8 bg-card p-4 sm:p-6 rounded-2xl shadow-xl max-w-[200px] sm:max-w-[240px] animate-fade-in">
-              <div className="flex items-center space-x-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                </div>
+            <div className="absolute -bottom-4 -right-4 sm:bottom-6 sm:right-6 bg-card p-3 sm:p-4 rounded-xl shadow-md max-w-[160px] sm:max-w-[180px] animate-fade-in">
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
                 <div>
-                  <p className="font-display font-medium text-sm">Custom Orders</p>
-                  <p className="text-xs text-muted-foreground">48-72hr turnaround</p>
+                  <p className="font-display font-medium text-xs">Custom Orders</p>
+                  <p className="text-[10px] text-muted-foreground">48-72hr turnaround</p>
                 </div>
               </div>
             </div>
@@ -42,10 +40,11 @@ const CustomStudioPreview = () => {
           {/* Content Side */}
           <div className="order-1 lg:order-2 space-y-6 sm:space-y-8">
             <div>
+              <div className="w-12 h-0.5 bg-primary mb-4" />
               <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
                 Custom Studio
               </p>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium leading-tight mb-4">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-medium leading-tight mb-4">
                 Design Your Dream Set
               </h2>
               <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
@@ -56,13 +55,11 @@ const CustomStudioPreview = () => {
             </div>
 
             {/* Feature List */}
-            <ul className="space-y-4">
+            <ul className="space-y-6">
               {features.map((feature, index) => (
                 <li key={index} className="flex items-center space-x-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="text-foreground/80">{feature.text}</span>
+                  <Check className="w-5 h-5 text-primary flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-foreground/80">{feature}</span>
                 </li>
               ))}
             </ul>

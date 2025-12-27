@@ -81,7 +81,7 @@ const ProductGrid = () => {
             Shop
           </p>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
-            Our Collection
+            Shop Our Bestsellers
           </h2>
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
             Handcrafted press-on nail sets designed for every occasion

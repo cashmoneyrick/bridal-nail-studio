@@ -17,6 +17,9 @@ export interface Product {
   options: ProductOption[];
   // Fix 7: Add optional customization data for custom studio orders
   customizationData?: Record<string, unknown>;
+  // Collection and badge for shop filtering
+  collection?: string;
+  badge?: 'Bestseller' | 'New' | null;
 }
 
 export interface ProductVariant {
@@ -53,7 +56,9 @@ export const sampleProducts: Product[] = [
         selectedOptions: []
       }
     ],
-    options: []
+    options: [],
+    collection: "Everyday",
+    badge: null
   },
   {
     id: "2",
@@ -73,7 +78,9 @@ export const sampleProducts: Product[] = [
         selectedOptions: []
       }
     ],
-    options: []
+    options: [],
+    collection: "Bold & Artistic",
+    badge: "Bestseller"
   },
   {
     id: "3",
@@ -93,7 +100,9 @@ export const sampleProducts: Product[] = [
         selectedOptions: []
       }
     ],
-    options: []
+    options: [],
+    collection: "French & Classic",
+    badge: "New"
   },
   {
     id: "4",
@@ -113,7 +122,9 @@ export const sampleProducts: Product[] = [
         selectedOptions: []
       }
     ],
-    options: []
+    options: [],
+    collection: "Bridal",
+    badge: null
   }
 ];
 

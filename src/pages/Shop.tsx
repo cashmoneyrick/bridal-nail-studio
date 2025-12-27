@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Product, getProducts } from "@/lib/products";
 import { Button } from "@/components/ui/button";
-import { Loader2, Filter, X, Grid3X3, LayoutList, Heart, ShoppingBag, ChevronDown } from "lucide-react";
+import { Loader2, Filter, X, Grid3X3, LayoutList, Heart, ShoppingBag, ChevronDown, Eye } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { toast } from "sonner";
+import QuickViewModal from "@/components/QuickViewModal";
 
 const SHAPES = ['All', 'Almond', 'Coffin', 'Stiletto', 'Square', 'Oval'];
 const LENGTHS = ['All', 'Short', 'Medium', 'Long', 'Extra Long'];
@@ -36,6 +37,7 @@ const Shop = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [taglineIndex, setTaglineIndex] = useState(0);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   
   const addItem = useCartStore(state => state.addItem);
 
@@ -300,6 +302,7 @@ const Shop = () => {
                   key={product.id} 
                   product={product} 
                   onQuickAdd={() => handleQuickAdd(product)}
+                  onQuickView={() => setQuickViewProduct(product)}
                 />
               ))}
             </div>
@@ -310,6 +313,7 @@ const Shop = () => {
                   key={product.id} 
                   product={product} 
                   onQuickAdd={() => handleQuickAdd(product)}
+                  onQuickView={() => setQuickViewProduct(product)}
                 />
               ))}
             </div>
@@ -317,12 +321,18 @@ const Shop = () => {
         </div>
       </main>
 
+      <QuickViewModal 
+        product={quickViewProduct} 
+        isOpen={!!quickViewProduct} 
+        onClose={() => setQuickViewProduct(null)} 
+      />
+
       <Footer />
     </div>
   );
 };
 
-const ProductCard = ({ product, onQuickAdd }: { product: Product; onQuickAdd: () => void }) => {
+const ProductCard = ({ product, onQuickAdd, onQuickView }: { product: Product; onQuickAdd: () => void; onQuickView: () => void }) => {
   const image = product.images[0];
   const isAvailable = product.variants[0]?.availableForSale;
   const { items, addFavorite, removeFavorite } = useFavoritesStore();
@@ -372,8 +382,20 @@ const ProductCard = ({ product, onQuickAdd }: { product: Product; onQuickAdd: ()
               </div>
             )}
             
-            {/* Quick Add Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+            {/* Quick View & Quick Add Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-full shadow-lg bg-background/90 backdrop-blur-sm hover:bg-background border border-border/50"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onQuickView();
+                }}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Quick View
+              </Button>
               <Button
                 variant="secondary"
                 size="sm"
@@ -384,8 +406,7 @@ const ProductCard = ({ product, onQuickAdd }: { product: Product; onQuickAdd: ()
                 }}
                 disabled={!isAvailable}
               >
-                <ShoppingBag className="h-4 w-4 mr-2" />
-                {isAvailable ? 'Quick Add' : 'Sold Out'}
+                <ShoppingBag className="h-4 w-4" />
               </Button>
             </div>
             
@@ -422,7 +443,7 @@ const ProductCard = ({ product, onQuickAdd }: { product: Product; onQuickAdd: ()
   );
 };
 
-const ProductListItem = ({ product, onQuickAdd }: { product: Product; onQuickAdd: () => void }) => {
+const ProductListItem = ({ product, onQuickAdd, onQuickView }: { product: Product; onQuickAdd: () => void; onQuickView: () => void }) => {
   const image = product.images[0];
   const isAvailable = product.variants[0]?.availableForSale;
   const { items, addFavorite, removeFavorite } = useFavoritesStore();
@@ -496,15 +517,25 @@ const ProductListItem = ({ product, onQuickAdd }: { product: Product; onQuickAdd
         
         <div className="flex items-center justify-between mt-4">
           <p className="text-primary font-display text-xl">${product.price.toFixed(2)}</p>
-          <Button
-            variant="outline"
-            className="rounded-full border-border/70 hover:border-primary/50 hover:bg-primary/5"
-            onClick={onQuickAdd}
-            disabled={!isAvailable}
-          >
-            <ShoppingBag className="h-4 w-4 mr-2" />
-            {isAvailable ? 'Add to Bag' : 'Sold Out'}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="rounded-full border-border/70 hover:border-primary/50 hover:bg-primary/5"
+              onClick={onQuickView}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Quick View
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full border-border/70 hover:border-primary/50 hover:bg-primary/5"
+              onClick={onQuickAdd}
+              disabled={!isAvailable}
+            >
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              {isAvailable ? 'Add' : 'Sold Out'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

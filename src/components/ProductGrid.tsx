@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { Product, getProducts } from "@/lib/products";
-import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { Button } from "@/components/ui/button";
-import { Loader2, ShoppingBag, Heart } from "lucide-react";
+import { Loader2, ShoppingBag, Heart, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import QuickViewModal from "@/components/QuickViewModal";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const addItem = useCartStore(state => state.addItem);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const { toggleFavorite, isFavorite } = useFavoritesStore();
 
   useEffect(() => {
@@ -21,31 +21,6 @@ const ProductGrid = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, []);
-
-  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const firstVariant = product.variants[0];
-    if (!firstVariant) return;
-
-    const cartItem: CartItem = {
-      product,
-      variantId: firstVariant.id,
-      variantTitle: firstVariant.title,
-      price: {
-        amount: firstVariant.price.toString(),
-        currencyCode: firstVariant.currencyCode,
-      },
-      quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || [],
-    };
-
-    addItem(cartItem);
-    toast.success(`${product.title} added to bag`, {
-      position: "top-center",
-    });
-  };
 
   const handleToggleFavorite = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
@@ -124,7 +99,7 @@ const ProductGrid = () => {
                 to={`/product/${product.handle}`}
                 className="group"
               >
-                <div className="relative overflow-hidden rounded-2xl bg-muted/30 aspect-square mb-4">
+                <div className="relative overflow-hidden rounded-2xl bg-muted/30 aspect-square mb-4 shadow-sm group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2">
                   {image ? (
                     <img
                       src={image}
@@ -142,7 +117,7 @@ const ProductGrid = () => {
                   {/* Favorite Button */}
                   <button
                     onClick={(e) => handleToggleFavorite(product, e)}
-                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-background hover:scale-110"
+                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-background hover:scale-110 z-10"
                   >
                     <Heart 
                       className={`h-5 w-5 transition-colors ${
@@ -153,13 +128,20 @@ const ProductGrid = () => {
                     />
                   </button>
                   
-                  {/* Quick Add Button */}
-                  <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button 
-                      className="w-full btn-primary text-sm"
-                      onClick={(e) => handleAddToCart(product, e)}
+                  {/* Quick View Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-center justify-center">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="rounded-full shadow-xl bg-background hover:bg-background border-0 px-6 py-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setQuickViewProduct(product);
+                      }}
                     >
-                      Add to Bag
+                      <Eye className="h-4 w-4 mr-2" />
+                      Quick View
                     </Button>
                   </div>
                 </div>
@@ -177,6 +159,13 @@ const ProductGrid = () => {
           })}
         </div>
       </div>
+
+      {/* Quick View Modal */}
+      <QuickViewModal 
+        product={quickViewProduct} 
+        isOpen={!!quickViewProduct} 
+        onClose={() => setQuickViewProduct(null)} 
+      />
     </section>
   );
 };

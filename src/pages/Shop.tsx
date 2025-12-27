@@ -92,7 +92,7 @@ const Shop = () => {
               </p>
               
               {/* Decorative divider */}
-              <div className="mt-10 flex items-center justify-center gap-4">
+              <div className="mt-10 hidden md:flex items-center justify-center gap-4">
                 <div className="w-12 h-px bg-gradient-to-r from-transparent to-primary/30" />
                 <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
                 <div className="w-12 h-px bg-gradient-to-l from-transparent to-primary/30" />

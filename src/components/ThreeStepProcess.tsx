@@ -9,7 +9,7 @@ const steps = [
     number: "02",
     title: "Choose Your Set",
     description: "Browse our curated collections or design your own custom set in our studio.",
-    image: "https://images.unsplash.com/photo-1604654894613-08e17c1f3c4e?w=800&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=800&auto=format&fit=crop&q=80",
   },
   {
     number: "03",

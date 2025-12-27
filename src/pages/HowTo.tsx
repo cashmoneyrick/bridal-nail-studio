@@ -15,7 +15,8 @@ import {
   Star,
   Zap,
   Scissors,
-  FileText
+  FileText,
+  ChevronDown
 } from "lucide-react";
 import {
   Accordion,
@@ -263,9 +264,8 @@ const HowTo = () => {
         </div>
         
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 hidden sm:flex">
-          <span className="text-xs text-muted-foreground tracking-wider animate-[bounce_2s_ease-in-out_infinite]">SCROLL</span>
-          <div className="w-px h-8 bg-gradient-to-b from-primary to-transparent animate-[bounce_2s_ease-in-out_infinite]" style={{ animationDelay: "0.1s" }} />
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center">
+          <ChevronDown className="w-5 h-5 text-muted-foreground animate-[bounce_2s_ease-in-out_infinite]" />
         </div>
       </section>
 

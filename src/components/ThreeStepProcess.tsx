@@ -22,6 +22,7 @@ const ThreeStepProcess = () => {
       <div className="container mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16">
+          <div className="w-12 h-0.5 bg-primary mx-auto mb-4" />
           <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
             How It Works
           </p>

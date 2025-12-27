@@ -3,6 +3,7 @@
 import roseQuartzImage from "@/assets/rose-quartz-dreams.jpeg";
 import midnightLuxeImage from "@/assets/midnight-luxe.jpeg";
 import frenchEleganceImage from "@/assets/french-elegance.jpeg";
+import cherryBlossomImage from "@/assets/cherry-blossom.jpeg";
 
 export interface Product {
   id: string;
@@ -101,7 +102,7 @@ export const sampleProducts: Product[] = [
     handle: "cherry-blossom",
     price: 42.00,
     currencyCode: "USD",
-    images: ["/placeholder.svg"],
+    images: [cherryBlossomImage],
     variants: [
       {
         id: "v4",

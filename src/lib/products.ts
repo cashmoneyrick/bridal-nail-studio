@@ -20,6 +20,8 @@ export interface Product {
   // Collection and badge for shop filtering
   collection?: string;
   badge?: 'Bestseller' | 'New' | null;
+  // Design type for filtering
+  designType?: 'Solid / Simple' | 'French Tip' | 'Ombré / Gradient' | 'Hand-painted Art' | '3D / Embellished';
 }
 
 export interface ProductVariant {
@@ -58,7 +60,8 @@ export const sampleProducts: Product[] = [
     ],
     options: [],
     collection: "Everyday",
-    badge: null
+    badge: null,
+    designType: "Solid / Simple"
   },
   {
     id: "2",
@@ -80,7 +83,8 @@ export const sampleProducts: Product[] = [
     ],
     options: [],
     collection: "Bold & Artistic",
-    badge: "Bestseller"
+    badge: "Bestseller",
+    designType: "Solid / Simple"
   },
   {
     id: "3",
@@ -102,7 +106,8 @@ export const sampleProducts: Product[] = [
     ],
     options: [],
     collection: "French & Classic",
-    badge: "New"
+    badge: "New",
+    designType: "French Tip"
   },
   {
     id: "4",
@@ -124,7 +129,8 @@ export const sampleProducts: Product[] = [
     ],
     options: [],
     collection: "Bridal",
-    badge: null
+    badge: null,
+    designType: "Hand-painted Art"
   }
 ];
 

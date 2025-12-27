@@ -9,9 +9,8 @@ import { useFavoritesStore } from "@/stores/favoritesStore";
 import { toast } from "sonner";
 import QuickViewModal from "@/components/QuickViewModal";
 
-const SHAPES = ['All', 'Almond', 'Coffin', 'Stiletto', 'Square', 'Oval'];
-const LENGTHS = ['All', 'Short', 'Medium', 'Long', 'Extra Long'];
-const COLLECTIONS = ['All', 'Bridal', 'Everyday', 'French & Classic', 'Bold & Artistic'];
+const PRICE_RANGES = ['All', 'Under $30', '$30–$50', '$50+'];
+const DESIGN_TYPES = ['All', 'Solid / Simple', 'French Tip', 'Ombré / Gradient', 'Hand-painted Art', '3D / Embellished'];
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
   { value: 'price-asc', label: 'Price: Low to High' },
@@ -22,9 +21,8 @@ const SORT_OPTIONS = [
 const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedShape, setSelectedShape] = useState('All');
-  const [selectedLength, setSelectedLength] = useState('All');
-  const [selectedCollection, setSelectedCollection] = useState('All');
+  const [selectedPriceRange, setSelectedPriceRange] = useState('All');
+  const [selectedDesignType, setSelectedDesignType] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -37,10 +35,19 @@ const Shop = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Filter by collection
+  // Filter products by price range and design type
   const filteredProducts = products.filter(product => {
-    if (selectedCollection === 'All') return true;
-    return product.collection === selectedCollection;
+    // Price Range filter
+    if (selectedPriceRange !== 'All') {
+      if (selectedPriceRange === 'Under $30' && product.price >= 30) return false;
+      if (selectedPriceRange === '$30–$50' && (product.price < 30 || product.price > 50)) return false;
+      if (selectedPriceRange === '$50+' && product.price <= 50) return false;
+    }
+    // Design Type filter
+    if (selectedDesignType !== 'All') {
+      if (product.designType !== selectedDesignType) return false;
+    }
+    return true;
   });
 
   // Sort products
@@ -58,13 +65,12 @@ const Shop = () => {
   });
 
   const clearFilters = () => {
-    setSelectedShape('All');
-    setSelectedLength('All');
-    setSelectedCollection('All');
+    setSelectedPriceRange('All');
+    setSelectedDesignType('All');
     setSortBy('newest');
   };
 
-  const hasActiveFilters = selectedShape !== 'All' || selectedLength !== 'All' || selectedCollection !== 'All';
+  const hasActiveFilters = selectedPriceRange !== 'All' || selectedDesignType !== 'All';
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,52 +108,6 @@ const Shop = () => {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Collection Filter Pills - Mobile Version */}
-          <div className="mb-12 -mt-4 md:hidden">
-            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-              <div className="flex gap-3 py-2">
-                {COLLECTIONS.map((collection) => (
-                  <button
-                    key={collection}
-                    onClick={() => setSelectedCollection(collection)}
-                    className={`
-                      flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap
-                      transition-all duration-300
-                      ${selectedCollection === collection
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'text-foreground/60 hover:text-foreground hover:bg-background/80'
-                      }
-                    `}
-                  >
-                    {collection}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Collection Filter Pills - Desktop Version */}
-          <div className="hidden md:flex justify-center mb-12 -mt-4">
-            <div className="inline-flex flex-wrap justify-center gap-3 p-2 bg-card/60 backdrop-blur-sm rounded-full border border-border/40 shadow-sm">
-              {COLLECTIONS.map((collection) => (
-                <button
-                  key={collection}
-                  onClick={() => setSelectedCollection(collection)}
-                  className={`
-                    px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap
-                    transition-all duration-300
-                    ${selectedCollection === collection
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-foreground/60 hover:text-foreground hover:bg-background/80'
-                    }
-                  `}
-                >
-                  {collection}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Premium Refined Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-12 py-5 border-y border-border/30">
             <div className="flex items-center gap-4">
@@ -160,7 +120,7 @@ const Shop = () => {
                 <span className="font-medium">Refine</span>
                 {hasActiveFilters && (
                   <span className="ml-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                    {(selectedShape !== 'All' ? 1 : 0) + (selectedLength !== 'All' ? 1 : 0) + (selectedCollection !== 'All' ? 1 : 0)}
+                    {(selectedPriceRange !== 'All' ? 1 : 0) + (selectedDesignType !== 'All' ? 1 : 0)}
                   </span>
                 )}
               </Button>
@@ -202,41 +162,41 @@ const Shop = () => {
           {showFilters && (
             <div className="mb-12 p-8 bg-gradient-to-br from-card/80 to-accent/10 backdrop-blur-sm border border-border/30 rounded-3xl animate-fade-in shadow-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {/* Shape Filter */}
+                {/* Price Range Filter */}
                 <div className="space-y-5">
-                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Shape</label>
+                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Price Range</label>
                   <div className="flex flex-wrap gap-2">
-                    {SHAPES.map(shape => (
+                    {PRICE_RANGES.map(range => (
                       <button
-                        key={shape}
-                        onClick={() => setSelectedShape(shape)}
+                        key={range}
+                        onClick={() => setSelectedPriceRange(range)}
                         className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                          selectedShape === shape
+                          selectedPriceRange === range
                             ? 'bg-primary text-primary-foreground shadow-md'
                             : 'bg-background/80 text-foreground/60 hover:text-foreground hover:bg-background'
                         }`}
                       >
-                        {shape}
+                        {range}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Length Filter */}
+                {/* Design Type Filter */}
                 <div className="space-y-5">
-                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Length</label>
+                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Design Type</label>
                   <div className="flex flex-wrap gap-2">
-                    {LENGTHS.map(length => (
+                    {DESIGN_TYPES.map(type => (
                       <button
-                        key={length}
-                        onClick={() => setSelectedLength(length)}
+                        key={type}
+                        onClick={() => setSelectedDesignType(type)}
                         className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                          selectedLength === length
+                          selectedDesignType === type
                             ? 'bg-primary text-primary-foreground shadow-md'
                             : 'bg-background/80 text-foreground/60 hover:text-foreground hover:bg-background'
                         }`}
                       >
-                        {length}
+                        {type}
                       </button>
                     ))}
                   </div>
@@ -256,9 +216,9 @@ const Shop = () => {
               <Button 
                 variant="outline" 
                 className="rounded-full px-8"
-                onClick={() => setSelectedCollection('All')}
+                onClick={clearFilters}
               >
-                View All Sets
+                Clear Filters
               </Button>
             </div>
           ) : (

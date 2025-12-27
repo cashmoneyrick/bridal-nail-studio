@@ -72,20 +72,7 @@ const Shop = () => {
       
       <main className="pt-24 pb-16">
         {/* Editorial Hero Section */}
-        <div className="relative overflow-hidden">
-          {/* Warm romantic gradient background */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: `
-                radial-gradient(ellipse 80% 60% at 50% 0%, hsl(350 45% 55% / 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 50% at 30% 20%, hsl(25 60% 80% / 0.15) 0%, transparent 40%),
-                radial-gradient(ellipse 60% 50% at 70% 30%, hsl(350 70% 88% / 0.12) 0%, transparent 40%),
-                linear-gradient(to bottom, hsl(350 30% 97% / 0.8) 0%, hsl(350 30% 97%) 100%)
-              `
-            }}
-          />
-          
+        <div className="relative overflow-hidden bg-[hsl(30,30%,97%)]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="text-center max-w-4xl mx-auto py-20 md:py-28">
               {/* Editorial tagline */}
@@ -117,8 +104,8 @@ const Shop = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Collection Filter Pills */}
           <div className="mb-12 -mt-4">
-            <div className="flex md:justify-center overflow-x-auto scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0">
-              <div className="inline-flex flex-nowrap md:flex-wrap md:justify-center gap-3 md:p-2 md:bg-card/60 md:backdrop-blur-sm md:rounded-full md:border md:border-border/40 md:shadow-sm">
+            <div className="flex md:justify-center overflow-x-auto scrollbar-hide px-4 md:px-0 -mx-4 md:mx-0 py-2 md:py-0">
+              <div className="flex flex-nowrap md:flex-wrap md:justify-center gap-3 md:p-2 md:bg-card/60 md:backdrop-blur-sm md:rounded-full md:border md:border-border/40 md:shadow-sm">
                 {COLLECTIONS.map((collection) => (
                   <button
                     key={collection}

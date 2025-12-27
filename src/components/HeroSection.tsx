@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
+import heroMobileImage from "@/assets/hero-mobile.jpeg";
 
 const HeroSection = () => {
+  const isMobile = useIsMobile();
   const scrollToShop = () => {
     document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -13,7 +16,14 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-0">
         <div className="w-full h-full bg-gradient-to-br from-secondary/40 via-background to-primary/20" />
         {/* Placeholder for bridal collection image */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80')] bg-cover bg-center opacity-60" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-60"
+          style={{ 
+            backgroundImage: isMobile 
+              ? `url(${heroMobileImage})` 
+              : `url('https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80')` 
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
       </div>
 

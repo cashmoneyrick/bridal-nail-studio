@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroMobileImage from "@/assets/hero-mobile.jpeg";
+import heroDesktopImage from "@/assets/hero-desktop.jpeg";
 
 const HeroSection = () => {
   const isMobile = useIsMobile();
@@ -21,7 +22,7 @@ const HeroSection = () => {
           style={{ 
             backgroundImage: isMobile 
               ? `url(${heroMobileImage})` 
-              : `url('https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80')` 
+              : `url(${heroDesktopImage})`
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />

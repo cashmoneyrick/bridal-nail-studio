@@ -35,47 +35,103 @@ const CategoryGrid = () => {
           </p>
         </div>
 
-        {/* Category Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {categories.map((category, index) => (
-            <a
-              key={category.title}
-              href={category.href}
-              className="group relative overflow-hidden rounded-2xl sm:rounded-3xl aspect-[3/4] cursor-pointer"
-              style={{ animationDelay: `${index * 150}ms` }}
-            >
-              {/* Image */}
-              <div className="absolute inset-0">
-                <img
-                  src={category.image}
-                  alt={category.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
-              </div>
-
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-                <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
-                  <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
-                    {category.title}
-                  </h3>
-                  <p className="text-white/70 text-sm sm:text-base mb-4">
-                    {category.description}
-                  </p>
-                  <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
+        {/* Bento Grid - Asymmetric Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6">
+          {/* First card - Large, spans 2 rows on desktop */}
+          <a
+            href={categories[0].href}
+            className="group relative overflow-hidden rounded-2xl aspect-[3/4] md:row-span-2 md:aspect-auto md:min-h-[500px] cursor-pointer"
+          >
+            <div className="absolute inset-0">
+              <img
+                src={categories[0].image}
+                alt={categories[0].title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
+            </div>
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
+                <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
+                  {categories[0].title}
+                </h3>
+                <p className="text-white/70 text-sm sm:text-base mb-4">
+                  {categories[0].description}
+                </p>
+                <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Shop Now
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
+            </div>
+            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
+          </a>
 
-              {/* Hover Border Effect */}
-              <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl sm:rounded-3xl transition-colors duration-300" />
-            </a>
-          ))}
+          {/* Second card - Top right */}
+          <a
+            href={categories[1].href}
+            className="group relative overflow-hidden rounded-2xl aspect-[3/4] md:aspect-[4/3] cursor-pointer"
+          >
+            <div className="absolute inset-0">
+              <img
+                src={categories[1].image}
+                alt={categories[1].title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
+            </div>
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
+                <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
+                  {categories[1].title}
+                </h3>
+                <p className="text-white/70 text-sm sm:text-base mb-4">
+                  {categories[1].description}
+                </p>
+                <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Shop Now
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
+          </a>
+
+          {/* Third card - Bottom right */}
+          <a
+            href={categories[2].href}
+            className="group relative overflow-hidden rounded-2xl aspect-[3/4] md:aspect-[4/3] cursor-pointer"
+          >
+            <div className="absolute inset-0">
+              <img
+                src={categories[2].image}
+                alt={categories[2].title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />
+            </div>
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
+                <h3 className="font-display text-xl sm:text-2xl font-medium text-white mb-2">
+                  {categories[2].title}
+                </h3>
+                <p className="text-white/70 text-sm sm:text-base mb-4">
+                  {categories[2].description}
+                </p>
+                <div className="flex items-center text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Shop Now
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-2xl transition-colors duration-300" />
+          </a>
         </div>
       </div>
     </section>

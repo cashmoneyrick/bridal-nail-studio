@@ -1,5 +1,7 @@
 // Product types and data (local, no Shopify dependency)
 
+import roseQuartzImage from "@/assets/rose-quartz-dreams.jpeg";
+
 export interface Product {
   id: string;
   title: string;
@@ -37,7 +39,7 @@ export const sampleProducts: Product[] = [
     handle: "rose-quartz-dreams",
     price: 32.00,
     currencyCode: "USD",
-    images: ["/placeholder.svg"],
+    images: [roseQuartzImage],
     variants: [
       {
         id: "v1",

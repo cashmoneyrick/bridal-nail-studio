@@ -279,9 +279,9 @@ export const ReviewSubmitMobile = ({
         <h3 className="font-semibold text-foreground mb-3">Price Breakdown</h3>
         <div className="space-y-2 text-sm">
           {priceBreakdown.items.map((item, index) => (
-            <div key={index} className="flex justify-between">
-              <span className="text-muted-foreground">{item.label}</span>
-              <span className="text-foreground">
+            <div key={index} className="flex justify-between gap-2">
+              <span className="text-muted-foreground min-w-0 flex-1 truncate">{item.label}</span>
+              <span className="text-foreground flex-shrink-0">
                 {item.isQuoteRequired ? 'Quote' : `$${item.amount.toFixed(2)}`}
               </span>
             </div>

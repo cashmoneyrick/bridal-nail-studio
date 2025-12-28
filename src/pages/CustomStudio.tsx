@@ -161,7 +161,7 @@ const CustomStudio = () => {
   const showMobileBack = currentStep > 0 || baseLookMicroStep > 0 || accentMicroStep > 0;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
       <Navigation />
       
       <main className="flex-1 pt-20">

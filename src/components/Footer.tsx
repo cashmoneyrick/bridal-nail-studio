@@ -28,9 +28,9 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-foreground text-background w-full max-w-full overflow-hidden">
       {/* Newsletter Section */}
-      <div className="bg-primary">
+      <div className="bg-primary w-full max-w-full overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="font-display text-2xl sm:text-3xl font-medium text-primary-foreground mb-3">

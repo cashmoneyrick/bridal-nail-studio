@@ -104,7 +104,7 @@ export const ReviewSubmitMobile = ({
   };
 
   return (
-    <div className="pb-32">
+    <div className="pb-32 w-full overflow-hidden">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-foreground mb-1">Review Your Design</h2>
@@ -114,7 +114,7 @@ export const ReviewSubmitMobile = ({
       </div>
 
       {/* Accordion Sections */}
-      <Accordion type="single" collapsible defaultValue="base" className="space-y-3">
+      <Accordion type="single" collapsible defaultValue="base" className="space-y-3 w-full overflow-hidden">
         {/* Base Look */}
         <ReviewSection
           value="base"

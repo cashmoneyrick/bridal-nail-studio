@@ -243,6 +243,7 @@ export const ReviewSubmit = () => {
         quantity: 1,
         selectedOptions: selectedOptions,
         needsSizingKit: false,
+        sizingOption: 'known',
       });
 
       toast.success('Added to cart!', {

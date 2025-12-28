@@ -29,6 +29,7 @@ export interface CartItem {
     value: string;
   }>;
   needsSizingKit: boolean;
+  sizingOption: 'kit' | 'known';
   sizeProfileId?: string;
   sizeProfileSnapshot?: {
     name: string;
@@ -104,8 +105,8 @@ export const useCartStore = create<CartStore>()(
         // If removed item had sizing kit, reassign to another qualifying item
         if (hadSizingKit && get().items.length > 0) {
           const remainingItems = get().items;
-          // Find items that don't have a sizeProfileId (need sizing help)
-          const itemsNeedingSizing = remainingItems.filter(item => !item.sizeProfileId);
+        // Find items that chose 'kit' option (need sizing help)
+        const itemsNeedingSizing = remainingItems.filter(item => item.sizingOption === 'kit');
           
           // If any items need sizing and none currently have the kit, assign to first one
           if (itemsNeedingSizing.length > 0 && !remainingItems.some(item => item.needsSizingKit)) {

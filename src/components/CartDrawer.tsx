@@ -144,12 +144,18 @@ export const CartDrawer = () => {
                         </p>
                         
                         {/* Sizing badges */}
-                        {(item.needsSizingKit || item.sizeProfileId) && (
+                        {(item.needsSizingKit || item.sizeProfileId || item.sizingOption === 'kit') && (
                           <div className="flex flex-wrap gap-1.5 mt-1.5">
                             {item.needsSizingKit && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
                                 <Package className="h-3 w-3" />
                                 Includes sizing kit
+                              </span>
+                            )}
+                            {item.sizingOption === 'kit' && !item.needsSizingKit && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+                                <Package className="h-3 w-3" />
+                                Sizing kit in order
                               </span>
                             )}
                             {item.sizeProfileId && !item.needsSizingKit && (

@@ -333,6 +333,7 @@ const ProductDetail = () => {
         { name: 'Length', value: selectedLength },
       ],
       needsSizingKit,
+      sizingOption,
       sizeProfileId,
       sizeProfileSnapshot,
     };

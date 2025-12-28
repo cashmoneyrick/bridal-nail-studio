@@ -235,6 +235,21 @@ const ProductDetail = () => {
     length: string;
     sizingOption: 'kit' | 'known';
     sizeProfileId?: string;
+    sizeProfileSnapshot?: {
+      name: string;
+      sizes: {
+        leftPinky: string;
+        leftRing: string;
+        leftMiddle: string;
+        leftIndex: string;
+        leftThumb: string;
+        rightThumb: string;
+        rightIndex: string;
+        rightMiddle: string;
+        rightRing: string;
+        rightPinky: string;
+      };
+    };
   } | null>(null);
   
   const addItem = useCartStore(state => state.addItem);
@@ -292,18 +307,34 @@ const ProductDetail = () => {
     const selectedProfile = getSelectedProfile();
     const sizeProfileId = sizingOption === 'known' && selectedProfile ? selectedProfile.id : undefined;
 
+    // Generate unique variantId including shape, length, and sizing info
+    const sizingSuffix = sizingOption === 'kit' 
+      ? 'kit' 
+      : `known-${sizeProfileId || 'no-profile'}`;
+    const variantId = `${product.id}-${selectedShape.toLowerCase()}-${selectedLength.toLowerCase()}-${sizingSuffix}`;
+
+    // Capture size profile snapshot for order fulfillment
+    const sizeProfileSnapshot = (sizingOption === 'known' && selectedProfile) ? {
+      name: selectedProfile.name,
+      sizes: selectedProfile.sizes,
+    } : undefined;
+
     const cartItem: CartItem = {
       product: product,
-      variantId: variant.id,
-      variantTitle: variant.title,
+      variantId,
+      variantTitle: `${selectedShape} / ${selectedLength}`,
       price: {
         amount: variant.price.toString(),
         currencyCode: variant.currencyCode,
       },
       quantity,
-      selectedOptions: variant.selectedOptions,
+      selectedOptions: [
+        { name: 'Shape', value: selectedShape },
+        { name: 'Length', value: selectedLength },
+      ],
       needsSizingKit,
       sizeProfileId,
+      sizeProfileSnapshot,
     };
 
     addItem(cartItem);
@@ -315,6 +346,7 @@ const ProductDetail = () => {
       length: selectedLength,
       sizingOption,
       sizeProfileId,
+      sizeProfileSnapshot,
     });
     
     // Show the success modal instead of toast

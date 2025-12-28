@@ -2,6 +2,19 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Product } from '@/lib/products';
 
+export interface NailSizesSnapshot {
+  leftPinky: string;
+  leftRing: string;
+  leftMiddle: string;
+  leftIndex: string;
+  leftThumb: string;
+  rightThumb: string;
+  rightIndex: string;
+  rightMiddle: string;
+  rightRing: string;
+  rightPinky: string;
+}
+
 export interface CartItem {
   product: Product;
   variantId: string;
@@ -17,6 +30,10 @@ export interface CartItem {
   }>;
   needsSizingKit: boolean;
   sizeProfileId?: string;
+  sizeProfileSnapshot?: {
+    name: string;
+    sizes: NailSizesSnapshot;
+  };
 }
 
 interface CartStore {

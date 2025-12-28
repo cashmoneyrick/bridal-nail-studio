@@ -16,6 +16,21 @@ interface AddToCartSuccessModalProps {
     length: string;
     sizingOption: 'kit' | 'known';
     sizeProfileId?: string;
+    sizeProfileSnapshot?: {
+      name: string;
+      sizes: {
+        leftPinky: string;
+        leftRing: string;
+        leftMiddle: string;
+        leftIndex: string;
+        leftThumb: string;
+        rightThumb: string;
+        rightIndex: string;
+        rightMiddle: string;
+        rightRing: string;
+        rightPinky: string;
+      };
+    };
   } | null;
   relatedProducts: Product[];
 }
@@ -44,9 +59,15 @@ const AddToCartSuccessModal = ({
   const handleQuickAdd = (product: Product) => {
     if (!addedItem) return;
 
+    // Generate matching variantId with sizing info
+    const sizingSuffix = addedItem.sizingOption === 'kit'
+      ? 'kit'
+      : `known-${addedItem.sizeProfileId || 'no-profile'}`;
+    const variantId = `${product.id}-${addedItem.shape.toLowerCase()}-${addedItem.length.toLowerCase()}-${sizingSuffix}`;
+
     const cartItem: CartItem = {
       product: product,
-      variantId: `${product.id}-${addedItem.shape.toLowerCase()}-${addedItem.length.toLowerCase()}`,
+      variantId,
       variantTitle: `${addedItem.shape} / ${addedItem.length}`,
       price: {
         amount: product.price.toString(),
@@ -59,6 +80,7 @@ const AddToCartSuccessModal = ({
       ],
       needsSizingKit: false,
       sizeProfileId: addedItem.sizeProfileId,
+      sizeProfileSnapshot: addedItem.sizeProfileSnapshot,
     };
 
     addItem(cartItem);

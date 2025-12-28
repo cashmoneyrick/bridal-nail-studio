@@ -4,37 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
-import { useCartStore, CartItem } from "@/stores/cartStore";
 import { toast } from "sonner";
-import { Product } from "@/lib/products";
 
 const Favorites = () => {
   const { items: favorites, removeFavorite } = useFavoritesStore();
-  const addItem = useCartStore(state => state.addItem);
-
-  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
-    e.preventDefault();
-    
-    if (!product.variants || product.variants.length === 0) return;
-    const firstVariant = product.variants[0];
-
-    const cartItem: CartItem = {
-      product,
-      variantId: firstVariant.id,
-      variantTitle: firstVariant.title,
-      price: {
-        amount: firstVariant.price.toString(),
-        currencyCode: firstVariant.currencyCode,
-      },
-      quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || [],
-    };
-
-    addItem(cartItem);
-    toast.success(`${product.title} added to bag`, {
-      position: "top-center",
-    });
-  };
 
   const handleRemoveFavorite = (productId: string, productTitle: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -122,11 +95,8 @@ const Favorites = () => {
                       
                       {/* Quick Add Button */}
                       <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <Button 
-                          className="w-full btn-primary text-sm"
-                          onClick={(e) => handleAddToCart(product, e)}
-                        >
-                          Add to Bag
+                        <Button className="w-full btn-primary text-sm">
+                          Select Options
                         </Button>
                       </div>
                     </div>

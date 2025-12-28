@@ -10,6 +10,11 @@ import CustomStudio from "./pages/CustomStudio";
 import Shop from "./pages/Shop";
 import NailClub from "./pages/NailClub";
 import HowTo from "./pages/HowTo";
+import HowToSizing from "./pages/HowToSizing";
+import HowToApplication from "./pages/HowToApplication";
+import HowToTroubleshooting from "./pages/HowToTroubleshooting";
+import HowToRemoval from "./pages/HowToRemoval";
+import HowToBridal from "./pages/HowToBridal";
 import Contact from "./pages/Contact";
 import Favorites from "./pages/Favorites";
 import Account from "./pages/Account";
@@ -55,6 +60,11 @@ const App = () => (
             <Route path="/shop" element={<Shop />} />
             <Route path="/club" element={<NailClub />} />
             <Route path="/how-to" element={<HowTo />} />
+            <Route path="/how-to/sizing" element={<HowToSizing />} />
+            <Route path="/how-to/application" element={<HowToApplication />} />
+            <Route path="/how-to/troubleshooting" element={<HowToTroubleshooting />} />
+            <Route path="/how-to/removal" element={<HowToRemoval />} />
+            <Route path="/how-to/bridal" element={<HowToBridal />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/account" element={<Account />} />

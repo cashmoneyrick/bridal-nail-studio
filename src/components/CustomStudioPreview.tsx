@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, Shapes, Sparkles, Heart } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import customStudioDesktop from "@/assets/custom-studio-desktop.jpeg";
+import customStudioMobile from "@/assets/custom-studio-mobile.jpeg";
 
 const features = [
   { icon: Upload, label: "Upload Inspo" },
@@ -19,7 +20,7 @@ const CustomStudioPreview = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={isMobile ? "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80" : customStudioDesktop}
+          src={isMobile ? customStudioMobile : customStudioDesktop}
           alt="Custom nail design process"
           loading="lazy"
           decoding="async"

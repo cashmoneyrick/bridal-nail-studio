@@ -4,27 +4,21 @@ import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroMobileImage from "@/assets/hero-mobile.jpeg";
 import heroDesktopImage from "@/assets/hero-desktop.jpeg";
-
 const HeroSection = () => {
   const isMobile = useIsMobile();
   const scrollToShop = () => {
-    document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('shop')?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image Placeholder */}
       <div className="absolute inset-0 z-0">
         <div className="w-full h-full bg-gradient-to-br from-secondary/40 via-background to-primary/20" />
         {/* Placeholder for bridal collection image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{ 
-            backgroundImage: isMobile 
-              ? `url(${heroMobileImage})` 
-              : `url(${heroDesktopImage})`
-          }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{
+        backgroundImage: isMobile ? `url(${heroMobileImage})` : `url(${heroDesktopImage})`
+      }} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
       </div>
 
@@ -50,20 +44,12 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button 
-              className="btn-primary text-base min-w-[200px] group"
-              size="lg"
-              onClick={scrollToShop}
-            >
+            <Button className="btn-primary text-base min-w-[200px] group" size="lg" onClick={scrollToShop}>
               Shop Valentine's Sets
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Link to="/custom-studio">
-              <Button 
-                variant="outline"
-                className="btn-secondary text-base min-w-[200px]"
-                size="lg"
-              >
+              <Button variant="outline" className="btn-secondary text-base min-w-[200px]" size="lg">
                 Design Your Love Story
               </Button>
             </Link>
@@ -72,9 +58,9 @@ const HeroSection = () => {
           {/* Valentine's Day Badge */}
           <div className="pt-6 animate-fade-in">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full text-sm text-foreground/80">
-              <span>💌</span>
-              <span>Limited Edition Valentine's Sets</span>
-              <span>💝</span>
+              
+              <span>Limited Edition Valentine's Set      </span>
+              
             </span>
           </div>
 
@@ -93,8 +79,6 @@ const HeroSection = () => {
           <div className="w-1 h-2 bg-foreground/50 rounded-full" />
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;

@@ -36,16 +36,7 @@ interface AccentNailsProps {
 const AccentNails = ({ microStep = 0, setMicroStep, onSkipToNext }: AccentNailsProps) => {
   const isMobile = useIsMobile();
   
-  // Use mobile flow on mobile devices when props are provided
-  if (isMobile && setMicroStep && onSkipToNext) {
-    return (
-      <AccentNailsMobile
-        microStep={microStep}
-        setMicroStep={setMicroStep}
-        onSkipToNext={onSkipToNext}
-      />
-    );
-  }
+  // All hooks must be called before any conditional returns
   const {
     hasAccentNails,
     accentNails,
@@ -58,6 +49,17 @@ const AccentNails = ({ microStep = 0, setMicroStep, onSkipToNext }: AccentNailsP
     setAccentConfig,
     setNailColor,
   } = useCustomStudioStore();
+  
+  // Use mobile flow on mobile devices when props are provided
+  if (isMobile && setMicroStep && onSkipToNext) {
+    return (
+      <AccentNailsMobile
+        microStep={microStep}
+        setMicroStep={setMicroStep}
+        onSkipToNext={onSkipToNext}
+      />
+    );
+  }
 
   const renderNail = (fingerIndex: FingerIndex) => {
     const isAccent = accentNails.has(fingerIndex);

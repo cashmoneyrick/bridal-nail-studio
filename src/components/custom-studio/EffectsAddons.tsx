@@ -13,6 +13,8 @@ import {
 } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile } from '@/hooks/use-mobile';
+import EffectsAddonsMobile from './mobile/EffectsAddonsMobile';
 
 const EFFECT_CONFIG: Array<{
   type: EffectType;
@@ -30,6 +32,7 @@ const RHINESTONE_OPTIONS: RhinestoneTier[] = ['none', 'just-a-touch', 'a-little-
 const CHARM_OPTIONS: CharmTier[] = ['none', 'single-statement', 'a-few-accents', 'charmed-out'];
 
 export function EffectsAddons() {
+  const isMobile = useIsMobile();
   const { 
     effects, 
     accentNails, 
@@ -42,6 +45,11 @@ export function EffectsAddons() {
     setCharmTier,
     setCharmPreferences
   } = useCustomStudioStore();
+
+  // Use mobile flow on mobile devices
+  if (isMobile) {
+    return <EffectsAddonsMobile />;
+  }
 
   const getEffectScope = (effectType: EffectType): EffectScope => {
     const effect = effects.find(e => e.effect === effectType);

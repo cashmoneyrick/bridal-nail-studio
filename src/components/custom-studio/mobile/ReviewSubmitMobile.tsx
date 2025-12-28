@@ -127,8 +127,8 @@ export const ReviewSubmitMobile = ({
   };
 
   return (
-    <div className="min-h-screen bg-background pb-36">
-      <div className="max-w-md mx-auto px-5 pt-6">
+    <div className="w-full overflow-hidden pb-36">
+      <div className="w-full pt-2">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-display font-semibold text-foreground mb-1">

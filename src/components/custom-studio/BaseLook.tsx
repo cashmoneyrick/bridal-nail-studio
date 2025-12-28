@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   ShapeType,
   LengthType,
@@ -15,6 +16,12 @@ import {
   COLOR_PALETTES,
   PresetColorPalette,
 } from '@/lib/pricing';
+import BaseLookMobile from './mobile/BaseLookMobile';
+
+interface BaseLookProps {
+  microStep?: number;
+  setMicroStep?: (step: number) => void;
+}
 
 // Shape icons as simple SVG paths
 const ShapeIcon = ({ shape, isSelected }: { shape: ShapeType; isSelected: boolean }) => {
@@ -50,8 +57,14 @@ const PriceBadge = ({ price }: { price: number }) => {
   );
 };
 
-const BaseLook = () => {
+const BaseLook = ({ microStep = 0, setMicroStep }: BaseLookProps) => {
+  const isMobile = useIsMobile();
   const { shape, length, baseFinish, colorPalette, setShape, setLength, setBaseFinish, setColorPalette, setNailColor } = useCustomStudioStore();
+
+  // On mobile: render quiz-style flow
+  if (isMobile && setMicroStep) {
+    return <BaseLookMobile microStep={microStep} setMicroStep={setMicroStep} />;
+  }
 
   const handlePaletteSelect = (palette: PresetColorPalette) => {
     setColorPalette({ name: palette.name, colors: palette.colors });

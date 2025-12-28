@@ -1,14 +1,18 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Minus, Plus, Trash2, Tag, X, Check } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, Tag, X, Check, Package, ChevronDown, ChevronUp } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 // Discount calculation functions (same as CartDrawer)
 const getMemberDiscount = (subtotal: number, isAuthenticated: boolean): number => {
   if (!isAuthenticated) return 0;
@@ -42,6 +46,16 @@ const Cart = () => {
   const isAuthenticated = !!user;
   const subtotal = getTotalPrice();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  const toggleExpanded = (variantId: string) => {
+    setExpandedItems(prev => 
+      prev.includes(variantId) 
+        ? prev.filter(id => id !== variantId)
+        : [...prev, variantId]
+    );
+  };
 
   // Calculate best discount
   const discountInfo = useMemo(() => {
@@ -130,12 +144,82 @@ const Cart = () => {
                             {item.selectedOptions.map(opt => opt.value).join(' · ')}
                           </p>
                         )}
-                        {item.needsSizingKit && (
-                          <span className="inline-flex items-center gap-1 text-xs text-primary mt-2 bg-primary/10 px-2 py-1 rounded-full">
-                            <Check className="h-3 w-3" />
-                            Includes sizing kit
-                          </span>
+                        {/* Sizing badges */}
+                        {(item.needsSizingKit || item.sizeProfileId) && (
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {item.needsSizingKit && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                                <Package className="h-3 w-3" />
+                                Includes sizing kit
+                              </span>
+                            )}
+                            {item.sizeProfileId && !item.needsSizingKit && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
+                                <Check className="h-3 w-3" />
+                                Using saved sizes
+                              </span>
+                            )}
+                          </div>
                         )}
+
+                        {/* Expandable details */}
+                        <Collapsible
+                          open={expandedItems.includes(item.variantId)}
+                          onOpenChange={() => toggleExpanded(item.variantId)}
+                          className="mt-3"
+                        >
+                          <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                            {expandedItems.includes(item.variantId) ? (
+                              <ChevronUp className="h-3 w-3" />
+                            ) : (
+                              <ChevronDown className="h-3 w-3" />
+                            )}
+                            View details
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="mt-2">
+                            <div className="bg-muted/50 rounded-lg p-3 text-xs space-y-2">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <span className="text-muted-foreground">Shape:</span>{' '}
+                                  <span className="font-medium">{item.selectedOptions.find(o => o.name === 'Shape')?.value || 'N/A'}</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Length:</span>{' '}
+                                  <span className="font-medium">{item.selectedOptions.find(o => o.name === 'Length')?.value || 'N/A'}</span>
+                                </div>
+                                <div className="col-span-2">
+                                  <span className="text-muted-foreground">Sizing:</span>{' '}
+                                  <span className="font-medium">
+                                    {item.needsSizingKit ? 'Sizing kit included' : item.sizeProfileId ? 'Using saved sizes' : 'Not specified'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Size profile snapshot - for seller fulfillment */}
+                              {item.sizeProfileSnapshot && (
+                                <div className="border-t border-border pt-2 mt-2">
+                                  <p className="text-muted-foreground mb-2">
+                                    Saved sizes ({item.sizeProfileSnapshot.name}):
+                                  </p>
+                                  <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                    <div className="font-medium">Left Hand:</div>
+                                    <div className="font-medium">Right Hand:</div>
+                                    <div>Thumb: {item.sizeProfileSnapshot.sizes.leftThumb}</div>
+                                    <div>Thumb: {item.sizeProfileSnapshot.sizes.rightThumb}</div>
+                                    <div>Index: {item.sizeProfileSnapshot.sizes.leftIndex}</div>
+                                    <div>Index: {item.sizeProfileSnapshot.sizes.rightIndex}</div>
+                                    <div>Middle: {item.sizeProfileSnapshot.sizes.leftMiddle}</div>
+                                    <div>Middle: {item.sizeProfileSnapshot.sizes.rightMiddle}</div>
+                                    <div>Ring: {item.sizeProfileSnapshot.sizes.leftRing}</div>
+                                    <div>Ring: {item.sizeProfileSnapshot.sizes.rightRing}</div>
+                                    <div>Pinky: {item.sizeProfileSnapshot.sizes.leftPinky}</div>
+                                    <div>Pinky: {item.sizeProfileSnapshot.sizes.rightPinky}</div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
                       </div>
                       <p className="font-medium text-foreground whitespace-nowrap">
                         ${(parseFloat(item.price.amount) * item.quantity).toFixed(2)}

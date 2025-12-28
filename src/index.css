@@ -152,6 +152,11 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Safe area padding for phones with home indicators */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 /* Confetti animation for Nail Club signup */

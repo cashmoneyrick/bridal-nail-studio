@@ -27,13 +27,13 @@ export const ReviewSection = ({
   value,
 }: ReviewSectionProps) => {
   return (
-    <AccordionItem value={value} className="border border-border rounded-lg overflow-hidden bg-card">
-      <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 min-h-[56px]">
-        <div className="flex items-start gap-3 text-left flex-1 min-w-0">
+    <AccordionItem value={value} className="border border-border rounded-lg overflow-hidden bg-card w-full">
+      <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 min-h-[56px] w-full">
+        <div className="flex items-start gap-3 text-left flex-1 min-w-0 overflow-hidden">
           <span className="text-xl flex-shrink-0 mt-0.5">{icon}</span>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 overflow-hidden">
             <p className="font-semibold text-foreground text-base">{title}</p>
-            <p className="text-sm text-muted-foreground truncate">{summary}</p>
+            <p className="text-sm text-muted-foreground truncate max-w-full">{summary}</p>
           </div>
         </div>
       </AccordionTrigger>

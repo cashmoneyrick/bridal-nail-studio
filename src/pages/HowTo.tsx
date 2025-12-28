@@ -45,17 +45,19 @@ const HowTo = () => {
       {/* Category Cards Grid */}
       <section className="pb-24 md:pb-32">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
-            {categories.map((category) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
+            {categories.map((category, index) => (
               <Link
                 key={category.path}
                 to={category.path}
-                className="group block"
+                className={`group block ${index === 4 ? 'md:col-span-2 lg:col-span-1' : ''}`}
               >
-                <div className="aspect-[4/3] bg-muted/30 rounded-lg mb-4 overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 border border-border/50 group-hover:border-border" />
-                <h3 className="font-serif text-base md:text-lg text-foreground group-hover:text-primary transition-colors">
-                  {category.title}
-                </h3>
+                <div className="bg-secondary/20 border border-border/50 rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-border">
+                  <div className="aspect-[4/3] bg-muted/30 rounded-xl mb-4 overflow-hidden" />
+                  <h3 className="font-serif text-base md:text-lg text-foreground group-hover:text-primary transition-colors">
+                    {category.title}
+                  </h3>
+                </div>
               </Link>
             ))}
           </div>

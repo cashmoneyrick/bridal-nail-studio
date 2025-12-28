@@ -10,6 +10,7 @@ import { EffectsAddons } from '@/components/custom-studio/EffectsAddons';
 import CustomArtwork from '@/components/custom-studio/CustomArtwork';
 import ReviewSubmit from '@/components/custom-studio/ReviewSubmit';
 import PriceDisplay from '@/components/custom-studio/PriceDisplay';
+import MobileBottomNav from '@/components/custom-studio/MobileBottomNav';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -135,11 +136,21 @@ const CustomStudio = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="container mx-auto px-4 pb-8">
+        <div className="container mx-auto px-4 pb-24 lg:pb-8">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Step Content */}
             <div className="lg:col-span-2">
               <div className="bg-card border border-border rounded-xl p-6 md:p-8">
+                {/* Mobile back button */}
+                {!isFirstStep && (
+                  <button
+                    onClick={prevStep}
+                    className="lg:hidden flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 -mt-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Back
+                  </button>
+                )}
                 {renderStepContent()}
               </div>
             </div>
@@ -156,7 +167,7 @@ const CustomStudio = () => {
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+                <div className="hidden lg:block bg-card border border-border rounded-lg p-4 space-y-3">
                   <div className="flex gap-3">
                     {!isFirstStep && (
                       <Button
@@ -206,6 +217,15 @@ const CustomStudio = () => {
           </div>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav
+        priceBreakdown={priceBreakdown}
+        onContinue={nextStep}
+        canProceed={canProceed()}
+        isLastStep={isLastStep}
+        currentStep={currentStep}
+      />
 
       <Footer />
 

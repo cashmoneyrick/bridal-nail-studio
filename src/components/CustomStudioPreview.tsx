@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Upload, Shapes, Sparkles, Heart } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import customStudioDesktop from "@/assets/custom-studio-desktop.jpeg";
 
 const features = [
   { icon: Upload, label: "Upload Inspo" },
@@ -10,12 +12,14 @@ const features = [
 ];
 
 const CustomStudioPreview = () => {
+  const isMobile = useIsMobile();
+  
   return (
     <section className="relative w-full py-24 sm:py-32 overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80"
+          src={isMobile ? "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80" : customStudioDesktop}
           alt="Custom nail design process"
           loading="lazy"
           decoding="async"

@@ -22,6 +22,7 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[];
   isLoading: boolean;
+  isDrawerOpen: boolean;
   
   // Actions
   addItem: (item: CartItem) => void;
@@ -32,6 +33,8 @@ interface CartStore {
   getTotalItems: () => number;
   getTotalPrice: () => number;
   hasSizingKitInCart: () => boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -39,6 +42,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isLoading: false,
+      isDrawerOpen: false,
 
       addItem: (item) => {
         const { items } = get();
@@ -116,10 +120,22 @@ export const useCartStore = create<CartStore>()(
       hasSizingKitInCart: () => {
         return get().items.some(item => item.needsSizingKit === true);
       },
+
+      openDrawer: () => {
+        set({ isDrawerOpen: true });
+      },
+
+      closeDrawer: () => {
+        set({ isDrawerOpen: false });
+      },
     }),
     {
       name: 'yourprettysets-cart',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        items: state.items,
+        isLoading: state.isLoading,
+      }),
     }
   )
 );

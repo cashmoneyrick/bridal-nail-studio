@@ -44,6 +44,9 @@ const CustomStudio = () => {
   
   // Mobile BaseLook micro-step state (0 = Shape, 1 = Length, 2 = Finish, 3 = Color)
   const [baseLookMicroStep, setBaseLookMicroStep] = useState(0);
+  
+  // Mobile AccentNails micro-step state (0 = Yes/No, 1 = Select nails, 2 = Configure)
+  const [accentMicroStep, setAccentMicroStep] = useState(0);
 
   // Compute completed steps based on store state
   const completedSteps = useMemo(() => {
@@ -90,21 +93,35 @@ const CustomStudio = () => {
   const confirmReset = () => {
     resetStudio();
     setBaseLookMicroStep(0);
+    setAccentMicroStep(0);
     setShowResetDialog(false);
   };
+  
+  // Handle skip-to-next when user selects "No accents"
+  const handleAccentSkip = () => {
+    nextStep();
+    setAccentMicroStep(0);
+  };
 
-  // Handle mobile back button (aware of BaseLook micro-steps)
+  // Handle mobile back button (aware of BaseLook and AccentNails micro-steps)
   const handleMobileBack = () => {
-    if (currentStep === 1 && baseLookMicroStep > 0) {
-      // Go back within BaseLook micro-steps
-      setBaseLookMicroStep(baseLookMicroStep - 1);
-    } else {
-      prevStep();
-      // Reset micro-step when leaving BaseLook
-      if (currentStep === 1) {
-        setBaseLookMicroStep(0);
-      }
+    // Handle AccentNails micro-steps (step 2)
+    if (currentStep === 2 && accentMicroStep > 0) {
+      setAccentMicroStep(accentMicroStep - 1);
+      return;
     }
+    
+    // Handle BaseLook micro-steps (step 1)
+    if (currentStep === 1 && baseLookMicroStep > 0) {
+      setBaseLookMicroStep(baseLookMicroStep - 1);
+      return;
+    }
+    
+    // Otherwise go to previous main step
+    prevStep();
+    // Reset micro-steps when leaving a step
+    if (currentStep === 1) setBaseLookMicroStep(0);
+    if (currentStep === 2) setAccentMicroStep(0);
   };
 
   const renderStepContent = () => {
@@ -119,7 +136,13 @@ const CustomStudio = () => {
           />
         );
       case 2:
-        return <AccentNails />;
+        return (
+          <AccentNails
+            microStep={accentMicroStep}
+            setMicroStep={setAccentMicroStep}
+            onSkipToNext={handleAccentSkip}
+          />
+        );
       case 3:
         return <EffectsAddons />;
       case 4:
@@ -134,8 +157,8 @@ const CustomStudio = () => {
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === 5;
   
-  // Show back button on mobile if not first step OR if in BaseLook with micro-step > 0
-  const showMobileBack = !isFirstStep || baseLookMicroStep > 0;
+  // Show back button on mobile if not first step OR if in any step with micro-step > 0
+  const showMobileBack = currentStep > 0 || baseLookMicroStep > 0 || accentMicroStep > 0;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

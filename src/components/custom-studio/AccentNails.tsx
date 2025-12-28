@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
 import { Check } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import AccentNailsMobile from './mobile/AccentNailsMobile';
 import {
   FingerIndex,
   FINGER_NAMES,
@@ -25,7 +27,25 @@ const FINGER_SHORT_LABELS: Record<FingerIndex, string> = {
   9: 'Pinky',
 };
 
-const AccentNails = () => {
+interface AccentNailsProps {
+  microStep?: number;
+  setMicroStep?: (step: number) => void;
+  onSkipToNext?: () => void;
+}
+
+const AccentNails = ({ microStep = 0, setMicroStep, onSkipToNext }: AccentNailsProps) => {
+  const isMobile = useIsMobile();
+  
+  // Use mobile flow on mobile devices when props are provided
+  if (isMobile && setMicroStep && onSkipToNext) {
+    return (
+      <AccentNailsMobile
+        microStep={microStep}
+        setMicroStep={setMicroStep}
+        onSkipToNext={onSkipToNext}
+      />
+    );
+  }
   const {
     hasAccentNails,
     accentNails,

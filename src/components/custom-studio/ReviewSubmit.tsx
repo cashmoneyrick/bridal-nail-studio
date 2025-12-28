@@ -30,9 +30,12 @@ import {
 } from '@/lib/pricing';
 import { Product } from '@/lib/products';
 import { logError } from '@/lib/logger';
+import { useIsMobile } from '@/hooks/use-mobile';
+import ReviewSubmitMobile from './mobile/ReviewSubmitMobile';
 
 export const ReviewSubmit = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMobile = useIsMobile();
   
   const { 
     shape, 
@@ -325,6 +328,19 @@ export const ReviewSubmit = () => {
   const getFingerNames = (nailIndices: number[]) => {
     return nailIndices.map(i => FINGER_NAMES[i]).join(', ');
   };
+
+  // Mobile: render mobile-optimized layout
+  if (isMobile) {
+    return (
+      <ReviewSubmitMobile
+        priceBreakdown={priceBreakdown}
+        hasCustomArtwork={hasCustomArtwork}
+        isSubmitting={isSubmitting}
+        onAddToCart={handleAddToCart}
+        onRequestQuote={handleRequestQuote}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

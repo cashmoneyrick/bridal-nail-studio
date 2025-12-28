@@ -41,6 +41,9 @@ const CustomStudio = () => {
 
   // Fix 6: Add reset confirmation dialog state
   const [showResetDialog, setShowResetDialog] = useState(false);
+  
+  // Mobile BaseLook micro-step state (0 = Shape, 1 = Length, 2 = Finish, 3 = Color)
+  const [baseLookMicroStep, setBaseLookMicroStep] = useState(0);
 
   // Compute completed steps based on store state
   const completedSteps = useMemo(() => {
@@ -72,6 +75,10 @@ const CustomStudio = () => {
     // Only allow clicking back to completed steps or current step
     if (step <= currentStep || completedSteps.has(step)) {
       setStep(step);
+      // Reset micro-step when navigating away from BaseLook
+      if (step !== 1) {
+        setBaseLookMicroStep(0);
+      }
     }
   };
 
@@ -82,7 +89,22 @@ const CustomStudio = () => {
 
   const confirmReset = () => {
     resetStudio();
+    setBaseLookMicroStep(0);
     setShowResetDialog(false);
+  };
+
+  // Handle mobile back button (aware of BaseLook micro-steps)
+  const handleMobileBack = () => {
+    if (currentStep === 1 && baseLookMicroStep > 0) {
+      // Go back within BaseLook micro-steps
+      setBaseLookMicroStep(baseLookMicroStep - 1);
+    } else {
+      prevStep();
+      // Reset micro-step when leaving BaseLook
+      if (currentStep === 1) {
+        setBaseLookMicroStep(0);
+      }
+    }
   };
 
   const renderStepContent = () => {
@@ -90,7 +112,12 @@ const CustomStudio = () => {
       case 0:
         return <StartingPoint />;
       case 1:
-        return <BaseLook />;
+        return (
+          <BaseLook 
+            microStep={baseLookMicroStep} 
+            setMicroStep={setBaseLookMicroStep} 
+          />
+        );
       case 2:
         return <AccentNails />;
       case 3:
@@ -106,6 +133,9 @@ const CustomStudio = () => {
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === 5;
+  
+  // Show back button on mobile if not first step OR if in BaseLook with micro-step > 0
+  const showMobileBack = !isFirstStep || baseLookMicroStep > 0;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -142,9 +172,9 @@ const CustomStudio = () => {
             <div className="lg:col-span-2">
               <div className="bg-card border border-border rounded-xl p-6 md:p-8">
                 {/* Mobile back button */}
-                {!isFirstStep && (
+                {showMobileBack && (
                   <button
-                    onClick={prevStep}
+                    onClick={handleMobileBack}
                     className="lg:hidden flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 -mt-2"
                   >
                     <ChevronLeft className="w-4 h-4" />

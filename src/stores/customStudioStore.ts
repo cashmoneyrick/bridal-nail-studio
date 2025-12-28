@@ -87,6 +87,7 @@ interface CustomStudioState {
   baseFinish: FinishType;
   colorPalette: ColorPalette | null;
   nailColors: Record<FingerIndex, string>;
+  selectedColors: string[];  // User's picked colors from the wheel
   
   // Step 3: Accent Nails
   hasAccentNails: boolean;
@@ -125,6 +126,9 @@ interface CustomStudioActions {
   setBaseFinish: (finish: FinishType) => void;
   setColorPalette: (palette: ColorPalette | null) => void;
   setNailColor: (finger: FingerIndex, color: string) => void;
+  addSelectedColor: (color: string) => void;
+  removeSelectedColor: (color: string) => void;
+  clearSelectedColors: () => void;
   
   // Step 3
   setHasAccentNails: (has: boolean) => void;
@@ -170,6 +174,7 @@ const initialState: CustomStudioState = {
   baseFinish: 'glossy',
   colorPalette: null,
   nailColors: { ...defaultNailColors },
+  selectedColors: [],
   hasAccentNails: false,
   accentNails: new Set(),
   accentConfigs: {},
@@ -228,8 +233,10 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         switch (state.currentStep) {
           case 0: // Starting Point
             return state.entryMode === 'fresh' || state.baseProduct !== null;
-          case 1: // Base Look - Fix 1: Require colorPalette
-            return !!state.shape && !!state.length && !!state.baseFinish && !!state.colorPalette;
+          case 1: // Base Look - Require colors selected AND at least one nail painted
+            const hasColors = state.selectedColors.length > 0;
+            const hasNailAssigned = Object.values(state.nailColors).some(color => color && color.length > 0);
+            return !!state.shape && !!state.length && !!state.baseFinish && hasColors && hasNailAssigned;
           case 2: // Accent Nails
             return !state.hasAccentNails || state.accentNails.size > 0;
           case 3: // Effects & Add-ons
@@ -255,6 +262,15 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
       setNailColor: (finger, color) => set((state) => ({
         nailColors: { ...state.nailColors, [finger]: color },
       })),
+      addSelectedColor: (color) => set((state) => ({
+        selectedColors: state.selectedColors.includes(color) 
+          ? state.selectedColors 
+          : [...state.selectedColors, color],
+      })),
+      removeSelectedColor: (color) => set((state) => ({
+        selectedColors: state.selectedColors.filter(c => c !== color),
+      })),
+      clearSelectedColors: () => set({ selectedColors: [] }),
       
       // Step 3
       setHasAccentNails: (has) => set({ 
@@ -419,10 +435,16 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         return { items, subtotal, hasQuoteItems };
       },
       
-      // Reset - Fix 5: Clear localStorage on reset
+      // Reset - Clear localStorage and all state on reset
       resetStudio: () => {
         localStorage.removeItem(STORAGE_KEY);
-        set({ ...initialState, accentNails: new Set(), accentConfigs: {} });
+        set({ 
+          ...initialState, 
+          accentNails: new Set(), 
+          accentConfigs: {},
+          selectedColors: [],
+          nailColors: { ...defaultNailColors },
+        });
       },
     }),
     {
@@ -437,6 +459,7 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         baseFinish: state.baseFinish,
         colorPalette: state.colorPalette,
         nailColors: state.nailColors,
+        selectedColors: state.selectedColors,
         hasAccentNails: state.hasAccentNails,
         accentNails: state.accentNails,
         accentConfigs: state.accentConfigs,

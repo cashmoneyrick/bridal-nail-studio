@@ -1,40 +1,33 @@
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Ruler, Sparkles, Heart, AlertCircle, Trash2 } from "lucide-react";
 
 const categories = [
   {
     title: "I Don't Know My Size",
     path: "/how-to/sizing",
     gridArea: "sizing",
-    icon: Ruler,
     isPrimary: true,
   },
   {
     title: "Applying for the First Time",
     path: "/how-to/application",
     gridArea: "applying",
-    icon: Sparkles,
   },
   {
     title: "Troubleshooting",
     path: "/how-to/troubleshooting",
-    gridArea: "trouble",
-    icon: AlertCircle,
+    gridArea: "troubleshooting",
   },
   {
     title: "Removing Your Set",
     path: "/how-to/removal",
     gridArea: "removal",
-    icon: Trash2,
   },
   {
     title: "Prepping for My Wedding",
     path: "/how-to/bridal",
     gridArea: "bridal",
-    icon: Heart,
-    isSpecial: true,
   },
 ];
 
@@ -59,96 +52,76 @@ const HowTo = () => {
       <section className="pb-24 md:pb-32">
         <div className="container mx-auto px-6">
           {/* Mobile: Single column stack */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Link
-                  key={category.path}
-                  to={category.path}
-                  className="group block"
+          <div className="grid grid-cols-1 gap-4 lg:hidden">
+            {categories.map((category) => (
+              <Link
+                key={category.path}
+                to={category.path}
+                className="group block"
+              >
+                <div
+                  className={`
+                    bg-secondary/20 border border-border/50 rounded-2xl overflow-hidden
+                    transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-border
+                  `}
                 >
-                  <div
-                    className={`
-                      bg-secondary/20 border border-border/50 rounded-2xl p-6 
-                      transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-border
-                      ${category.isPrimary || category.isSpecial ? 'min-h-[180px]' : 'min-h-[140px]'}
-                      ${category.isSpecial ? 'bg-primary/5' : ''}
-                    `}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`
-                        p-3 rounded-xl 
-                        ${category.isPrimary ? 'bg-primary/10' : category.isSpecial ? 'bg-rose/10' : 'bg-muted/50'}
-                      `}>
-                        <Icon className={`
-                          w-6 h-6 
-                          ${category.isPrimary ? 'text-primary' : category.isSpecial ? 'text-rose' : 'text-muted-foreground'}
-                        `} />
-                      </div>
-                      <h3 className={`
-                        font-serif text-foreground group-hover:text-primary transition-colors
-                        ${category.isPrimary ? 'text-xl' : category.isSpecial ? 'text-xl' : 'text-lg'}
-                      `}>
-                        {category.title}
-                      </h3>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Desktop: Bento Grid */}
-          <div 
-            className="hidden md:grid gap-4 lg:gap-6"
-            style={{
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gridTemplateRows: 'repeat(3, minmax(140px, auto))',
-              gridTemplateAreas: `
-                "sizing applying applying"
-                "sizing trouble trouble"
-                "removal bridal bridal"
-              `,
-            }}
-          >
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Link
-                  key={category.path}
-                  to={category.path}
-                  className="group block"
-                  style={{ gridArea: category.gridArea }}
-                >
-                  <div
-                    className={`
-                      h-full bg-secondary/20 border border-border/50 rounded-2xl 
-                      transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border
-                      flex flex-col justify-between
-                      ${category.isPrimary ? 'p-8 lg:p-10' : category.isSpecial ? 'p-6 lg:p-8' : 'p-5 lg:p-6'}
-                      ${category.isSpecial ? 'bg-primary/5' : ''}
-                    `}
-                  >
-                    <div className={`
-                      p-3 rounded-xl w-fit
-                      ${category.isPrimary ? 'bg-primary/10 p-4' : category.isSpecial ? 'bg-rose/10' : 'bg-muted/50'}
-                    `}>
-                      <Icon className={`
-                        ${category.isPrimary ? 'w-8 h-8' : 'w-6 h-6'}
-                        ${category.isPrimary ? 'text-primary' : category.isSpecial ? 'text-rose' : 'text-muted-foreground'}
-                      `} />
-                    </div>
+                  {/* Placeholder Image */}
+                  <div className={`bg-muted/30 ${category.isPrimary ? 'aspect-[16/10]' : 'aspect-[16/9]'}`} />
+                  {/* Title */}
+                  <div className="p-4">
                     <h3 className={`
-                      font-serif text-foreground group-hover:text-primary transition-colors mt-4
-                      ${category.isPrimary ? 'text-2xl lg:text-3xl' : category.isSpecial ? 'text-xl lg:text-2xl' : 'text-lg lg:text-xl'}
+                      font-serif text-foreground group-hover:text-primary transition-colors
+                      ${category.isPrimary ? 'text-xl' : 'text-lg'}
                     `}>
                       {category.title}
                     </h3>
                   </div>
-                </Link>
-              );
-            })}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop: Bento Grid */}
+          <div 
+            className="hidden lg:grid gap-6"
+            style={{
+              gridTemplateColumns: '1fr 1fr',
+              gridTemplateRows: 'auto auto auto',
+              gridTemplateAreas: `
+                "sizing applying"
+                "sizing troubleshooting"
+                "removal bridal"
+              `,
+            }}
+          >
+            {categories.map((category) => (
+              <Link
+                key={category.path}
+                to={category.path}
+                className="group block"
+                style={{ gridArea: category.gridArea }}
+              >
+                <div
+                  className={`
+                    h-full bg-secondary/20 border border-border/50 rounded-2xl overflow-hidden
+                    transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border
+                    flex flex-col
+                  `}
+                >
+                  {/* Placeholder Image */}
+                  <div className={`bg-muted/30 flex-1 ${category.isPrimary ? 'min-h-[300px]' : 'min-h-[120px]'}`} />
+                  {/* Title */}
+                  <div className={category.isPrimary ? 'p-6 lg:p-8' : 'p-4 lg:p-5'}>
+                    <h3 className={`
+                      font-serif text-foreground group-hover:text-primary transition-colors
+                      ${category.isPrimary ? 'text-2xl lg:text-3xl' : 'text-lg lg:text-xl'}
+                    `}>
+                      {category.title}
+                    </h3>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

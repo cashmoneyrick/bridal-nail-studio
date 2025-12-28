@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
-import { Gift, Lightbulb, ArrowRight } from "lucide-react";
+import { Gift, Lightbulb, ArrowRight, Check, Ruler, HelpCircle, Sparkles } from "lucide-react";
 
 const shapes = [
   { id: "square", name: "Square" },
@@ -13,6 +13,37 @@ const shapes = [
   { id: "almond", name: "Almond" },
   { id: "coffin", name: "Coffin" },
   { id: "stiletto", name: "Stiletto" },
+];
+
+const sizingTips = [
+  "When in doubt, size up — you can always file down, but you can't add width",
+  "Measure at the widest part of your natural nail",
+  "If you're between sizes, choose the larger one for comfort",
+  "Your dominant hand may have slightly different sizes",
+];
+
+const sizingSteps = [
+  {
+    step: 1,
+    title: "Lay Out Your Sizing Nails",
+    description: "Your kit includes numbered nails from 0 (largest) to 9 (smallest). Lay them out in order for easy reference.",
+  },
+  {
+    step: 2,
+    title: "Try Each Size",
+    description: "Press each sizing nail onto your natural nail. It should fit from sidewall to sidewall without pressing into your skin or leaving gaps.",
+  },
+  {
+    step: 3,
+    title: "Record Your Sizes",
+    description: "Write down the number that fits each finger — thumb through pinky, both hands. Each finger may be a different size!",
+  },
+  {
+    step: 4,
+    title: "Save to Your Account",
+    description: "Once you know your sizes, save them to your Perfect Fit Profile for faster ordering.",
+    hasAction: true,
+  },
 ];
 
 const HowToSizing = () => {
@@ -24,7 +55,6 @@ const HowToSizing = () => {
 
     const shapeName = shapes.find((s) => s.id === selectedShape)?.name || selectedShape;
 
-    // Create a sizing kit product for the cart
     const sizingKitProduct = {
       id: `sizing-kit-${selectedShape}`,
       handle: `sizing-kit-${selectedShape}`,
@@ -55,7 +85,6 @@ const HowToSizing = () => {
       selectedOptions: [{ name: "Shape", value: shapeName }],
     });
 
-    console.log(`Added sizing kit to cart: ${shapeName}`);
     toast.success(`Sizing Kit (${shapeName}) added to cart!`);
   };
 
@@ -68,10 +97,10 @@ const HowToSizing = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
-              I Don't Know My Size
+              Find Your Perfect Fit
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl mb-10">
-              Finding your perfect fit is easy.
+              The right size makes all the difference. Here's how to find yours.
             </p>
             
             {/* Hero Image Placeholder */}
@@ -80,24 +109,17 @@ const HowToSizing = () => {
         </div>
       </section>
 
-      {/* Info Callout */}
+      {/* Info Callouts */}
       <section className="pb-8">
         <div className="container mx-auto px-6">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-secondary/30 rounded-xl p-6 md:p-8 flex gap-4 items-start">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <div className="bg-primary/5 rounded-xl p-6 md:p-8 flex gap-4 items-start">
               <Gift className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-foreground">
                 <span className="font-medium">Good news!</span> Your first set includes a free sizing kit in the shape you order.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Alert Callout */}
-      <section className="pb-16 md:pb-20">
-        <div className="container mx-auto px-6">
-          <div className="max-w-2xl mx-auto">
+            
             <div className="bg-muted/20 border border-border/50 rounded-xl p-6 md:p-8 flex gap-4 items-start">
               <Lightbulb className="w-6 h-6 text-muted-foreground flex-shrink-0 mt-0.5" />
               <p className="text-muted-foreground">
@@ -109,7 +131,7 @@ const HowToSizing = () => {
       </section>
 
       {/* Sizing Kit Purchase Section */}
-      <section className="pb-20 md:pb-28">
+      <section className="py-20 md:py-28">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
@@ -169,8 +191,8 @@ const HowToSizing = () => {
       </section>
 
       {/* How to Use Your Kit Section */}
-      <section className="pb-24 md:pb-32 bg-secondary/10">
-        <div className="container mx-auto px-6 py-16 md:py-24">
+      <section className="py-24 md:py-32 bg-secondary/10">
+        <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
@@ -182,79 +204,132 @@ const HowToSizing = () => {
             </div>
 
             <div className="space-y-16 md:space-y-20">
-              {/* Step 1 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="aspect-[4/3] bg-muted/30 rounded-lg order-1" />
-                <div className="order-2">
-                  <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">
-                    Step 1
-                  </span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
-                    Lay Out Your Sizing Nails
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Your kit includes numbered nails from 0 (largest) to 9 (smallest).
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="aspect-[4/3] bg-muted/30 rounded-lg order-1 md:order-2" />
-                <div className="order-2 md:order-1">
-                  <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">
-                    Step 2
-                  </span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
-                    Try Each Size
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Press each sizing nail onto your natural nail. It should fit from sidewall to sidewall without pressing into your skin or leaving gaps.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="aspect-[4/3] bg-muted/30 rounded-lg order-1" />
-                <div className="order-2">
-                  <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">
-                    Step 3
-                  </span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
-                    Record Your Sizes
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Write down the number that fits each finger — thumb through pinky, both hands.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 4 */}
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="aspect-[4/3] bg-muted/30 rounded-lg order-1 md:order-2 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <p className="text-muted-foreground text-sm">Save to your account</p>
+              {sizingSteps.map((item, index) => (
+                <div 
+                  key={item.step} 
+                  className="grid md:grid-cols-2 gap-8 items-center"
+                >
+                  <div 
+                    className={`aspect-[4/3] bg-muted/30 rounded-lg ${
+                      index % 2 === 0 ? "order-1" : "order-1 md:order-2"
+                    }`} 
+                  />
+                  <div className={index % 2 === 0 ? "order-2" : "order-2 md:order-1"}>
+                    <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">
+                      Step {item.step}
+                    </span>
+                    <h3 className="font-serif text-2xl text-foreground mb-4">
+                      {item.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed mb-6">
+                      {item.description}
+                    </p>
+                    {item.hasAction && (
+                      <Button asChild variant="outline" className="group">
+                        <Link to="/account/perfect-fit">
+                          Save My Sizes
+                          <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
-                <div className="order-2 md:order-1">
-                  <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">
-                    Step 4
-                  </span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
-                    Save to Your Account
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed mb-6">
-                    Once you know your sizes, save them to your Perfect Fit Profile for faster ordering.
-                  </p>
-                  <Button asChild variant="outline" className="group">
-                    <Link to="/account/perfect-fit">
-                      Save My Sizes
-                      <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                    </Link>
-                  </Button>
-                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pro Tips Section */}
+      <section className="py-20 md:py-28">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 mb-4">
+                <Ruler className="w-5 h-5 text-primary" />
+                <span className="text-sm uppercase tracking-wider text-muted-foreground">Pro Tips</span>
               </div>
+              <h2 className="font-serif text-3xl md:text-4xl text-foreground">
+                Sizing Tips to Remember
+              </h2>
+            </div>
+
+            <div className="grid gap-4">
+              {sizingTips.map((tip, index) => (
+                <div 
+                  key={index}
+                  className="flex items-start gap-4 bg-secondary/10 rounded-lg p-5"
+                >
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-foreground">{tip}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Still Unsure Callout */}
+      <section className="pb-20 md:pb-28">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-primary/5 rounded-2xl p-8 md:p-12 text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-6">
+                <HelpCircle className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-serif text-2xl md:text-3xl text-foreground mb-4">
+                Still Unsure?
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+                If you're between sizes or have any questions about fit, our team is here to help. 
+                We'll make sure you get the perfect match.
+              </p>
+              <Button asChild variant="outline">
+                <Link to="/contact">
+                  Contact Us
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Perfect Fit Promise */}
+      <section className="pb-20 md:pb-28">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-secondary/20 rounded-2xl p-8 md:p-12 text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-6">
+                <Sparkles className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-serif text-2xl md:text-3xl text-foreground mb-4">
+                Our Perfect Fit Promise
+              </h3>
+              <p className="text-muted-foreground max-w-lg mx-auto">
+                Once you save your sizes to your account, we'll automatically customize every set you order. 
+                No more guessing — just perfect nails, every time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* End of Page CTA */}
+      <section className="pb-24 md:pb-32">
+        <div className="container mx-auto px-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-8">
+              Ready to shop?
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild variant="outline" size="lg">
+                <Link to="/how-to">Back to How To</Link>
+              </Button>
+              <Button asChild size="lg">
+                <Link to="/shop">Browse All Sets</Link>
+              </Button>
             </div>
           </div>
         </div>

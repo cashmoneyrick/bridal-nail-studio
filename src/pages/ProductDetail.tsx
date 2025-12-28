@@ -227,8 +227,19 @@ const ProductDetail = () => {
   const [sizingOption, setSizingOption] = useState<'kit' | 'known'>('kit');
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<{
+    product: Product;
+    shape: string;
+    length: string;
+    sizingOption: 'kit' | 'known';
+    sizeProfileId?: string;
+  } | null>(null);
   
-  const addItem = useCartStore(state => state.addItem);
+  const { addItem, hasSizingKitInCart } = useCartStore(state => ({
+    addItem: state.addItem,
+    hasSizingKitInCart: state.hasSizingKitInCart,
+  }));
   const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
   const { toggleFavorite, isFavorite } = useFavoritesStore();
   const navigate = useNavigate();
@@ -275,6 +286,13 @@ const ProductDetail = () => {
     const variant = product.variants.find(v => v.id === selectedVariant);
     if (!variant) return;
 
+    // Determine needsSizingKit: true only if user wants kit AND cart doesn't already have one
+    const needsSizingKit = sizingOption === 'kit' && !hasSizingKitInCart();
+    
+    // Determine sizeProfileId: only set if user knows their sizes and has selected a profile
+    const selectedProfile = getSelectedProfile();
+    const sizeProfileId = sizingOption === 'known' && selectedProfile ? selectedProfile.id : undefined;
+
     const cartItem: CartItem = {
       product: product,
       variantId: variant.id,
@@ -285,13 +303,23 @@ const ProductDetail = () => {
       },
       quantity,
       selectedOptions: variant.selectedOptions,
-      needsSizingKit: false,
+      needsSizingKit,
+      sizeProfileId,
     };
 
     addItem(cartItem);
-    toast.success(`${product.title} added to bag`, {
-      position: "top-center",
+    
+    // Store the configuration for the success modal
+    setLastAddedItem({
+      product,
+      shape: selectedShape,
+      length: selectedLength,
+      sizingOption,
+      sizeProfileId,
     });
+    
+    // Show the success modal instead of toast
+    setShowSuccessModal(true);
   };
 
   const currentVariant = product?.variants.find(v => v.id === selectedVariant);
@@ -847,6 +875,8 @@ const ProductDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* TODO: AddToCartSuccessModal will be added here */}
 
       <Footer />
     </div>

@@ -285,6 +285,7 @@ const ProductDetail = () => {
       },
       quantity,
       selectedOptions: variant.selectedOptions,
+      needsSizingKit: false,
     };
 
     addItem(cartItem);

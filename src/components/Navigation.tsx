@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Heart, User } from "lucide-react";
+import { Menu, X, Heart, User, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartDrawer from "@/components/CartDrawer";
 import { Link } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
+import { useCartStore } from "@/stores/cartStore";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, initialized } = useAuthStore();
+  const totalCartItems = useCartStore(state => state.getTotalItems());
 
   // Get display initial - prefer profile name, then email, then default
   const getDisplayInitial = () => {
@@ -101,6 +103,16 @@ const Navigation = () => {
                   </span>
                 )}
               </Link>
+              <Link to="/cart" className="relative">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                  <ShoppingBag className="h-5 w-5" />
+                </Button>
+                {totalCartItems > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                    {totalCartItems > 9 ? '9+' : totalCartItems}
+                  </span>
+                )}
+              </Link>
               <CartDrawer />
               <Link 
                 to={user && initialized ? "/account" : "/auth"}
@@ -120,6 +132,16 @@ const Navigation = () => {
                 {favoritesCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
                     {favoritesCount > 9 ? '9+' : favoritesCount}
+                  </span>
+                )}
+              </Link>
+              <Link to="/cart" className="relative">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                  <ShoppingBag className="h-5 w-5" />
+                </Button>
+                {totalCartItems > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                    {totalCartItems > 9 ? '9+' : totalCartItems}
                   </span>
                 )}
               </Link>

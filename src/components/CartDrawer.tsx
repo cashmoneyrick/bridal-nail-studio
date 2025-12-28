@@ -1,14 +1,12 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { ShoppingBag, Minus, Plus, Trash2, Loader2, Tag, X, Check } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
@@ -99,16 +97,6 @@ export const CartDrawer = () => {
 
   return (
     <Sheet open={isDrawerOpen} onOpenChange={(open) => open ? openDrawer() : closeDrawer()}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
-          <ShoppingBag className="h-5 w-5" />
-          {totalItems > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground">
-              {totalItems}
-            </Badge>
-          )}
-        </Button>
-      </SheetTrigger>
       
       <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">

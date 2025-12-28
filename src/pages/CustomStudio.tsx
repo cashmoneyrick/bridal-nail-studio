@@ -161,12 +161,12 @@ const CustomStudio = () => {
   const showMobileBack = currentStep > 0 || baseLookMicroStep > 0 || accentMicroStep > 0;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden w-full max-w-full">
       <Navigation />
       
       <main className="flex-1 pt-20">
         {/* Header */}
-        <div className="bg-gradient-to-b from-primary/5 to-transparent py-8 md:py-12">
+        <div className="bg-gradient-to-b from-primary/5 to-transparent py-8 md:py-12 w-full max-w-full overflow-hidden">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-2xl mx-auto">
               <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">

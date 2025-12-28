@@ -199,11 +199,7 @@ export const CustomArtwork = () => {
   // Fix 8: Track object URLs for cleanup
   const objectUrlsRef = useRef<Set<string>>(new Set());
 
-  if (isMobile) {
-    return <CustomArtworkMobile />;
-  }
-
-  // Cleanup object URLs on unmount
+  // Cleanup object URLs on unmount - MUST be before conditional return
   useEffect(() => {
     return () => {
       objectUrlsRef.current.forEach(url => {
@@ -211,6 +207,10 @@ export const CustomArtwork = () => {
       });
     };
   }, []);
+
+  if (isMobile) {
+    return <CustomArtworkMobile />;
+  }
 
   const handleCustomToggle = (enabled: boolean) => {
     setCustomEnabled(enabled);

@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { ShoppingBag, Minus, Plus, Trash2, Loader2, Tag, X, Check } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, Loader2, Tag, X, Check, Package } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -142,6 +142,24 @@ export const CartDrawer = () => {
                         <p className="font-semibold mt-1">
                           ${parseFloat(item.price.amount).toFixed(2)}
                         </p>
+                        
+                        {/* Sizing badges */}
+                        {(item.needsSizingKit || item.sizeProfileId) && (
+                          <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            {item.needsSizingKit && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                                <Package className="h-3 w-3" />
+                                Includes sizing kit
+                              </span>
+                            )}
+                            {item.sizeProfileId && !item.needsSizingKit && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
+                                <Check className="h-3 w-3" />
+                                Using saved sizes
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">

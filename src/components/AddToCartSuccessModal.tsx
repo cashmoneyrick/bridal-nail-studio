@@ -79,6 +79,7 @@ const AddToCartSuccessModal = ({
         { name: 'Length', value: addedItem.length },
       ],
       needsSizingKit: false,
+      sizingOption: addedItem.sizingOption,
       sizeProfileId: addedItem.sizeProfileId,
       sizeProfileSnapshot: addedItem.sizeProfileSnapshot,
     };

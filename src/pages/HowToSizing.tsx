@@ -54,6 +54,7 @@ const HowToSizing = () => {
       quantity: 1,
       selectedOptions: [{ name: "Shape", value: shapeName }],
       needsSizingKit: false,
+      sizingOption: 'kit',
     });
 
     console.log(`Added sizing kit to cart: ${shapeName}`);

@@ -190,7 +190,13 @@ const Cart = () => {
                                 <div className="col-span-2">
                                   <span className="text-muted-foreground">Sizing:</span>{' '}
                                   <span className="font-medium">
-                                    {item.needsSizingKit ? 'Sizing kit included' : item.sizeProfileId ? 'Using saved sizes' : 'Not specified'}
+                                    {item.needsSizingKit 
+                                      ? 'Sizing kit included with this set' 
+                                      : item.sizingOption === 'kit'
+                                        ? 'Sizing kit included in order'
+                                        : item.sizeProfileId 
+                                          ? 'Using saved sizes' 
+                                          : 'Not specified'}
                                   </span>
                                 </div>
                               </div>

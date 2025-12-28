@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -47,7 +48,6 @@ const getDiscountLabel = (code: string): string => {
 };
 
 export const CartDrawer = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const { 
     items, 
     isLoading, 
@@ -56,6 +56,9 @@ export const CartDrawer = () => {
     clearCart,
     getTotalItems,
     getTotalPrice,
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
   } = useCartStore();
   
   const { appliedCode, clearAppliedCode } = useDiscountCodesStore();
@@ -91,11 +94,11 @@ export const CartDrawer = () => {
     toast.success("Checkout functionality coming soon!", {
       position: "top-center",
     });
-    setIsOpen(false);
+    closeDrawer();
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isDrawerOpen} onOpenChange={(open) => open ? openDrawer() : closeDrawer()}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
           <ShoppingBag className="h-5 w-5" />
@@ -235,6 +238,12 @@ export const CartDrawer = () => {
                     )}
                   </div>
                 </div>
+                
+                <Link to="/cart" onClick={closeDrawer} className="block">
+                  <Button variant="outline" className="w-full" size="lg">
+                    View Full Cart
+                  </Button>
+                </Link>
                 
                 <Button 
                   onClick={handleCheckout}

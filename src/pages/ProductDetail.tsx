@@ -236,10 +236,8 @@ const ProductDetail = () => {
     sizeProfileId?: string;
   } | null>(null);
   
-  const { addItem, hasSizingKitInCart } = useCartStore(state => ({
-    addItem: state.addItem,
-    hasSizingKitInCart: state.hasSizingKitInCart,
-  }));
+  const addItem = useCartStore(state => state.addItem);
+  const hasSizingKitInCart = useCartStore(state => state.hasSizingKitInCart);
   const { profiles, selectedProfileId, selectProfile, getSelectedProfile } = useNailProfilesStore();
   const { toggleFavorite, isFavorite } = useFavoritesStore();
   const navigate = useNavigate();

@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { ProductReviews } from "@/components/ProductReviews";
+import AddToCartSuccessModal from "@/components/AddToCartSuccessModal";
 
 // Shape icons as simple SVG components
 const ShapeIcon = ({ shape, selected }: { shape: string; selected: boolean }) => {
@@ -874,7 +875,12 @@ const ProductDetail = () => {
         </DialogContent>
       </Dialog>
 
-      {/* TODO: AddToCartSuccessModal will be added here */}
+      <AddToCartSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        addedItem={lastAddedItem}
+        relatedProducts={relatedProducts}
+      />
 
       <Footer />
     </div>

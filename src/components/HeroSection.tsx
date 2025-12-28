@@ -25,12 +25,10 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up">
-          {/* Valentine's Announcement */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full animate-fade-in">
-            <span className="text-xs sm:text-sm font-medium tracking-wider uppercase text-primary">
-              Valentine's Collection 2026
-            </span>
-          </div>
+          {/* Tagline */}
+          <p className="text-sm sm:text-base font-medium tracking-[0.3em] uppercase text-foreground/70">
+            Valentine's Collection 2025
+          </p>
 
           {/* Main Headline */}
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-tight text-balance">
@@ -51,9 +49,7 @@ const HeroSection = () => {
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Link to="/custom-studio">
-              <Button variant="outline" className="btn-secondary text-base min-w-[200px]" size="lg">
-                Design Your Love Story
-              </Button>
+              
             </Link>
           </div>
 

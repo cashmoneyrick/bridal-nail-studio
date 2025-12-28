@@ -24,6 +24,7 @@ import AccountSettings from "./pages/AccountSettings";
 import Addresses from "./pages/Addresses";
 import OrderHistory from "./pages/OrderHistory";
 import PaymentMethods from "./pages/PaymentMethods";
+import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 import EmailPopup from "./components/EmailPopup";
 import FaqChatbot from "./components/FaqChatbot";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/orders" element={<OrderHistory />} />
             <Route path="/payment" element={<PaymentMethods />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/cart" element={<Cart />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

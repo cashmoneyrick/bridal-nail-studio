@@ -29,7 +29,6 @@ const HeroSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full animate-fade-in">
             <span className="text-xs sm:text-sm font-medium tracking-wider uppercase text-primary">
               Valentine's Collection 2025
-              ❤️ Valentine's Collection 2025
             </span>
           </div>
 

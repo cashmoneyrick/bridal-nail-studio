@@ -31,6 +31,7 @@ const AddToCartSuccessModal = ({
 
   const navigate = useNavigate();
   const addItem = useCartStore(state => state.addItem);
+  const openDrawer = useCartStore(state => state.openDrawer);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -73,7 +74,7 @@ const AddToCartSuccessModal = ({
 
   const handleViewBag = () => {
     onClose();
-    navigate('/cart');
+    openDrawer();
   };
 
   if (!addedItem) return null;

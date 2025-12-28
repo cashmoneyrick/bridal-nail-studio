@@ -53,6 +53,7 @@ const HowToSizing = () => {
       price: { amount: "5.00", currencyCode: "USD" },
       quantity: 1,
       selectedOptions: [{ name: "Shape", value: shapeName }],
+      needsSizingKit: false,
     });
 
     console.log(`Added sizing kit to cart: ${shapeName}`);

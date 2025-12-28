@@ -15,6 +15,8 @@ export interface CartItem {
     name: string;
     value: string;
   }>;
+  needsSizingKit: boolean;
+  sizeProfileId?: string;
 }
 
 interface CartStore {
@@ -29,6 +31,7 @@ interface CartStore {
   setLoading: (loading: boolean) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  hasSizingKitInCart: () => boolean;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -68,9 +71,32 @@ export const useCartStore = create<CartStore>()(
       },
 
       removeItem: (variantId) => {
+        const { items } = get();
+        const itemToRemove = items.find(item => item.variantId === variantId);
+        const hadSizingKit = itemToRemove?.needsSizingKit === true;
+        
+        // Remove the item
         set({
-          items: get().items.filter(item => item.variantId !== variantId)
+          items: items.filter(item => item.variantId !== variantId)
         });
+        
+        // If removed item had sizing kit, reassign to another qualifying item
+        if (hadSizingKit && get().items.length > 0) {
+          const remainingItems = get().items;
+          // Find items that don't have a sizeProfileId (need sizing help)
+          const itemsNeedingSizing = remainingItems.filter(item => !item.sizeProfileId);
+          
+          // If any items need sizing and none currently have the kit, assign to first one
+          if (itemsNeedingSizing.length > 0 && !remainingItems.some(item => item.needsSizingKit)) {
+            set({
+              items: remainingItems.map(item => 
+                item.variantId === itemsNeedingSizing[0].variantId
+                  ? { ...item, needsSizingKit: true }
+                  : item
+              )
+            });
+          }
+        }
       },
 
       clearCart: () => {
@@ -85,6 +111,10 @@ export const useCartStore = create<CartStore>()(
 
       getTotalPrice: () => {
         return get().items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
+      },
+
+      hasSizingKitInCart: () => {
+        return get().items.some(item => item.needsSizingKit === true);
       },
     }),
     {

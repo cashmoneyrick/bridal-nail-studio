@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
 import { NailArtType, FingerIndex, NAIL_ART_PRICES, NAIL_ART_LABELS, FINGER_NAMES, LEFT_HAND, RIGHT_HAND } from '@/lib/pricing';
 import { Palette, Upload, Sparkles, Flower2, PenTool, PartyPopper, X, ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import CustomArtworkMobile from './mobile/CustomArtworkMobile';
 
 const DESIGN_OPTIONS: { type: NailArtType; icon: React.ElementType; description: string }[] = [
   { type: 'simple-lines', icon: PenTool, description: 'Minimalist geometric patterns, dots, and clean lines' },
@@ -190,12 +191,17 @@ const PredefinedDesignCard = ({
 };
 
 export const CustomArtwork = () => {
+  const isMobile = useIsMobile();
   const { customArtwork, setCustomArtwork } = useCustomStudioStore();
   const [customEnabled, setCustomEnabled] = useState(!!customArtwork);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fix 8: Track object URLs for cleanup
   const objectUrlsRef = useRef<Set<string>>(new Set());
+
+  if (isMobile) {
+    return <CustomArtworkMobile />;
+  }
 
   // Cleanup object URLs on unmount
   useEffect(() => {

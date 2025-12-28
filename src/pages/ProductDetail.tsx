@@ -97,10 +97,9 @@ const NAIL_LENGTHS = ['Short', 'Medium', 'Long', 'Extra Long'];
 // Pairs Well With Carousel Component
 interface PairsWellWithCarouselProps {
   products: Product[];
-  addItem: (item: CartItem) => void;
 }
 
-const PairsWellWithCarousel = ({ products, addItem }: PairsWellWithCarouselProps) => {
+const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -122,30 +121,6 @@ const PairsWellWithCarousel = ({ products, addItem }: PairsWellWithCarouselProps
       api.off("reInit", updateScrollState);
     };
   }, [api]);
-
-  const handleQuickAdd = (e: React.MouseEvent, product: Product) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const variantId = `${product.id}-almond-medium`;
-    
-    addItem({
-      product,
-      variantId,
-      variantTitle: 'Almond / Medium',
-      price: {
-        amount: product.price.toString(),
-        currencyCode: 'USD',
-      },
-      quantity: 1,
-      selectedOptions: [
-        { name: 'Shape', value: 'Almond' },
-        { name: 'Length', value: 'Medium' },
-      ],
-    });
-    
-    toast.success(`${product.title} added to bag!`);
-  };
 
   return (
     <section className="mt-28 mb-16">
@@ -210,15 +185,16 @@ const PairsWellWithCarousel = ({ products, addItem }: PairsWellWithCarouselProps
                       </div>
                     )}
                     
-                    {/* Quick Add Button - appears on hover */}
+                    {/* View Set Button - appears on hover */}
                     <Button
                       variant="outline"
                       size="sm"
                       className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 rounded-full bg-background/95 backdrop-blur-sm border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-md"
-                      onClick={(e) => handleQuickAdd(e, product)}
+                      asChild
                     >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Quick Add
+                      <Link to={`/product/${product.handle}`}>
+                        View Set
+                      </Link>
                     </Button>
                   </div>
                 </Link>
@@ -846,7 +822,7 @@ const ProductDetail = () => {
 
           {/* Pairs Well With Carousel */}
           {relatedProducts.length > 0 && (
-            <PairsWellWithCarousel products={relatedProducts} addItem={addItem} />
+            <PairsWellWithCarousel products={relatedProducts} />
           )}
 
           {/* Reviews */}

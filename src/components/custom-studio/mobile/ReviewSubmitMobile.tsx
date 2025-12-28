@@ -1,7 +1,6 @@
-import { Accordion } from '@/components/ui/accordion';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, ShoppingCart, Send } from 'lucide-react';
-import { ReviewSection } from './ReviewSection';
+import { Loader2, ShoppingCart, Send, Check, Circle, ChevronRight, ChevronDown } from 'lucide-react';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
 import { PriceBreakdown } from '@/stores/customStudioStore';
 import {
@@ -14,6 +13,7 @@ import {
   NAIL_ART_LABELS,
   FINGER_NAMES,
 } from '@/lib/pricing';
+import { cn } from '@/lib/utils';
 
 interface ReviewSubmitMobileProps {
   priceBreakdown: PriceBreakdown;
@@ -30,11 +30,12 @@ export const ReviewSubmitMobile = ({
   onAddToCart,
   onRequestQuote,
 }: ReviewSubmitMobileProps) => {
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  
   const {
     shape,
     length,
     baseFinish,
-    colorPalette,
     hasAccentNails,
     accentNails,
     effects,
@@ -42,289 +43,180 @@ export const ReviewSubmitMobile = ({
     charmTier,
     predefinedArtwork,
     customArtwork,
-    notes,
     setStep,
   } = useCustomStudioStore();
 
-  const selectedAccentNails = Array.from(accentNails);
-
   // Summary generators
-  const getBaseLookSummary = () => {
-    const parts = [
-      shape ? SHAPE_LABELS[shape] : null,
-      length ? LENGTH_LABELS[length] : null,
-      baseFinish ? FINISH_LABELS[baseFinish] : null,
-    ].filter(Boolean);
-    return parts.join(' • ') || 'Not configured';
+  const getBaseSummary = (): string | null => {
+    if (!shape || !length || !baseFinish) return null;
+    return `${SHAPE_LABELS[shape]} · ${LENGTH_LABELS[length]} · ${FINISH_LABELS[baseFinish]}`;
   };
 
-  const getAccentsSummary = () => {
-    if (!hasAccentNails || selectedAccentNails.length === 0) {
-      return 'No accents';
+  const getAccentsSummary = (): string | null => {
+    if (!hasAccentNails || accentNails.size === 0) return null;
+    if (accentNails.size <= 3) {
+      return Array.from(accentNails).map(i => FINGER_NAMES[i]).join(', ');
     }
-    return `${selectedAccentNails.length} accent nail${selectedAccentNails.length !== 1 ? 's' : ''}`;
+    return `${accentNails.size} accent nails`;
   };
 
-  const getEffectsSummary = () => {
+  const getEffectsSummary = (): string | null => {
+    if (effects.length === 0) return null;
+    return effects.map(e => EFFECT_LABELS[e.effect]).join(', ');
+  };
+
+  const getArtworkSummary = (): string | null => {
     const parts: string[] = [];
-    
-    if (effects.length > 0) {
-      parts.push(...effects.map(e => EFFECT_LABELS[e.effect]));
-    }
-    
+    predefinedArtwork.forEach(art => {
+      parts.push(`${NAIL_ART_LABELS[art.type]} (${art.nails.size})`);
+    });
+    if (customArtwork) parts.push('Custom request');
+    return parts.length > 0 ? parts.join(' · ') : null;
+  };
+
+  const getAddonsSummary = (): string | null => {
+    const parts: string[] = [];
     if (rhinestoneTier && rhinestoneTier !== 'none') {
       parts.push(RHINESTONE_LABELS[rhinestoneTier]);
     }
-    
     if (charmTier && charmTier !== 'none') {
       parts.push(CHARM_LABELS[charmTier]);
     }
-    
-    return parts.length > 0 ? parts.join(', ') : 'None';
+    return parts.length > 0 ? parts.join(' · ') : null;
   };
 
-  const getArtworkSummary = () => {
-    const parts: string[] = [];
+  // Checklist row component
+  const ChecklistRow = ({
+    summary,
+    emptyText,
+    onClick,
+  }: {
+    summary: string | null;
+    emptyText: string;
+    onClick: () => void;
+  }) => {
+    const hasContent = summary !== null;
     
-    if (predefinedArtwork.length > 0) {
-      predefinedArtwork.forEach(art => {
-        parts.push(`${NAIL_ART_LABELS[art.type]} (${art.nails.size})`);
-      });
-    }
-    
-    if (customArtwork) {
-      parts.push('Custom request');
-    }
-    
-    return parts.length > 0 ? parts.join(', ') : 'None';
-  };
-
-  const getFingerNames = (nailIndices: number[]) => {
-    return nailIndices.map(i => FINGER_NAMES[i]).join(', ');
+    return (
+      <button
+        onClick={onClick}
+        className={cn(
+          "w-full flex items-center gap-3 py-4 border-b border-border text-left group",
+          !hasContent && "opacity-50"
+        )}
+      >
+        <div className={cn(
+          "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0",
+          hasContent ? "bg-primary/10" : "bg-muted"
+        )}>
+          {hasContent ? (
+            <Check className="w-4 h-4 text-primary" />
+          ) : (
+            <Circle className="w-4 h-4 text-muted-foreground" />
+          )}
+        </div>
+        <span className={cn(
+          "flex-1 text-base min-w-0 truncate",
+          hasContent ? "text-foreground" : "text-muted-foreground"
+        )}>
+          {hasContent ? summary : emptyText}
+        </span>
+        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+      </button>
+    );
   };
 
   return (
-    <div className="pb-32 w-full overflow-hidden">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-foreground mb-1">Review Your Design</h2>
-        <p className="text-sm text-muted-foreground">
-          Make sure everything looks perfect
-        </p>
-      </div>
-
-      {/* Accordion Sections */}
-      <Accordion type="single" collapsible defaultValue="base" className="space-y-3 w-full overflow-hidden">
-        {/* Base Look */}
-        <ReviewSection
-          value="base"
-          icon="🎨"
-          title="Base Look"
-          summary={getBaseLookSummary()}
-          onEdit={() => setStep(1)}
-        >
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Shape:</span>
-                <span className="text-foreground">{shape ? SHAPE_LABELS[shape] : '—'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Length:</span>
-                <span className="text-foreground">{length ? LENGTH_LABELS[length] : '—'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Finish:</span>
-                <span className="text-foreground">{baseFinish ? FINISH_LABELS[baseFinish] : '—'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Palette:</span>
-                <span className="text-foreground">{colorPalette?.name || '—'}</span>
-              </div>
-            </div>
-            {colorPalette && (
-              <div className="flex gap-2">
-                {colorPalette.colors.map((color, i) => (
-                  <div
-                    key={i}
-                    className="w-7 h-7 rounded-full border border-border shadow-sm"
-                    style={{ backgroundColor: color }}
-                    title={color}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </ReviewSection>
-
-        {/* Accent Nails */}
-        <ReviewSection
-          value="accents"
-          icon="✋"
-          title="Accents"
-          summary={getAccentsSummary()}
-          onEdit={() => setStep(2)}
-        >
-          {hasAccentNails && selectedAccentNails.length > 0 ? (
-            <p className="text-sm text-foreground">
-              Selected: {getFingerNames(selectedAccentNails)}
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">No accent nails selected</p>
-          )}
-        </ReviewSection>
-
-        {/* Effects & Add-ons */}
-        <ReviewSection
-          value="effects"
-          icon="✨"
-          title="Effects & Add-ons"
-          summary={getEffectsSummary()}
-          onEdit={() => setStep(3)}
-        >
-          <div className="space-y-2">
-            {effects.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {effects.map((effectApp, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    {EFFECT_LABELS[effectApp.effect]} ({effectApp.scope === 'all' ? 'All' : 'Accents'})
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No effects selected</p>
-            )}
-
-            <div className="flex flex-wrap gap-2 text-sm">
-              {rhinestoneTier && rhinestoneTier !== 'none' && (
-                <span className="text-foreground">
-                  Rhinestones: {RHINESTONE_LABELS[rhinestoneTier]}
-                </span>
-              )}
-              {charmTier && charmTier !== 'none' && (
-                <span className="text-foreground">
-                  Charms: {CHARM_LABELS[charmTier]}
-                </span>
-              )}
-            </div>
-          </div>
-        </ReviewSection>
-
-        {/* Artwork */}
-        <ReviewSection
-          value="artwork"
-          icon="🖼️"
-          title="Artwork"
-          summary={getArtworkSummary()}
-          onEdit={() => setStep(4)}
-        >
-          <div className="space-y-2">
-            {predefinedArtwork.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {predefinedArtwork.map((art, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-medium"
-                  >
-                    {NAIL_ART_LABELS[art.type]} ({art.nails.size} nail{art.nails.size !== 1 ? 's' : ''})
-                  </span>
-                ))}
-              </div>
-            ) : null}
-
-            {customArtwork ? (
-              <div className="space-y-1">
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-500/10 text-amber-600 rounded-full text-xs font-medium">
-                  Custom Request
-                </span>
-                {customArtwork.description && (
-                  <p className="text-sm text-muted-foreground italic line-clamp-2">
-                    "{customArtwork.description}"
-                  </p>
-                )}
-                {customArtwork.inspirationImages.length > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    📷 {customArtwork.inspirationImages.length} inspiration image{customArtwork.inspirationImages.length !== 1 ? 's' : ''}
-                  </p>
-                )}
-              </div>
-            ) : null}
-
-            {predefinedArtwork.length === 0 && !customArtwork && (
-              <p className="text-sm text-muted-foreground">No artwork selected</p>
-            )}
-          </div>
-        </ReviewSection>
-
-        {/* Notes (if any) */}
-        {notes && (
-          <ReviewSection
-            value="notes"
-            icon="📝"
-            title="Notes"
-            summary={notes.length > 30 ? notes.substring(0, 30) + '...' : notes}
-            onEdit={() => setStep(4)}
-          >
-            <p className="text-sm text-muted-foreground italic">"{notes}"</p>
-          </ReviewSection>
-        )}
-      </Accordion>
-
-      {/* Price Breakdown */}
-      <div className="mt-6 bg-muted/30 border border-border rounded-lg p-4">
-        <h3 className="font-semibold text-foreground mb-3">Price Breakdown</h3>
-        <div className="space-y-2 text-sm">
-          {priceBreakdown.items.map((item, index) => (
-            <div key={index} className="flex justify-between gap-2">
-              <span className="text-muted-foreground min-w-0 flex-1 truncate">{item.label}</span>
-              <span className="text-foreground flex-shrink-0">
-                {item.isQuoteRequired ? 'Quote' : `$${item.amount.toFixed(2)}`}
-              </span>
-            </div>
-          ))}
-          <div className="border-t border-border pt-2 mt-2 flex justify-between font-semibold">
-            <span>Total</span>
-            <span className="text-lg">
-              ${priceBreakdown.subtotal.toFixed(2)}
-              {priceBreakdown.hasQuoteItems && <span className="text-primary text-sm ml-1">+</span>}
-            </span>
-          </div>
+    <div className="min-h-screen bg-background pb-36">
+      <div className="max-w-md mx-auto px-5 pt-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-display font-semibold text-foreground mb-1">
+            Your Custom Set
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Tap any section to edit
+          </p>
         </div>
+
+        {/* Checklist Rows */}
+        <div className="mb-8">
+          <ChecklistRow
+            summary={getBaseSummary()}
+            emptyText="Base look not configured"
+            onClick={() => setStep(1)}
+          />
+          <ChecklistRow
+            summary={getAccentsSummary()}
+            emptyText="No accents"
+            onClick={() => setStep(2)}
+          />
+          <ChecklistRow
+            summary={getEffectsSummary()}
+            emptyText="No effects"
+            onClick={() => setStep(3)}
+          />
+          <ChecklistRow
+            summary={getArtworkSummary()}
+            emptyText="No artwork"
+            onClick={() => setStep(4)}
+          />
+          <ChecklistRow
+            summary={getAddonsSummary()}
+            emptyText="No add-ons"
+            onClick={() => setStep(3)}
+          />
+        </div>
+
+        {/* Price Display Card */}
+        <button
+          onClick={() => setShowBreakdown(!showBreakdown)}
+          className="w-full bg-card border border-border rounded-2xl p-6 text-center"
+        >
+          <p className="text-3xl font-display font-semibold text-foreground mb-1">
+            ${priceBreakdown.subtotal.toFixed(2)}
+            {priceBreakdown.hasQuoteItems && <span className="text-primary">+</span>}
+          </p>
+          <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+            {showBreakdown ? 'Hide' : 'Tap for'} breakdown
+            <ChevronDown className={cn("w-4 h-4 transition-transform", showBreakdown && "rotate-180")} />
+          </p>
+          
+          {showBreakdown && (
+            <div className="mt-4 pt-4 border-t border-border text-left space-y-2">
+              {priceBreakdown.items.map((item, index) => (
+                <div key={index} className="flex justify-between text-sm gap-2">
+                  <span className="text-muted-foreground min-w-0 flex-1 truncate">{item.label}</span>
+                  <span className="text-foreground flex-shrink-0">
+                    {item.isQuoteRequired ? 'Quote' : `$${item.amount.toFixed(2)}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </button>
       </div>
 
-      {/* Sticky CTA */}
+      {/* Sticky CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-        <div className="h-4 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-        <div className="bg-card border-t border-border px-4 py-3 pb-6 flex items-center justify-between gap-4 safe-area-bottom">
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-lg font-bold text-foreground">
-              ${priceBreakdown.subtotal.toFixed(2)}
-              {priceBreakdown.hasQuoteItems && <span className="text-primary ml-0.5">+</span>}
-            </span>
-          </div>
-          
+        <div className="bg-gradient-to-t from-background via-background to-transparent h-6 pointer-events-none" />
+        <div className="bg-background px-5 pb-8 pt-4">
           <Button
-            size="lg"
             onClick={hasCustomArtwork ? onRequestQuote : onAddToCart}
             disabled={isSubmitting}
-            className="flex-1 max-w-[200px] min-h-[48px] text-base font-semibold"
+            className="w-full h-14 text-lg font-semibold rounded-full shadow-lg"
           >
             {isSubmitting ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : hasCustomArtwork ? (
               <>
-                <Send className="w-4 h-4 mr-2" />
-                Request Quote
+                <Send className="w-5 h-5 mr-2" />
+                Request Quote · ${priceBreakdown.subtotal.toFixed(2)}
               </>
             ) : (
               <>
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Add to Cart
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                Add to Cart · ${priceBreakdown.subtotal.toFixed(2)}
               </>
             )}
           </Button>

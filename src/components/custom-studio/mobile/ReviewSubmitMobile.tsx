@@ -69,6 +69,11 @@ export const ReviewSubmitMobile = ({
     return parts.length > 0 ? parts.join(' · ') : null;
   };
 
+  const truncateText = (text: string | null, maxLength: number = 32): string | null => {
+    if (!text) return null;
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
   // Checklist row component
   const ChecklistRow = ({
     summary,
@@ -95,8 +100,7 @@ export const ReviewSubmitMobile = ({
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-display font-semibold text-foreground mb-1">
-            ​TESTTESTETSTEST
-
+            Your Custom Set
           </h1>
           <p className="text-muted-foreground text-sm">
             Tap any section to edit
@@ -105,11 +109,11 @@ export const ReviewSubmitMobile = ({
 
         {/* Checklist Rows */}
         <div className="mb-8 overflow-hidden">
-          <ChecklistRow summary={getBaseSummary()} emptyText="Base look not configured" onClick={() => setStep(1)} />
-          <ChecklistRow summary={getAccentsSummary()} emptyText="No accents" onClick={() => setStep(2)} />
-          <ChecklistRow summary={getEffectsSummary()} emptyText="No effects" onClick={() => setStep(3)} />
-          <ChecklistRow summary={getArtworkSummary()} emptyText="No artwork" onClick={() => setStep(4)} />
-          <ChecklistRow summary={getAddonsSummary()} emptyText="No add-ons" onClick={() => setStep(3)} />
+          <ChecklistRow summary={truncateText(getBaseSummary())} emptyText="Base look not configured" onClick={() => setStep(1)} />
+          <ChecklistRow summary={truncateText(getAccentsSummary())} emptyText="No accents" onClick={() => setStep(2)} />
+          <ChecklistRow summary={truncateText(getEffectsSummary())} emptyText="No effects" onClick={() => setStep(3)} />
+          <ChecklistRow summary={truncateText(getArtworkSummary())} emptyText="No artwork" onClick={() => setStep(4)} />
+          <ChecklistRow summary={truncateText(getAddonsSummary())} emptyText="No add-ons" onClick={() => setStep(3)} />
         </div>
 
         {/* Price Display Card */}

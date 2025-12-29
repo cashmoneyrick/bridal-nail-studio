@@ -101,7 +101,7 @@ export const ReviewSubmitMobile = ({
       <button
         onClick={onClick}
         className={cn(
-          "w-full flex items-center gap-3 py-4 border-b border-border text-left group",
+          "w-full flex items-center gap-3 py-4 border-b border-border text-left group overflow-hidden",
           !hasContent && "opacity-50"
         )}
       >
@@ -128,7 +128,7 @@ export const ReviewSubmitMobile = ({
 
   return (
     <div className="w-full overflow-hidden pb-36">
-      <div className="w-full pt-2">
+      <div className="w-full pt-2 overflow-hidden">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-display font-semibold text-foreground mb-1">
@@ -140,7 +140,7 @@ export const ReviewSubmitMobile = ({
         </div>
 
         {/* Checklist Rows */}
-        <div className="mb-8">
+        <div className="mb-8 overflow-hidden">
           <ChecklistRow
             summary={getBaseSummary()}
             emptyText="Base look not configured"

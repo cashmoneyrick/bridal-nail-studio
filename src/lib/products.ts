@@ -5,6 +5,22 @@ import midnightLuxeImage from "@/assets/midnight-luxe.jpeg";
 import frenchEleganceImage from "@/assets/french-elegance.jpeg";
 import cherryBlossomImage from "@/assets/cherry-blossom.jpeg";
 
+// Collection slugs for type safety
+export const COLLECTIONS = [
+  'french-modern',
+  'golden-hour',
+  'the-gallery',
+  'dark-romance',
+  'liquid-chrome',
+  'in-bloom',
+  'the-basics',
+  'all-the-extras',
+  'pop-of-color',
+  'valentines',
+] as const;
+
+export type CollectionSlug = typeof COLLECTIONS[number];
+
 export interface Product {
   id: string;
   title: string;
@@ -18,7 +34,7 @@ export interface Product {
   // Fix 7: Add optional customization data for custom studio orders
   customizationData?: Record<string, unknown>;
   // Collection and badge for shop filtering
-  collection?: string;
+  collection?: CollectionSlug;
   badge?: 'Bestseller' | 'New' | null;
   // Design type for filtering
   designType?: 'Solid / Simple' | 'French Tip' | 'Ombré / Gradient' | 'Hand-painted Art' | '3D / Embellished';
@@ -59,7 +75,7 @@ export const sampleProducts: Product[] = [
       }
     ],
     options: [],
-    collection: "Everyday",
+    collection: "the-basics",
     badge: null,
     designType: "Solid / Simple"
   },
@@ -82,7 +98,7 @@ export const sampleProducts: Product[] = [
       }
     ],
     options: [],
-    collection: "Bold & Artistic",
+    collection: "dark-romance",
     badge: "Bestseller",
     designType: "Solid / Simple"
   },
@@ -105,7 +121,7 @@ export const sampleProducts: Product[] = [
       }
     ],
     options: [],
-    collection: "French & Classic",
+    collection: "french-modern",
     badge: "New",
     designType: "French Tip"
   },
@@ -128,7 +144,7 @@ export const sampleProducts: Product[] = [
       }
     ],
     options: [],
-    collection: "Bridal",
+    collection: "in-bloom",
     badge: null,
     designType: "Hand-painted Art"
   }

@@ -9,22 +9,74 @@ import {
 
 const categories = [
   {
-    title: "Everyday Elegance",
-    description: "Subtle sophistication for daily wear",
-    image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80",
-    href: "/shop/everyday",
+    title: "French Modern",
+    description: "Contemporary takes on the classic French tip",
+    image: "",
+    href: "/shop?collection=french-modern",
+    isLimited: false,
   },
   {
-    title: "Special Occasions",
-    description: "Statement sets for your biggest moments",
-    image: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&q=80",
-    href: "/shop/occasions",
+    title: "Golden Hour",
+    description: "Warm, sun-kissed tones for a radiant glow",
+    image: "",
+    href: "/shop?collection=golden-hour",
+    isLimited: false,
   },
   {
-    title: "Artistic Designs",
-    description: "Bold, creative expressions of nail art",
-    image: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&q=80",
-    href: "/shop/artistic",
+    title: "The Gallery",
+    description: "Artistic statement pieces for the bold",
+    image: "",
+    href: "/shop?collection=the-gallery",
+    isLimited: false,
+  },
+  {
+    title: "Dark Romance",
+    description: "Moody, sultry shades with an edge",
+    image: "",
+    href: "/shop?collection=dark-romance",
+    isLimited: false,
+  },
+  {
+    title: "Liquid Chrome",
+    description: "Metallic mirror finishes that captivate",
+    image: "",
+    href: "/shop?collection=liquid-chrome",
+    isLimited: false,
+  },
+  {
+    title: "In Bloom",
+    description: "Delicate florals and garden-inspired art",
+    image: "",
+    href: "/shop?collection=in-bloom",
+    isLimited: false,
+  },
+  {
+    title: "The Basics",
+    description: "Timeless essentials for everyday elegance",
+    image: "",
+    href: "/shop?collection=the-basics",
+    isLimited: false,
+  },
+  {
+    title: "All The Extras",
+    description: "Charms, gems, and embellishments galore",
+    image: "",
+    href: "/shop?collection=all-the-extras",
+    isLimited: false,
+  },
+  {
+    title: "Pop Of Color",
+    description: "Bold, vibrant hues that make a statement",
+    image: "",
+    href: "/shop?collection=pop-of-color",
+    isLimited: false,
+  },
+  {
+    title: "Valentines Collection",
+    description: "Limited edition - Love-inspired designs",
+    image: "",
+    href: "/shop?collection=valentines",
+    isLimited: true,
   },
 ];
 
@@ -67,14 +119,29 @@ const CategoryGrid = () => {
                     href={category.href} 
                     className="group block relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer"
                   >
-                    {/* Image */}
-                    <img 
-                      src={category.image} 
-                      alt={category.title}
-                      loading="lazy"
-                      decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                    />
+                    {/* Image or Placeholder */}
+                    {category.image ? (
+                      <img 
+                        src={category.image} 
+                        alt={category.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted/60 flex items-center justify-center">
+                        <div className="absolute inset-4 border-2 border-dashed border-border/40 rounded-xl flex items-center justify-center">
+                          <span className="text-muted-foreground/60 text-sm font-medium">Add Image</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Limited Badge */}
+                    {category.isLimited && (
+                      <div className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full z-20">
+                        Limited
+                      </div>
+                    )}
                     
                     {/* Overlay gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent" />

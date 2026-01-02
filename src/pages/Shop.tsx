@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Product, getProducts } from "@/lib/products";
 import { Button } from "@/components/ui/button";
-import { Loader2, Filter, X, Heart, ChevronDown, Eye } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, Filter, X, Heart, Eye } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useFavoritesStore } from "@/stores/favoritesStore";
@@ -141,20 +148,18 @@ const Shop = () => {
                 {sortedProducts.length} {sortedProducts.length === 1 ? 'piece' : 'pieces'}
               </span>
               
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none text-sm bg-transparent border-none pl-0 pr-8 py-2 focus:outline-none focus:ring-0 cursor-pointer text-foreground/70 hover:text-foreground transition-colors font-medium"
-                >
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-auto border-none bg-transparent shadow-none h-auto py-2 px-0 pr-6 text-sm font-medium text-foreground/70 hover:text-foreground focus:ring-0 focus:ring-offset-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="end">
                   {SORT_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value} className="bg-background text-foreground">
+                    <SelectItem key={option.value} value={option.value}>
                       {option.label}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-                <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              </div>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

@@ -30,24 +30,26 @@ const Footer = () => {
   return (
     <footer className="bg-foreground text-background w-full max-w-full overflow-hidden">
       {/* Newsletter Section */}
-      <div className="bg-primary w-full max-w-full overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div className="bg-primary relative overflow-hidden">
+        {/* Subtle gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 relative">
           <div className="max-w-2xl mx-auto text-center">
-            <h3 className="font-display text-2xl sm:text-3xl font-medium text-primary-foreground mb-3">
+            <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium text-primary-foreground mb-4 tracking-tight">
               Join the Nail Drop Club
             </h3>
-            <p className="text-primary-foreground/80 mb-6 text-sm sm:text-base">
+            <p className="text-primary-foreground/90 mb-8 text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
               Get exclusive access to new designs, special offers, and nail care tips delivered to your inbox.
             </p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 rounded-full px-6"
+                className="h-14 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 rounded-2xl px-6 text-base focus:bg-primary-foreground/15 transition-colors"
               />
-              <Button 
-                type="submit" 
-                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-full px-8"
+              <Button
+                type="submit"
+                className="h-14 bg-primary-foreground text-primary hover:bg-white hover:shadow-lg rounded-2xl px-10 font-medium transition-all duration-300"
               >
                 Subscribe
               </Button>
@@ -57,53 +59,56 @@ const Footer = () => {
       </div>
 
       {/* Main Footer */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 lg:gap-16">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1">
-            <h2 className="font-display text-xl sm:text-2xl font-semibold mb-4">
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-5 tracking-tight">
               YourPrettySets
             </h2>
-            <p className="text-background/60 text-sm mb-6 leading-relaxed">
+            <p className="text-background/70 text-base mb-8 leading-relaxed">
               Handcrafted luxury press-on nails designed to make every moment beautiful.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="mailto:hello@yourprettysets.com"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
-              >
-                <Mail className="w-5 h-5" />
-              </a>
+            <div className="space-y-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-background/50 font-medium">Follow Us</p>
+              <div className="flex gap-3">
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-xl bg-background/5 border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group"
+                >
+                  <Instagram className="w-5 h-5 group-hover:text-primary-foreground" />
+                </a>
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-xl bg-background/5 border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group"
+                >
+                  <Facebook className="w-5 h-5 group-hover:text-primary-foreground" />
+                </a>
+                <a
+                  href="mailto:hello@yourprettysets.com"
+                  className="w-11 h-11 rounded-xl bg-background/5 border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group"
+                >
+                  <Mail className="w-5 h-5 group-hover:text-primary-foreground" />
+                </a>
+              </div>
             </div>
           </div>
 
           {/* Shop Links */}
           <div>
-            <h4 className="font-medium text-sm uppercase tracking-wider mb-4">
+            <h4 className="font-display text-sm uppercase tracking-[0.2em] text-background/80 mb-6">
               Shop
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {footerLinks.shop.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-background/60 hover:text-background text-sm transition-colors duration-200"
+                    className="text-background/70 hover:text-primary text-base transition-colors duration-300 hover:translate-x-1 inline-block"
                   >
                     {link.name}
                   </a>
@@ -114,15 +119,15 @@ const Footer = () => {
 
           {/* Help Links */}
           <div>
-            <h4 className="font-medium text-sm uppercase tracking-wider mb-4">
+            <h4 className="font-display text-sm uppercase tracking-[0.2em] text-background/80 mb-6">
               Help
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {footerLinks.help.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-background/60 hover:text-background text-sm transition-colors duration-200"
+                    className="text-background/70 hover:text-primary text-base transition-colors duration-300 hover:translate-x-1 inline-block"
                   >
                     {link.name}
                   </a>
@@ -133,15 +138,15 @@ const Footer = () => {
 
           {/* Company Links */}
           <div>
-            <h4 className="font-medium text-sm uppercase tracking-wider mb-4">
+            <h4 className="font-display text-sm uppercase tracking-[0.2em] text-background/80 mb-6">
               Company
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-background/60 hover:text-background text-sm transition-colors duration-200"
+                    className="text-background/70 hover:text-primary text-base transition-colors duration-300 hover:translate-x-1 inline-block"
                   >
                     {link.name}
                   </a>
@@ -151,19 +156,30 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Payment Methods */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-12 pt-8 border-t border-background/5">
+          <span className="text-xs uppercase tracking-[0.2em] text-background/40">We Accept</span>
+          <div className="flex items-center gap-4">
+            <span className="text-background/50 text-sm font-medium">Visa</span>
+            <span className="text-background/50 text-sm font-medium">Mastercard</span>
+            <span className="text-background/50 text-sm font-medium">Amex</span>
+            <span className="text-background/50 text-sm font-medium">PayPal</span>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="border-t border-background/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-background/50 text-sm">
+        <div className="border-t border-background/10 mt-16 pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <p className="text-background/40 text-sm">
             © 2024 YourPrettySets. All rights reserved.
           </p>
-          <div className="flex items-center space-x-6 text-sm text-background/50">
-            <a href="/privacy" className="hover:text-background transition-colors">
+          <div className="flex items-center gap-8 text-sm text-background/40">
+            <a href="/privacy" className="hover:text-primary transition-colors duration-300">
               Privacy
             </a>
-            <a href="/terms" className="hover:text-background transition-colors">
+            <a href="/terms" className="hover:text-primary transition-colors duration-300">
               Terms
             </a>
-            <a href="/accessibility" className="hover:text-background transition-colors">
+            <a href="/accessibility" className="hover:text-primary transition-colors duration-300">
               Accessibility
             </a>
           </div>

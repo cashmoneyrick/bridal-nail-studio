@@ -154,7 +154,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-background/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-background/50 text-sm">
-            © 2024 YourPrettySets. All rights reserved.
+            © 2024 YourPrettySets. All rights reserved. TEST123
           </p>
           <div className="flex items-center space-x-6 text-sm text-background/50">
             <a href="/privacy" className="hover:text-background transition-colors">

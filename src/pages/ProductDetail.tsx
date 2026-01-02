@@ -109,16 +109,16 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
 
   useEffect(() => {
     if (!api) return;
-    
+
     const updateScrollState = () => {
       setCanScrollPrev(api.canScrollPrev());
       setCanScrollNext(api.canScrollNext());
     };
-    
+
     updateScrollState();
     api.on("select", updateScrollState);
     api.on("reInit", updateScrollState);
-    
+
     return () => {
       api.off("select", updateScrollState);
       api.off("reInit", updateScrollState);
@@ -126,20 +126,20 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
   }, [api]);
 
   return (
-    <section className="mt-28 mb-16">
+    <section className="mt-20 mb-12">
       {/* Header with Editorial Title and Navigation */}
-      <div className="flex justify-between items-end mb-10">
+      <div className="flex justify-between items-end mb-8">
         <div>
-          <span className="text-sm uppercase tracking-widest text-muted-foreground mb-2 block">
-            Complete the look
+          <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2 block">
+            COMPLETE THE LOOK
           </span>
-          <h2 className="font-display text-3xl font-medium">Pairs Well With</h2>
+          <h2 className="font-display text-3xl md:text-4xl font-medium tracking-tight">Pairs Well With</h2>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full h-10 w-10 border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all disabled:opacity-40"
+            className="rounded-full h-10 w-10 border-border/50 bg-background shadow-sm hover:shadow-md hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 disabled:opacity-30 disabled:shadow-none disabled:hover:bg-background disabled:hover:border-border/50"
             onClick={() => api?.scrollPrev()}
             disabled={!canScrollPrev}
           >
@@ -148,7 +148,7 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full h-10 w-10 border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all disabled:opacity-40"
+            className="rounded-full h-10 w-10 border-border/50 bg-background shadow-sm hover:shadow-md hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 disabled:opacity-30 disabled:shadow-none disabled:hover:bg-background disabled:hover:border-border/50"
             onClick={() => api?.scrollNext()}
             disabled={!canScrollNext}
           >
@@ -172,10 +172,10 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
               key={product.id} 
               className="pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/4"
             >
-              <div className="group relative transition-transform duration-300 hover:-translate-y-1">
+              <div className="group relative transition-all duration-300 hover:-translate-y-2">
                 <Link to={`/product/${product.handle}`} className="block">
                   {/* Image Container */}
-                  <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50/50 mb-4 relative shadow-sm group-hover:shadow-lg transition-shadow duration-300">
+                  <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/5 via-primary/3 to-background mb-4 relative shadow-md border border-transparent group-hover:shadow-xl group-hover:border-primary/10 transition-all duration-300">
                     {product.images[0] ? (
                       <img
                         src={product.images[0]}
@@ -192,7 +192,7 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 rounded-full bg-background/95 backdrop-blur-sm border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-md"
+                      className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 rounded-full bg-background/95 backdrop-blur-sm border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-md"
                       asChild
                     >
                       <Link to={`/product/${product.handle}`}>
@@ -204,16 +204,27 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
                 
                 {/* Text Content */}
                 <Link to={`/product/${product.handle}`}>
-                  <h3 className="font-display text-base font-medium mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                  <h3 className="font-display text-base font-medium mb-1.5 group-hover:text-primary transition-colors duration-300 line-clamp-1">
                     {product.title}
                   </h3>
-                  <p className="text-primary font-medium">${product.price.toFixed(2)}</p>
+                  <p className="text-primary font-medium transition-colors duration-300 group-hover:text-primary/80">${product.price.toFixed(2)}</p>
                 </Link>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
       </Carousel>
+
+      {/* View All Sets Link */}
+      <div className="text-center mt-8">
+        <Link
+          to="/shop"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+        >
+          View all sets
+          <ChevronRight className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 };
@@ -843,8 +854,8 @@ const ProductDetail = () => {
                   {currentVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'} — ${(price * quantity).toFixed(2)}
                 </Button>
 
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full rounded-full"
                   onClick={() => navigate(`/custom-studio?base=${product.handle}`)}
                 >
@@ -853,101 +864,147 @@ const ProductDetail = () => {
                 </Button>
               </div>
 
-              {/* Accordion Info */}
-              <Accordion type="single" collapsible className="w-full border-t border-border/50 pt-4">
-                <AccordionItem value="whats-included">
-                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      What's Included
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-primary" />
-                        10 press-on nails (full set)
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-primary" />
-                        Nail prep kit & application tools
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-primary" />
-                        Nail glue & adhesive tabs
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-primary" />
-                        Mini nail file & buffer
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-primary" />
-                        Cuticle pusher
-                      </li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
+              {/* Separator */}
+              <div className="border-t border-border/50 my-6" />
 
-                <AccordionItem value="how-to-apply">
-                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
-                    <div className="flex items-center gap-2">
-                      <Hand className="h-4 w-4" />
-                      How to Apply
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                      <li>Clean and prep your natural nails</li>
-                      <li>Push back cuticles gently</li>
-                      <li>Buff the surface of your nails</li>
-                      <li>Apply glue or adhesive tab</li>
-                      <li>Press and hold for 30 seconds</li>
-                    </ol>
-                    <Button 
-                      variant="link" 
-                      className="p-0 h-auto mt-2 text-primary"
-                      onClick={() => setIsTutorialOpen(true)}
-                    >
-                      <PlayCircle className="h-4 w-4 mr-1" />
-                      Watch Tutorial
-                    </Button>
-                  </AccordionContent>
-                </AccordionItem>
+              {/* Accordion Info - Luxury Card Design */}
+              <div className="space-y-3">
+                {/* How to Apply */}
+                <Accordion type="single" collapsible>
+                  <AccordionItem
+                    value="how-to-apply"
+                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
+                  >
+                    <AccordionTrigger className="p-5 hover:no-underline group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
+                          <Hand className="h-5 w-5" />
+                        </div>
+                        <span className="text-base font-medium">How to Apply</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-5 pt-0">
+                      <div className="pl-12">
+                        <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                          <li>Clean and prep your natural nails</li>
+                          <li>Push back cuticles gently</li>
+                          <li>Buff the surface of your nails</li>
+                          <li>Apply glue or adhesive tab</li>
+                          <li>Press and hold for 30 seconds</li>
+                        </ol>
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto mt-3 text-primary"
+                          onClick={() => setIsTutorialOpen(true)}
+                        >
+                          <PlayCircle className="h-4 w-4 mr-1" />
+                          Watch Tutorial
+                        </Button>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
 
-                <AccordionItem value="care">
-                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
-                    <div className="flex items-center gap-2">
-                      <Droplets className="h-4 w-4" />
-                      Care & Maintenance
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>• Avoid prolonged water exposure</li>
-                      <li>• Wear gloves when cleaning</li>
-                      <li>• Apply cuticle oil daily for longer wear</li>
-                      <li>• Gently file any rough edges</li>
-                      <li>• Store unused nails in a cool, dry place</li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
+                {/* What's Included */}
+                <Accordion type="single" collapsible>
+                  <AccordionItem
+                    value="whats-included"
+                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
+                  >
+                    <AccordionTrigger className="p-5 hover:no-underline group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
+                          <Package className="h-5 w-5" />
+                        </div>
+                        <span className="text-base font-medium">What's Included</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-5 pt-0">
+                      <div className="pl-12">
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          <li className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-primary" />
+                            10 press-on nails (full set)
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-primary" />
+                            Nail prep kit & application tools
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-primary" />
+                            Nail glue & adhesive tabs
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-primary" />
+                            Mini nail file & buffer
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-primary" />
+                            Cuticle pusher
+                          </li>
+                        </ul>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
 
-                <AccordionItem value="shipping">
-                  <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-primary transition-colors">
-                    <div className="flex items-center gap-2">
-                      <Truck className="h-4 w-4" />
-                      Shipping & Returns
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-3 text-sm text-muted-foreground">
-                      <p><strong className="text-foreground">Shipping:</strong> Free standard shipping on orders over $50. Orders ship within 1-3 business days.</p>
-                      <p><strong className="text-foreground">Returns:</strong> We accept returns within 14 days of delivery for unused items in original packaging.</p>
-                      <p><strong className="text-foreground">Custom Orders:</strong> Custom nail sets are final sale and cannot be returned.</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                {/* Care & Maintenance */}
+                <Accordion type="single" collapsible>
+                  <AccordionItem
+                    value="care"
+                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
+                  >
+                    <AccordionTrigger className="p-5 hover:no-underline group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
+                          <Droplets className="h-5 w-5" />
+                        </div>
+                        <span className="text-base font-medium">Care & Maintenance</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-5 pt-0">
+                      <div className="pl-12">
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          <li>• Avoid prolonged water exposure</li>
+                          <li>• Wear gloves when cleaning</li>
+                          <li>• Apply cuticle oil daily for longer wear</li>
+                          <li>• Gently file any rough edges</li>
+                          <li>• Store unused nails in a cool, dry place</li>
+                        </ul>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
+                {/* Shipping */}
+                <Accordion type="single" collapsible>
+                  <AccordionItem
+                    value="shipping"
+                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
+                  >
+                    <AccordionTrigger className="p-5 hover:no-underline group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
+                          <Truck className="h-5 w-5" />
+                        </div>
+                        <span className="text-base font-medium">Shipping</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-5 pt-0">
+                      <div className="pl-12">
+                        <div className="space-y-3 text-sm text-muted-foreground">
+                          <p><strong className="text-foreground">Shipping:</strong> Free standard shipping on orders over $50. Orders ship within 1-3 business days.</p>
+                          <p><strong className="text-foreground">Returns:</strong> We accept returns within 14 days of delivery for unused items in original packaging.</p>
+                          <p><strong className="text-foreground">Custom Orders:</strong> Custom nail sets are final sale and cannot be returned.</p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+
+              {/* Separator */}
+              <div className="border-t border-border/50" />
             </div>
           </div>
 

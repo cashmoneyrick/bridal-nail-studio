@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { Product, getProductByHandle, getProducts } from "@/lib/products";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
@@ -258,6 +260,32 @@ const ProductDetail = () => {
   const { toggleFavorite, isFavorite } = useFavoritesStore();
   const navigate = useNavigate();
 
+  // Benefits carousel for mobile with autoplay
+  const [benefitsEmblaRef, benefitsEmblaApi] = useEmblaCarousel(
+    {
+      align: "start",
+      loop: true,
+    },
+    [Autoplay({ delay: 4500, stopOnInteraction: false, stopOnMouseEnter: true })]
+  );
+  const [benefitsSelectedIndex, setBenefitsSelectedIndex] = useState(0);
+
+  const onBenefitsSelect = useCallback(() => {
+    if (!benefitsEmblaApi) return;
+    setBenefitsSelectedIndex(benefitsEmblaApi.selectedScrollSnap());
+  }, [benefitsEmblaApi]);
+
+  useEffect(() => {
+    if (!benefitsEmblaApi) return;
+    onBenefitsSelect();
+    benefitsEmblaApi.on("select", onBenefitsSelect);
+    benefitsEmblaApi.on("reInit", onBenefitsSelect);
+    return () => {
+      benefitsEmblaApi.off("select", onBenefitsSelect);
+      benefitsEmblaApi.off("reInit", onBenefitsSelect);
+    };
+  }, [benefitsEmblaApi, onBenefitsSelect]);
+
   const handleToggleFavorite = () => {
     if (!product) return;
     
@@ -356,6 +384,66 @@ const ProductDetail = () => {
 
   const currentVariant = product?.variants.find(v => v.id === selectedVariant);
   const price = currentVariant?.price || product?.price || 0;
+
+  // Benefits array in the specified order
+  const benefits = [
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+      label: "10-min apply"
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+          <path d="M8 14h.01" />
+          <path d="M12 14h.01" />
+          <path d="M16 14h.01" />
+          <path d="M8 18h.01" />
+          <path d="M12 18h.01" />
+        </svg>
+      ),
+      label: "2 weeks wear"
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+      label: "Salon-quality"
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 19l7-7 3 3-7 7-3-3z" />
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+          <path d="M2 2l7.586 7.586" />
+          <circle cx="11" cy="11" r="2" />
+        </svg>
+      ),
+      label: "Hand-painted"
+    },
+    {
+      icon: <Truck className="w-7 h-7" />,
+      label: "Free Shipping"
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9" />
+        </svg>
+      ),
+      label: "Reusable"
+    },
+  ];
 
   if (loading) {
     return (
@@ -502,60 +590,51 @@ const ProductDetail = () => {
               </div>
 
               {/* Key Features */}
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-x-4 gap-y-6 py-6 border-y border-border/50">
-                {[
-                  { icon: (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 19l7-7 3 3-7 7-3-3z" />
-                      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
-                      <path d="M2 2l7.586 7.586" />
-                      <circle cx="11" cy="11" r="2" />
-                    </svg>
-                  ), label: "Hand-painted" },
-                  { icon: (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9" />
-                    </svg>
-                  ), label: "Reusable" },
-                  { icon: (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  ), label: "Salon-quality" },
-                  { icon: (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                      <line x1="12" y1="22.08" x2="12" y2="12" />
-                    </svg>
-                  ), label: "Full kit" },
-                  { icon: (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                      <path d="M8 14h.01" />
-                      <path d="M12 14h.01" />
-                      <path d="M16 14h.01" />
-                      <path d="M8 18h.01" />
-                      <path d="M12 18h.01" />
-                    </svg>
-                  ), label: "2 weeks wear" },
-                  { icon: (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                  ), label: "10-min apply" },
-                ].map((feature, idx) => (
-                  <div key={idx} className="flex flex-col items-center text-center group cursor-default">
-                    <div className="text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
-                      {feature.icon}
+              <div className="py-6 border-y border-border/50">
+                {/* Mobile Carousel */}
+                <div className="md:hidden">
+                  <div className="overflow-hidden" ref={benefitsEmblaRef}>
+                    <div className="flex">
+                      {benefits.map((feature, idx) => (
+                        <div key={idx} className="flex-none" style={{ width: '33.33%' }}>
+                          <div className="flex flex-col items-center text-center group cursor-default px-2">
+                            <div className="text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
+                              {feature.icon}
+                            </div>
+                            <span className="text-xs text-muted-foreground leading-tight">{feature.label}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-xs text-muted-foreground leading-tight">{feature.label}</span>
                   </div>
-                ))}
+                  {/* Dot indicators */}
+                  <div className="flex justify-center gap-1.5 mt-4">
+                    {Array.from({ length: Math.ceil(benefits.length / 3) }).map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => benefitsEmblaApi?.scrollTo(idx * 3)}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                          Math.floor(benefitsSelectedIndex / 3) === idx
+                            ? 'bg-primary w-4'
+                            : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                        }`}
+                        aria-label={`View benefits ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop Grid */}
+                <div className="hidden md:grid md:grid-cols-6 gap-x-4 gap-y-6">
+                  {benefits.map((feature, idx) => (
+                    <div key={idx} className="flex flex-col items-center text-center group cursor-default">
+                      <div className="text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
+                        {feature.icon}
+                      </div>
+                      <span className="text-xs text-muted-foreground leading-tight">{feature.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Shape Selector */}
@@ -566,23 +645,30 @@ const ProductDetail = () => {
                     {selectedShape}
                   </span>
                 </div>
-                <div className="flex gap-2">
-                  {NAIL_SHAPES.map(shape => (
-                    <button
-                      key={shape}
-                      onClick={() => setSelectedShape(shape)}
-                      className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border transition-all ${
-                        selectedShape === shape 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      <ShapeIcon shape={shape} selected={selectedShape === shape} />
-                      <span className={`text-xs ${selectedShape === shape ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                        {shape}
-                      </span>
-                    </button>
-                  ))}
+                {/* Horizontal scroll container for small screens */}
+                <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+                  <div className="flex gap-2 min-w-max sm:min-w-0">
+                    {NAIL_SHAPES.map(shape => (
+                      <button
+                        key={shape}
+                        onClick={() => setSelectedShape(shape)}
+                        className={`flex-shrink-0 w-[72px] sm:flex-1 sm:w-auto flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 ${
+                          selectedShape === shape
+                            ? 'border-primary bg-primary/5 shadow-sm'
+                            : 'border-border/60 hover:border-primary/40 hover:bg-muted/30'
+                        }`}
+                      >
+                        <ShapeIcon shape={shape} selected={selectedShape === shape} />
+                        <span className={`text-xs font-medium ${
+                          selectedShape === shape
+                            ? 'text-primary'
+                            : 'text-muted-foreground'
+                        }`}>
+                          {shape}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -594,20 +680,23 @@ const ProductDetail = () => {
                     {selectedLength}
                   </span>
                 </div>
-                <div className="flex gap-2">
-                  {NAIL_LENGTHS.map(length => (
-                    <button
-                      key={length}
-                      onClick={() => setSelectedLength(length)}
-                      className={`flex-1 px-4 py-3 rounded-full text-sm font-medium transition-all ${
-                        selectedLength === length
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
-                    >
-                      {length}
-                    </button>
-                  ))}
+                {/* Horizontal scroll container for small screens */}
+                <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+                  <div className="flex gap-2 min-w-max sm:min-w-0">
+                    {NAIL_LENGTHS.map(length => (
+                      <button
+                        key={length}
+                        onClick={() => setSelectedLength(length)}
+                        className={`flex-shrink-0 min-w-max px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 sm:flex-1 sm:min-w-0 ${
+                          selectedLength === length
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-border/50'
+                        }`}
+                      >
+                        {length}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -725,26 +814,23 @@ const ProductDetail = () => {
 
               {/* Quantity & Add to Cart */}
               <div className="space-y-4 pt-4 border-t border-border">
-                <div className="flex items-center gap-4">
+                {/* Quantity selector - matching action button style */}
+                <div className="flex items-center justify-between w-full py-2.5 px-4 rounded-full border border-border hover:border-primary/50 transition-colors">
                   <label className="text-sm font-medium">Quantity</label>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 rounded-full"
+                    <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-7 h-7 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
                     >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-8 text-center font-medium">{quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 rounded-full"
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="w-6 text-center text-sm font-medium">{quantity}</span>
+                    <button
                       onClick={() => setQuantity(quantity + 1)}
+                      className="w-7 h-7 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
                     >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
 
@@ -765,22 +851,6 @@ const ProductDetail = () => {
                   <Sparkles className="h-4 w-4 mr-2" />
                   Customize This Design
                 </Button>
-              </div>
-
-              {/* Trust Badges */}
-              <div className="grid grid-cols-3 gap-4 py-4 mb-2">
-                <div className="text-center">
-                  <Truck className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">Free Shipping $50+</p>
-                </div>
-                <div className="text-center">
-                  <Gift className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">Gift Wrapping</p>
-                </div>
-                <div className="text-center">
-                  <RotateCcw className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">Easy Returns</p>
-                </div>
               </div>
 
               {/* Accordion Info */}

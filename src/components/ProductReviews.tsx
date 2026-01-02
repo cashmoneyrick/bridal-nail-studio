@@ -110,19 +110,19 @@ const ReviewCard = ({ review }: { review: Review }) => {
   };
 
   return (
-    <div className="border-b border-border pb-6 last:border-0">
+    <div className="bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01]">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <StarRating rating={review.rating} />
             {review.verified && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full">
                 <CheckCircle2 className="h-3 w-3" />
                 Verified Purchase
               </span>
             )}
           </div>
-          <h4 className="font-medium text-foreground">{review.title}</h4>
+          <h4 className="font-display text-lg font-semibold text-foreground">{review.title}</h4>
         </div>
       </div>
       
@@ -142,16 +142,16 @@ const ReviewCard = ({ review }: { review: Review }) => {
       
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <span className="font-medium text-foreground">{review.author}</span>
+          <span className="font-medium text-foreground/90">{review.author}</span>
           <span>•</span>
-          <span>{review.date}</span>
+          <span className="text-xs text-muted-foreground/70">{review.date}</span>
         </div>
         <button
           onClick={handleHelpful}
           disabled={hasVoted}
-          className={`inline-flex items-center gap-1.5 text-sm transition-colors ${
-            hasVoted 
-              ? "text-primary" 
+          className={`inline-flex items-center gap-1.5 text-sm transition-all duration-200 hover:scale-105 ${
+            hasVoted
+              ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -229,11 +229,11 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
   };
 
   return (
-    <section className="mt-16 lg:mt-24 border-t border-border pt-12">
+    <section className="mt-16 lg:mt-20 pt-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h2 className="font-display text-2xl sm:text-3xl font-medium mb-2">
+          <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2">
             Customer Reviews
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -243,7 +243,8 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
         
         <Dialog open={isWriteDialogOpen} onOpenChange={setIsWriteDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="btn-primary">
+            <Button className="btn-primary gap-2 px-6">
+              <Star className="h-4 w-4" />
               Write a Review
             </Button>
           </DialogTrigger>
@@ -350,12 +351,12 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
       </div>
 
       {/* Rating Summary */}
-      <div className="bg-muted/30 rounded-2xl p-6 mb-8">
+      <div className="bg-gradient-to-br from-primary/5 via-card to-card rounded-2xl p-8 shadow-sm border border-border/30 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Average Rating */}
           <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-              <span className="font-display text-5xl font-medium">{averageRating.toFixed(1)}</span>
+              <span className="font-display text-6xl font-semibold text-foreground">{averageRating.toFixed(1)}</span>
               <div>
                 <StarRating rating={Math.round(averageRating)} />
                 <p className="text-sm text-muted-foreground mt-1">Based on {reviews.length} reviews</p>
@@ -373,9 +374,9 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
               <div key={rating} className="flex items-center gap-3">
                 <span className="text-sm w-6">{rating}</span>
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-amber-400 rounded-full transition-all"
+                <div className="flex-1 h-2.5 bg-muted/50 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
                     style={{ width: `${(ratingCounts[idx] / reviews.length) * 100}%` }}
                   />
                 </div>
@@ -387,23 +388,23 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
       </div>
 
       {/* Trust Badges */}
-      <div className="flex flex-wrap items-center justify-center gap-6 mb-8 py-4 border-y border-border">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CheckCircle2 className="h-5 w-5 text-primary" />
-          <span>All reviews verified</span>
+      <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full text-sm">
+          <CheckCircle2 className="h-4 w-4 text-primary" />
+          <span className="text-foreground/80 font-medium">All reviews verified</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-          <span>Honest customer feedback</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full text-sm">
+          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+          <span className="text-foreground/80 font-medium">Honest feedback</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <ThumbsUp className="h-5 w-5 text-primary" />
-          <span>No incentivized reviews</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full text-sm">
+          <ThumbsUp className="h-4 w-4 text-primary" />
+          <span className="text-foreground/80 font-medium">No incentivized reviews</span>
         </div>
       </div>
 
       {/* Reviews List */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         {reviews.map((review) => (
           <ReviewCard key={review.id} review={review} />
         ))}

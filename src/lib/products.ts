@@ -21,6 +21,14 @@ export const COLLECTIONS = [
 
 export type CollectionSlug = typeof COLLECTIONS[number];
 
+// Complexity tiers for filtering
+export const COMPLEXITY_TIERS = ['Basic', 'Moderate', 'Detailed', 'Complex'] as const;
+export type ComplexityTier = typeof COMPLEXITY_TIERS[number];
+
+// Primary colors for filtering
+export const PRIMARY_COLORS = ['Pink', 'Red', 'Nude', 'Black', 'White', 'Gold', 'Blue', 'Purple', 'Multi'] as const;
+export type PrimaryColor = typeof PRIMARY_COLORS[number];
+
 export interface Product {
   id: string;
   title: string;
@@ -36,8 +44,9 @@ export interface Product {
   // Collection and badge for shop filtering
   collection?: CollectionSlug;
   badge?: 'Bestseller' | 'New' | null;
-  // Design type for filtering
-  designType?: 'Solid / Simple' | 'French Tip' | 'Ombré / Gradient' | 'Hand-painted Art' | '3D / Embellished';
+  // Filtering fields
+  complexityTier: ComplexityTier;
+  primaryColor: PrimaryColor;
 }
 
 export interface ProductVariant {
@@ -77,7 +86,8 @@ export const sampleProducts: Product[] = [
     options: [],
     collection: "the-basics",
     badge: null,
-    designType: "Solid / Simple"
+    complexityTier: "Basic",
+    primaryColor: "Pink"
   },
   {
     id: "2",
@@ -100,7 +110,8 @@ export const sampleProducts: Product[] = [
     options: [],
     collection: "dark-romance",
     badge: "Bestseller",
-    designType: "Solid / Simple"
+    complexityTier: "Moderate",
+    primaryColor: "Black"
   },
   {
     id: "3",
@@ -123,7 +134,8 @@ export const sampleProducts: Product[] = [
     options: [],
     collection: "french-modern",
     badge: "New",
-    designType: "French Tip"
+    complexityTier: "Basic",
+    primaryColor: "White"
   },
   {
     id: "4",
@@ -146,7 +158,8 @@ export const sampleProducts: Product[] = [
     options: [],
     collection: "in-bloom",
     badge: null,
-    designType: "Hand-painted Art"
+    complexityTier: "Detailed",
+    primaryColor: "Pink"
   }
 ];
 

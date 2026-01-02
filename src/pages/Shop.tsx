@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Product, getProducts } from "@/lib/products";
+import { Product, getProducts, COLLECTIONS, COMPLEXITY_TIERS, PRIMARY_COLORS } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,8 +16,59 @@ import { useFavoritesStore } from "@/stores/favoritesStore";
 import { toast } from "sonner";
 import QuickViewModal from "@/components/QuickViewModal";
 
-const PRICE_RANGES = ['All', 'Under $30', '$30–$50', '$50+'];
-const DESIGN_TYPES = ['All', 'Solid / Simple', 'French Tip', 'Ombré / Gradient', 'Hand-painted Art', '3D / Embellished'];
+const PRICE_RANGES = ['Under $30', '$30-$40', 'Over $40'] as const;
+const PRICE_ICON_COLOR = '#7B9E7B'; // Sage green
+const PRICE_ICONS: Record<string, string> = {
+  'Under $30': '$',
+  '$30-$40': '$$',
+  'Over $40': '$$$',
+};
+const COLOR_SWATCHES: Record<string, string> = {
+  'Pink': '#F4B4C4',
+  'Red': '#C94C4C',
+  'Nude': '#E8D4C4',
+  'Black': '#1A1A1A',
+  'White': '#FFFFFF',
+  'Gold': '#D4AF37',
+  'Blue': '#6B8CC7',
+  'Purple': '#9B7BB8',
+  'Multi': 'linear-gradient(90deg, #F4B4C4, #D4AF37, #6B8CC7, #9B7BB8)',
+};
+
+const COMPLEXITY_ICONS: Record<string, React.ReactNode> = {
+  'Basic': (
+    <svg viewBox="0 0 16 20" className="w-4 h-5">
+      <path d="M8 1C4.5 1 2 4 2 8v7c0 2.2 1.8 4 4 4h4c2.2 0 4-1.8 4-4V8c0-4-2.5-7-6-7z"
+            fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1"/>
+    </svg>
+  ),
+  'Moderate': (
+    <svg viewBox="0 0 16 20" className="w-4 h-5">
+      <path d="M8 1C4.5 1 2 4 2 8v7c0 2.2 1.8 4 4 4h4c2.2 0 4-1.8 4-4V8c0-4-2.5-7-6-7z"
+            fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1"/>
+      <path d="M3 13h10" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
+  ),
+  'Detailed': (
+    <svg viewBox="0 0 16 20" className="w-4 h-5">
+      <path d="M8 1C4.5 1 2 4 2 8v7c0 2.2 1.8 4 4 4h4c2.2 0 4-1.8 4-4V8c0-4-2.5-7-6-7z"
+            fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1"/>
+      <circle cx="8" cy="6" r="1.5" fill="currentColor"/>
+      <circle cx="5.5" cy="10" r="1" fill="currentColor"/>
+      <circle cx="10.5" cy="10" r="1" fill="currentColor"/>
+    </svg>
+  ),
+  'Complex': (
+    <svg viewBox="0 0 16 20" className="w-4 h-5">
+      <path d="M8 1C4.5 1 2 4 2 8v7c0 2.2 1.8 4 4 4h4c2.2 0 4-1.8 4-4V8c0-4-2.5-7-6-7z"
+            fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1"/>
+      <path d="M8 5l1 2h2l-1.5 1.5.5 2L8 9.5 6 10.5l.5-2L5 7h2z" fill="currentColor"/>
+      <circle cx="5" cy="13" r="1" fill="currentColor"/>
+      <circle cx="8" cy="14" r="1" fill="currentColor"/>
+      <circle cx="11" cy="13" r="1" fill="currentColor"/>
+    </svg>
+  ),
+};
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
   { value: 'price-asc', label: 'Price: Low to High' },
@@ -25,11 +76,18 @@ const SORT_OPTIONS = [
   { value: 'name-asc', label: 'Name: A-Z' },
 ];
 
+// Format collection slug for display
+const formatCollectionName = (slug: string) => {
+  return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
 const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPriceRange, setSelectedPriceRange] = useState('All');
-  const [selectedDesignType, setSelectedDesignType] = useState('All');
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
+  const [selectedComplexity, setSelectedComplexity] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -42,17 +100,19 @@ const Shop = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Filter products by price range and design type
+  // Filter products by all criteria
   const filteredProducts = products.filter(product => {
+    // Collection filter
+    if (selectedCollection && product.collection !== selectedCollection) return false;
+    // Complexity filter
+    if (selectedComplexity && product.complexityTier !== selectedComplexity) return false;
+    // Color filter
+    if (selectedColor && product.primaryColor !== selectedColor) return false;
     // Price Range filter
-    if (selectedPriceRange !== 'All') {
+    if (selectedPriceRange) {
       if (selectedPriceRange === 'Under $30' && product.price >= 30) return false;
-      if (selectedPriceRange === '$30–$50' && (product.price < 30 || product.price > 50)) return false;
-      if (selectedPriceRange === '$50+' && product.price <= 50) return false;
-    }
-    // Design Type filter
-    if (selectedDesignType !== 'All') {
-      if (product.designType !== selectedDesignType) return false;
+      if (selectedPriceRange === '$30-$40' && (product.price < 30 || product.price > 40)) return false;
+      if (selectedPriceRange === 'Over $40' && product.price <= 40) return false;
     }
     return true;
   });
@@ -72,12 +132,14 @@ const Shop = () => {
   });
 
   const clearFilters = () => {
-    setSelectedPriceRange('All');
-    setSelectedDesignType('All');
-    setSortBy('newest');
+    setSelectedCollection(null);
+    setSelectedComplexity(null);
+    setSelectedColor(null);
+    setSelectedPriceRange(null);
   };
 
-  const hasActiveFilters = selectedPriceRange !== 'All' || selectedDesignType !== 'All';
+  const activeFilterCount = [selectedCollection, selectedComplexity, selectedColor, selectedPriceRange].filter(Boolean).length;
+  const hasActiveFilters = activeFilterCount > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,7 +189,7 @@ const Shop = () => {
                 <span className="font-medium">Refine</span>
                 {hasActiveFilters && (
                   <span className="ml-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                    {(selectedPriceRange !== 'All' ? 1 : 0) + (selectedDesignType !== 'All' ? 1 : 0)}
+                    {activeFilterCount}
                   </span>
                 )}
               </Button>
@@ -165,43 +227,99 @@ const Shop = () => {
 
           {/* Premium Filters Panel */}
           {showFilters && (
-            <div className="mb-12 p-8 bg-gradient-to-br from-card/80 to-accent/10 backdrop-blur-sm border border-border/30 rounded-3xl animate-fade-in shadow-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {/* Price Range Filter */}
-                <div className="space-y-5">
-                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Price Range</label>
+            <div className="mb-12 p-6 sm:p-8 bg-gradient-to-br from-card/80 to-accent/10 backdrop-blur-sm border border-border/30 rounded-3xl animate-fade-in shadow-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Collection Filter */}
+                <div className="space-y-4">
+                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Collection</label>
                   <div className="flex flex-wrap gap-2">
-                    {PRICE_RANGES.map(range => (
+                    {COLLECTIONS.map(collection => (
                       <button
-                        key={range}
-                        onClick={() => setSelectedPriceRange(range)}
-                        className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                          selectedPriceRange === range
+                        key={collection}
+                        onClick={() => setSelectedCollection(selectedCollection === collection ? null : collection)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                          selectedCollection === collection
                             ? 'bg-primary text-primary-foreground shadow-md'
                             : 'bg-background/80 text-foreground/60 hover:text-foreground hover:bg-background'
                         }`}
                       >
-                        {range}
+                        {formatCollectionName(collection)}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Design Type Filter */}
-                <div className="space-y-5">
-                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Design Type</label>
+                {/* Complexity Filter */}
+                <div className="space-y-4">
+                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Complexity</label>
                   <div className="flex flex-wrap gap-2">
-                    {DESIGN_TYPES.map(type => (
+                    {COMPLEXITY_TIERS.map(tier => (
                       <button
-                        key={type}
-                        onClick={() => setSelectedDesignType(type)}
-                        className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                          selectedDesignType === type
+                        key={tier}
+                        onClick={() => setSelectedComplexity(selectedComplexity === tier ? null : tier)}
+                        className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                          selectedComplexity === tier
                             ? 'bg-primary text-primary-foreground shadow-md'
                             : 'bg-background/80 text-foreground/60 hover:text-foreground hover:bg-background'
                         }`}
                       >
-                        {type}
+                        <span className="mr-2 opacity-80">
+                          {COMPLEXITY_ICONS[tier]}
+                        </span>
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Color Filter */}
+                <div className="space-y-4">
+                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Color</label>
+                  <div className="flex flex-wrap gap-2">
+                    {PRIMARY_COLORS.map(color => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(selectedColor === color ? null : color)}
+                        className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                          selectedColor === color
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-background/80 text-foreground/60 hover:text-foreground hover:bg-background'
+                        }`}
+                      >
+                        <span
+                          className="w-4 h-4 rounded-full inline-block mr-2 flex-shrink-0"
+                          style={{
+                            background: COLOR_SWATCHES[color],
+                            border: color === 'White' ? '1px solid #E5E5E5' : 'none',
+                          }}
+                        />
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price Range Filter */}
+                <div className="space-y-4">
+                  <label className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">Price Range</label>
+                  <div className="flex flex-wrap gap-2">
+                    {PRICE_RANGES.map(range => (
+                      <button
+                        key={range}
+                        onClick={() => setSelectedPriceRange(selectedPriceRange === range ? null : range)}
+                        className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                          selectedPriceRange === range
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-background/80 text-foreground/60 hover:text-foreground hover:bg-background'
+                        }`}
+                      >
+                        <span
+                          className="mr-2 font-semibold"
+                          style={{ color: selectedPriceRange === range ? 'inherit' : PRICE_ICON_COLOR }}
+                        >
+                          {PRICE_ICONS[range]}
+                        </span>
+                        {range}
                       </button>
                     ))}
                   </div>

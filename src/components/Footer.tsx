@@ -156,17 +156,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Payment Methods */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-12 pt-8 border-t border-background/5">
-          <span className="text-xs uppercase tracking-[0.2em] text-background/40">We Accept</span>
-          <div className="flex items-center gap-4">
-            <span className="text-background/50 text-sm font-medium">Visa</span>
-            <span className="text-background/50 text-sm font-medium">Mastercard</span>
-            <span className="text-background/50 text-sm font-medium">Amex</span>
-            <span className="text-background/50 text-sm font-medium">PayPal</span>
-          </div>
-        </div>
-
         {/* Bottom Bar */}
         <div className="border-t border-background/10 mt-16 pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
           <p className="text-background/40 text-sm">

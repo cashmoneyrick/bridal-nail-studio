@@ -206,8 +206,9 @@ const ProductGrid = () => {
                           <h3 className="font-display text-base font-medium truncate flex-1 mr-3">
                             {product.title}
                           </h3>
-                          <p className="text-muted-foreground text-sm font-medium whitespace-nowrap">
-                            ${product.price.toFixed(2)}
+                          <p className="text-sm whitespace-nowrap">
+                            <span className="text-foreground/40 line-through mr-1.5">Salon: $80+</span>
+                            <span className="text-muted-foreground font-medium">${product.price.toFixed(2)}</span>
                           </p>
                         </div>
                       </Link>
@@ -300,8 +301,9 @@ const ProductGrid = () => {
                   <h3 className="font-display text-lg font-medium group-hover:text-primary transition-colors">
                     {product.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
-                    ${product.price.toFixed(2)} {product.currencyCode}
+                  <p className="text-sm">
+                    <span className="text-foreground/40 line-through mr-1.5">Salon: $80+</span>
+                    <span className="text-muted-foreground">${product.price.toFixed(2)}</span>
                   </p>
                 </div>
               </Link>

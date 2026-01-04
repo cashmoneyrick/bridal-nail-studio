@@ -31,52 +31,88 @@ const CustomStudioPreview = () => {
 
       {/* Centered Content */}
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center space-y-6 sm:space-y-8">
-          {/* Decorative Line */}
-          <div className="w-12 h-0.5 bg-primary mx-auto" />
+        {isMobile ? (
+          // MOBILE LAYOUT - Soft, romantic, elegant
+          <div className="max-w-sm mx-auto text-center space-y-5">
+            {/* Decorative Line */}
+            <div className="w-12 h-0.5 bg-white mx-auto" />
 
-          {/* Label */}
-          <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary">
-            Custom Studio
-          </p>
+            {/* Label */}
+            <p className="text-sm font-medium tracking-[0.2em] uppercase text-white">
+              Custom Studio
+            </p>
 
-          {/* Headline */}
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-medium leading-tight text-white">
-            Design Your Dream Set
-          </h2>
+            {/* Headline */}
+            <h2 className="font-display text-3xl font-medium leading-tight text-white [text-shadow:_0_1px_8px_rgb(0_0_0_/_30%)]">
+              Made Just for You
+            </h2>
 
-          {/* Description */}
-          <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-            Can't find exactly what you're looking for? Our Custom Studio lets you 
-            bring your nail vision to life. Work with our artists to create a 
-            one-of-a-kind set that's uniquely yours.
-          </p>
+            {/* Tagline - italic, romantic */}
+            <p className="italic text-white/80 text-base tracking-wide leading-relaxed">
+              Upload your inspo. Pick your shape. Add your magic.
+            </p>
 
-          {/* Feature Pills */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20"
-              >
-                <feature.icon className="w-4 h-4 text-primary" />
-                <span className="text-white text-sm font-medium">{feature.label}</span>
-              </div>
-            ))}
+            {/* CTA - dusty rose fill */}
+            <div className="pt-2">
+              <Link to="/custom-studio">
+                <Button
+                  className="bg-primary/90 text-white hover:bg-primary rounded-full px-8 font-medium"
+                  size="lg"
+                >
+                  Start Designing
+                </Button>
+              </Link>
+            </div>
           </div>
+        ) : (
+          // DESKTOP LAYOUT - unchanged
+          <div className="max-w-3xl mx-auto text-center space-y-6 sm:space-y-8">
+            {/* Decorative Line */}
+            <div className="w-12 h-0.5 bg-primary mx-auto" />
 
-          {/* CTA */}
-          <div className="pt-4">
-            <Link to="/custom-studio">
-              <Button 
-                className="bg-white text-primary hover:bg-white/90 rounded-full px-8 font-medium"
-                size="lg"
-              >
-                Start Designing
-              </Button>
-            </Link>
+            {/* Label */}
+            <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary">
+              Custom Studio
+            </p>
+
+            {/* Headline */}
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-medium leading-tight text-white">
+              Design Your Dream Set
+            </h2>
+
+            {/* Description */}
+            <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
+              Can't find exactly what you're looking for? Our Custom Studio lets you
+              bring your nail vision to life. Work with our artists to create a
+              one-of-a-kind set that's uniquely yours.
+            </p>
+
+            {/* Feature Pills */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20"
+                >
+                  <feature.icon className="w-4 h-4 text-primary" />
+                  <span className="text-white text-sm font-medium">{feature.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="pt-4">
+              <Link to="/custom-studio">
+                <Button
+                  className="bg-white text-primary hover:bg-white/90 rounded-full px-8 font-medium"
+                  size="lg"
+                >
+                  Start Designing
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

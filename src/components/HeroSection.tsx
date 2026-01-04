@@ -44,31 +44,18 @@ const HeroSection = () => {
             Hearts, roses, and love notes—designed to make every moment magical.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          {/* CTA */}
+          <div className="flex flex-col items-center gap-4 pt-4">
             <Button className="btn-primary text-base min-w-[200px] group" size="lg" onClick={scrollToShop}>
               Shop Valentine's Sets
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Link to="/custom-studio">
-              <Button variant="outline" className="btn-secondary text-base min-w-[200px]" size="lg">
-                Design Your Love Story
-              </Button>
+            <Link
+              to="/custom-studio"
+              className="text-sm text-foreground/50 hover:text-foreground/70 underline underline-offset-4 transition-colors"
+            >
+              or design your own →
             </Link>
-          </div>
-
-          {/* Valentine's Day Badge */}
-          <div className="pt-6 animate-fade-in">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-full text-sm text-foreground/80">
-              
-              <span>★★★★★ Loved by 2,000+ happy customers      </span>
-              
-            </span>
-          </div>
-
-          {/* Trust Badge */}
-          <div className="pt-4 sm:pt-6">
-            
           </div>
         </div>
       </div>

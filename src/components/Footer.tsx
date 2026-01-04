@@ -73,7 +73,8 @@ const Footer = () => {
               />
               <Button
                 type="submit"
-                className="h-14 bg-white text-primary shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm rounded-2xl px-10 font-semibold transition-all duration-200"
+                variant="ghost"
+                className="h-14 bg-white text-primary shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm rounded-2xl px-10 font-semibold transition-all duration-200"
               >
                 Subscribe
               </Button>

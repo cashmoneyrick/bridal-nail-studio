@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Instagram, Facebook, Mail, MapPin, Phone } from "lucide-react";
+import { Instagram, Facebook, Mail, MapPin, Phone, Check } from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {
@@ -38,22 +38,49 @@ const Footer = () => {
             <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium text-primary-foreground mb-4 tracking-tight">
               Join the Nail Drop Club
             </h3>
-            <p className="text-primary-foreground/90 mb-8 text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
-              Get exclusive access to new designs, special offers, and nail care tips delivered to your inbox.
-            </p>
+            {/* Benefits List */}
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-3 max-w-lg mx-auto mt-4 mb-6">
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                </span>
+                <span className="text-sm font-medium text-primary-foreground">17% off first order</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                </span>
+                <span className="text-sm font-medium text-primary-foreground">Free shipping over $65</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                </span>
+                <span className="text-sm font-medium text-primary-foreground">Early access to collections</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                </span>
+                <span className="text-sm font-medium text-primary-foreground">Priority member shipping</span>
+              </li>
+            </ul>
             <form className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="h-14 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 rounded-2xl px-6 text-base focus:bg-primary-foreground/15 transition-colors"
+                className="h-14 flex-1 bg-[#FDF8F5] border-0 text-primary placeholder:text-primary/60 rounded-2xl px-6 text-base shadow-sm focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-primary transition-all"
               />
               <Button
                 type="submit"
-                className="h-14 bg-primary-foreground text-primary hover:bg-white hover:shadow-lg rounded-2xl px-10 font-medium transition-all duration-300"
+                className="h-14 bg-white text-primary shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm rounded-2xl px-10 font-semibold transition-all duration-200"
               >
                 Subscribe
               </Button>
             </form>
+            <p className="text-xs text-white/70 mt-3">
+              No spam, just pretty nails ✨
+            </p>
           </div>
         </div>
       </div>

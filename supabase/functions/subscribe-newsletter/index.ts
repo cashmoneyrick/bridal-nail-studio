@@ -117,7 +117,7 @@ serve(async (req) => {
     const sanitizedFirstName = sanitizeString(first_name, 50);
     
     // Validate source
-    const allowedSources = ['nail_club_page', 'popup', 'footer'];
+    const allowedSources = ['nail_club_page', 'popup', 'footer', 'homepage_valentine'];
     const sanitizedSource = allowedSources.includes(source) ? source : 'nail_club_page';
 
     // Create Supabase client with service role key to bypass RLS

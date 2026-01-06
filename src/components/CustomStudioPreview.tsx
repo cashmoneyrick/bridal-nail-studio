@@ -1,119 +1,132 @@
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Upload, Shapes, Sparkles, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import customStudioDesktop from "@/assets/custom-studio-desktop.jpeg";
-import customStudioMobile from "@/assets/custom-studio-mobile.jpeg";
-
-const features = [
-  { icon: Upload, label: "Upload Inspo" },
-  { icon: Shapes, label: "Pick Shape" },
-  { icon: Sparkles, label: "Add Effects" },
-  { icon: Heart, label: "Save Designs" },
-];
 
 const CustomStudioPreview = () => {
+  const [position, setPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  
+
+  // Pointer event handlers for dragging
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
+      if (!isDragging || !containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+      setPosition(percentage);
+    },
+    [isDragging]
+  );
+
+  const handlePointerUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Attach window listeners when dragging
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", handlePointerUp);
+    }
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [isDragging, handlePointerMove, handlePointerUp]);
+
+  // Keyboard handler for accessibility
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setPosition((prev) => Math.max(0, prev - 5));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setPosition((prev) => Math.min(100, prev + 5));
+    }
+  };
+
   return (
-    <section className="relative w-full py-24 sm:py-32 overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
-        <img
-          src={isMobile ? customStudioMobile : customStudioDesktop}
-          alt="Custom nail design process"
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-      </div>
+    <section className="relative w-full py-24 sm:py-32 bg-background">
+      <div
+        ref={containerRef}
+        className="relative w-full overflow-hidden"
+        style={{ aspectRatio: isMobile ? "4/5" : "21/9" }}
+      >
+          {/* Image Layers - Same approach for both desktop and mobile */}
+          {/* Bottom layer - Finished image */}
+          <div className="absolute inset-0 bg-[#D4A5A5] flex items-center justify-center">
+            <span className={`text-white font-display opacity-20 ${isMobile ? 'text-4xl' : 'text-5xl'}`}>
+              FINISHED
+            </span>
+          </div>
 
-      {/* Centered Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-        {isMobile ? (
-          // MOBILE LAYOUT - Soft, romantic, elegant
-          <div className="max-w-sm mx-auto text-center space-y-5">
-            {/* Decorative Line */}
-            <div className="w-12 h-0.5 bg-white mx-auto" />
+          {/* Top layer - Sketch image (clipped) */}
+          <div
+            className="absolute inset-0 bg-[#F5E6D3] flex items-center justify-center"
+            style={{
+              clipPath: `inset(0 ${100 - position}% 0 0)`,
+            }}
+          >
+            <span className={`text-foreground/20 font-display opacity-30 ${isMobile ? 'text-4xl' : 'text-5xl'}`}>
+              SKETCH
+            </span>
+          </div>
 
-            {/* Label */}
-            <p className="text-sm font-medium tracking-[0.2em] uppercase text-white">
-              Custom Studio
-            </p>
+          {/* Slider Handle */}
+          <div
+            className="absolute top-0 bottom-0 z-20 cursor-ew-resize touch-none w-8 -ml-4"
+            style={{ left: `${position}%` }}
+            onPointerDown={handlePointerDown}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
+            role="slider"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(position)}
+            aria-label="Before and after comparison slider"
+          >
+            {/* Vertical line */}
+            <div className="absolute left-1/2 -translate-x-1/2 inset-y-0 w-0.5 bg-white shadow-lg" />
 
-            {/* Headline */}
-            <h2 className="font-display text-3xl font-medium leading-tight text-white [text-shadow:_0_1px_8px_rgb(0_0_0_/_30%)]">
-              Made Just for You
-            </h2>
-
-            {/* Tagline - italic, romantic */}
-            <p className="italic text-white/80 text-base tracking-wide leading-relaxed">
-              Upload your inspo. Pick your shape. Add your magic.
-            </p>
-
-            {/* CTA - dusty rose fill */}
-            <div className="pt-2">
-              <Link to="/custom-studio">
-                <Button
-                  className="bg-primary/90 text-white hover:bg-primary rounded-full px-8 font-medium"
-                  size="lg"
-                >
-                  Start Designing
-                </Button>
-              </Link>
+            {/* Circular handle with arrows */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-lg border border-white/20 flex items-center justify-center gap-0.5">
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>
           </div>
-        ) : (
-          // DESKTOP LAYOUT - unchanged
-          <div className="max-w-3xl mx-auto text-center space-y-6 sm:space-y-8">
-            {/* Decorative Line */}
-            <div className="w-12 h-0.5 bg-primary mx-auto" />
 
-            {/* Label */}
-            <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary">
-              Custom Studio
-            </p>
-
-            {/* Headline */}
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-medium leading-tight text-white">
-              Design Your Dream Set
-            </h2>
-
-            {/* Description */}
-            <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-              Can't find exactly what you're looking for? Our Custom Studio lets you
-              bring your nail vision to life. Work with our artists to create a
-              one-of-a-kind set that's uniquely yours.
-            </p>
-
-            {/* Feature Pills */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20"
-                >
-                  <feature.icon className="w-4 h-4 text-primary" />
-                  <span className="text-white text-sm font-medium">{feature.label}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <div className="pt-4">
-              <Link to="/custom-studio">
-                <Button
-                  className="bg-white text-primary hover:bg-white/90 rounded-full px-8 font-medium"
-                  size="lg"
-                >
-                  Start Designing
-                </Button>
-              </Link>
+          {/* Text Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+            <div className="text-center max-w-sm mx-auto px-4 pointer-events-auto space-y-4">
+              <p className="text-sm font-medium tracking-[0.2em] uppercase text-white [text-shadow:_0_2px_12px_rgb(0_0_0_/_50%)]">
+                Custom Studio
+              </p>
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium text-white [text-shadow:_0_2px_12px_rgb(0_0_0_/_50%)]">
+                Made Just for You
+              </h2>
+              <p className="italic text-white/90 text-base [text-shadow:_0_1px_8px_rgb(0_0_0_/_40%)]">
+                Upload your inspo. Pick your shape. Add your magic.
+              </p>
+              <div className="pt-2">
+                <Link to="/custom-studio">
+                  <Button className="bg-primary/90 text-white hover:bg-primary rounded-full px-8 font-medium">
+                    Start Designing
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
     </section>
   );
 };

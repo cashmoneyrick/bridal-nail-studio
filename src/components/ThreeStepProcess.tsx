@@ -39,7 +39,7 @@ const ThreeStepProcess = () => {
   return (
     <>
       {/* Section 1: Banner Header */}
-      <section className="py-12 sm:py-16 bg-background">
+      <section className="py-6 sm:py-8 bg-background">
         <div className="text-center">
           <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
             How It Works
@@ -51,19 +51,19 @@ const ThreeStepProcess = () => {
       </section>
 
       {/* Section 2: Full-Bleed Image Carousel */}
-      <section className="pb-16 sm:pb-20 bg-background">
+      <section className="bg-background">
         <div className="relative">
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex">
               {slides.map((slide, index) => (
                 <div
                   key={index}
-                  className="flex-none w-[85%] md:w-[60%] lg:w-[45%] pl-4 first:pl-4"
+                  className="flex-none w-full"
                 >
                   <img
                     src={slide.src}
                     alt={slide.alt}
-                    className="w-full h-auto rounded-xl object-cover"
+                    className="w-full h-[400px] sm:h-[500px] lg:h-[600px] object-cover"
                   />
                 </div>
               ))}
@@ -85,22 +85,22 @@ const ThreeStepProcess = () => {
           >
             <ChevronRight className="h-5 w-5" />
           </button>
-        </div>
 
-        {/* Dot Indicators */}
-        <div className="flex justify-center gap-2 mt-6">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollTo(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === selectedIndex
-                  ? "bg-primary w-6"
-                  : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+          {/* Dot Indicators - Overlaid */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => scrollTo(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === selectedIndex
+                    ? "bg-[#c26871] w-6"
+                    : "bg-[#c26871]/40 hover:bg-[#c26871]/60"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
     </>

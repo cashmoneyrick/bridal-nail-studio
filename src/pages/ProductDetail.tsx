@@ -717,8 +717,8 @@ const ProductDetail = () => {
                   {/* Left arrow - desktop only */}
                   {shapeCanScrollLeft && (
                     <button
-                      onClick={() => scrollBy(shapeScrollRef, -200)}
-                      className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      onClick={() => scrollBy(shapeScrollRef, -150)}
+                      className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-background/95 border border-border shadow-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
                       aria-label="Scroll left"
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -729,7 +729,7 @@ const ProductDetail = () => {
                   <div
                     ref={shapeScrollRef}
                     onScroll={() => handleScrollProgress(shapeScrollRef, setShapeScrollProgress, setShapeCanScroll, setShapeCanScrollLeft, setShapeCanScrollRight)}
-                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide touch-pan-x"
+                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide scroll-smooth touch-pan-x"
                   >
                     <div className="flex gap-2 min-w-max sm:min-w-0">
                       {NAIL_SHAPES.map(shape => (
@@ -758,8 +758,8 @@ const ProductDetail = () => {
                   {/* Right arrow - desktop only */}
                   {shapeCanScrollRight && (
                     <button
-                      onClick={() => scrollBy(shapeScrollRef, 200)}
-                      className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      onClick={() => scrollBy(shapeScrollRef, 150)}
+                      className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-background/95 border border-border shadow-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
                       aria-label="Scroll right"
                     >
                       <ChevronRight className="h-4 w-4" />
@@ -793,8 +793,8 @@ const ProductDetail = () => {
                   {/* Left arrow - desktop only */}
                   {lengthCanScrollLeft && (
                     <button
-                      onClick={() => scrollBy(lengthScrollRef, -200)}
-                      className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      onClick={() => scrollBy(lengthScrollRef, -150)}
+                      className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-background/95 border border-border shadow-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
                       aria-label="Scroll left"
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -805,7 +805,7 @@ const ProductDetail = () => {
                   <div
                     ref={lengthScrollRef}
                     onScroll={() => handleScrollProgress(lengthScrollRef, setLengthScrollProgress, setLengthCanScroll, setLengthCanScrollLeft, setLengthCanScrollRight)}
-                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide touch-pan-x"
+                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide scroll-smooth touch-pan-x"
                   >
                     <div className="flex gap-2 min-w-max sm:min-w-0">
                       {NAIL_LENGTHS.map(length => (
@@ -827,8 +827,8 @@ const ProductDetail = () => {
                   {/* Right arrow - desktop only */}
                   {lengthCanScrollRight && (
                     <button
-                      onClick={() => scrollBy(lengthScrollRef, 200)}
-                      className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      onClick={() => scrollBy(lengthScrollRef, 150)}
+                      className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-background/95 border border-border shadow-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
                       aria-label="Scroll right"
                     >
                       <ChevronRight className="h-4 w-4" />

@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Instagram, Facebook, Mail, MapPin, Phone, Check } from "lucide-react";
+import { Instagram, Facebook, Mail } from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {
@@ -29,63 +27,6 @@ const Footer = () => {
 
   return (
     <footer className="bg-foreground text-background w-full max-w-full overflow-hidden">
-      {/* Newsletter Section */}
-      <div className="bg-primary relative overflow-hidden">
-        {/* Subtle gradient overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 relative">
-          <div className="max-w-2xl mx-auto text-center">
-            <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium text-primary-foreground mb-4 tracking-tight">
-              Join the Nail Drop Club
-            </h3>
-            {/* Benefits List */}
-            <ul className="grid grid-cols-2 gap-x-6 gap-y-3 max-w-lg mx-auto mt-4 mb-6">
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
-                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                </span>
-                <span className="text-sm font-medium text-primary-foreground">17% off first order</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
-                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                </span>
-                <span className="text-sm font-medium text-primary-foreground">Free shipping over $65</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
-                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                </span>
-                <span className="text-sm font-medium text-primary-foreground">Early access to collections</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">
-                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                </span>
-                <span className="text-sm font-medium text-primary-foreground">Priority member shipping</span>
-              </li>
-            </ul>
-            <form className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="h-14 flex-1 bg-[#FDF8F5] border-0 text-primary placeholder:text-primary/60 rounded-2xl px-6 text-base shadow-sm focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-primary transition-all"
-              />
-              <Button
-                type="submit"
-                variant="ghost"
-                className="h-14 bg-white text-primary shadow-md hover:bg-white hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm rounded-2xl px-10 font-semibold transition-all duration-200"
-              >
-                Subscribe
-              </Button>
-            </form>
-            <p className="text-xs text-white/70 mt-3">
-              No spam, just pretty nails ✨
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 lg:gap-16">

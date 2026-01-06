@@ -397,10 +397,6 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
           <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
           <span className="text-foreground/80 font-medium">Honest feedback</span>
         </div>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full text-sm">
-          <ThumbsUp className="h-4 w-4 text-primary" />
-          <span className="text-foreground/80 font-medium">No incentivized reviews</span>
-        </div>
       </div>
 
       {/* Reviews List */}

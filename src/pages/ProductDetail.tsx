@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -271,6 +271,18 @@ const ProductDetail = () => {
   const { toggleFavorite, isFavorite } = useFavoritesStore();
   const navigate = useNavigate();
 
+  // Scroll progress state for selectors
+  const shapeScrollRef = useRef<HTMLDivElement>(null);
+  const lengthScrollRef = useRef<HTMLDivElement>(null);
+  const [shapeScrollProgress, setShapeScrollProgress] = useState(0);
+  const [lengthScrollProgress, setLengthScrollProgress] = useState(0);
+  const [shapeCanScroll, setShapeCanScroll] = useState(false);
+  const [lengthCanScroll, setLengthCanScroll] = useState(false);
+  const [shapeCanScrollLeft, setShapeCanScrollLeft] = useState(false);
+  const [shapeCanScrollRight, setShapeCanScrollRight] = useState(false);
+  const [lengthCanScrollLeft, setLengthCanScrollLeft] = useState(false);
+  const [lengthCanScrollRight, setLengthCanScrollRight] = useState(false);
+
   // Benefits carousel for mobile with autoplay
   const [benefitsEmblaRef, benefitsEmblaApi] = useEmblaCarousel(
     {
@@ -296,6 +308,50 @@ const ProductDetail = () => {
       benefitsEmblaApi.off("reInit", onBenefitsSelect);
     };
   }, [benefitsEmblaApi, onBenefitsSelect]);
+
+  // Scroll progress handler
+  const handleScrollProgress = (
+    ref: React.RefObject<HTMLDivElement>,
+    setProgress: (val: number) => void,
+    setCanScroll: (val: boolean) => void,
+    setCanScrollLeft?: (val: boolean) => void,
+    setCanScrollRight?: (val: boolean) => void
+  ) => {
+    const el = ref.current;
+    if (!el) return;
+
+    const canScroll = el.scrollWidth > el.clientWidth;
+    setCanScroll(canScroll);
+
+    if (canScroll) {
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const progress = el.scrollLeft / maxScroll;
+      setProgress(progress);
+
+      setCanScrollLeft?.(el.scrollLeft > 0);
+      setCanScrollRight?.(el.scrollLeft < maxScroll - 1);
+    } else {
+      setCanScrollLeft?.(false);
+      setCanScrollRight?.(false);
+    }
+  };
+
+  // Scroll button handler
+  const scrollBy = (ref: React.RefObject<HTMLDivElement>, amount: number) => {
+    ref.current?.scrollBy({ left: amount, behavior: 'smooth' });
+  };
+
+  // Check scroll overflow on mount and resize
+  useEffect(() => {
+    const checkOverflow = () => {
+      handleScrollProgress(shapeScrollRef, setShapeScrollProgress, setShapeCanScroll, setShapeCanScrollLeft, setShapeCanScrollRight);
+      handleScrollProgress(lengthScrollRef, setLengthScrollProgress, setLengthCanScroll, setLengthCanScrollLeft, setLengthCanScrollRight);
+    };
+
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, []);
 
   const handleToggleFavorite = () => {
     if (!product) return;
@@ -656,31 +712,72 @@ const ProductDetail = () => {
                     {selectedShape}
                   </span>
                 </div>
-                {/* Horizontal scroll container for small screens */}
-                <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
-                  <div className="flex gap-2 min-w-max sm:min-w-0">
-                    {NAIL_SHAPES.map(shape => (
-                      <button
-                        key={shape}
-                        onClick={() => setSelectedShape(shape)}
-                        className={`flex-shrink-0 w-[72px] sm:flex-1 sm:w-auto flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 ${
-                          selectedShape === shape
-                            ? 'border-primary bg-primary/5 shadow-sm'
-                            : 'border-border/60 hover:border-primary/40 hover:bg-muted/30'
-                        }`}
-                      >
-                        <ShapeIcon shape={shape} selected={selectedShape === shape} />
-                        <span className={`text-xs font-medium ${
-                          selectedShape === shape
-                            ? 'text-primary'
-                            : 'text-muted-foreground'
-                        }`}>
-                          {shape}
-                        </span>
-                      </button>
-                    ))}
+                {/* Scroll container with arrows */}
+                <div className="relative">
+                  {/* Left arrow - desktop only */}
+                  {shapeCanScrollLeft && (
+                    <button
+                      onClick={() => scrollBy(shapeScrollRef, -200)}
+                      className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      aria-label="Scroll left"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                  )}
+
+                  {/* Horizontal scroll container */}
+                  <div
+                    ref={shapeScrollRef}
+                    onScroll={() => handleScrollProgress(shapeScrollRef, setShapeScrollProgress, setShapeCanScroll, setShapeCanScrollLeft, setShapeCanScrollRight)}
+                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide touch-pan-x"
+                  >
+                    <div className="flex gap-2 min-w-max sm:min-w-0">
+                      {NAIL_SHAPES.map(shape => (
+                        <button
+                          key={shape}
+                          onClick={() => setSelectedShape(shape)}
+                          className={`flex-shrink-0 w-[72px] sm:flex-1 sm:w-auto flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 ${
+                            selectedShape === shape
+                              ? 'border-primary bg-primary/5 shadow-sm'
+                              : 'border-border/60 hover:border-primary/40 hover:bg-muted/30'
+                          }`}
+                        >
+                          <ShapeIcon shape={shape} selected={selectedShape === shape} />
+                          <span className={`text-xs font-medium ${
+                            selectedShape === shape
+                              ? 'text-primary'
+                              : 'text-muted-foreground'
+                          }`}>
+                            {shape}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Right arrow - desktop only */}
+                  {shapeCanScrollRight && (
+                    <button
+                      onClick={() => scrollBy(shapeScrollRef, 200)}
+                      className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      aria-label="Scroll right"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
+                {/* Scroll indicator - mobile only */}
+                {shapeCanScroll && (
+                  <div className="sm:hidden mt-3 mx-auto w-16 h-1 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary/50 rounded-full transition-transform duration-150"
+                      style={{
+                        width: '40%',
+                        transform: `translateX(${shapeScrollProgress * 150}%)`
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Length Selector */}
@@ -691,24 +788,65 @@ const ProductDetail = () => {
                     {selectedLength}
                   </span>
                 </div>
-                {/* Horizontal scroll container for small screens */}
-                <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
-                  <div className="flex gap-2 min-w-max sm:min-w-0">
-                    {NAIL_LENGTHS.map(length => (
-                      <button
-                        key={length}
-                        onClick={() => setSelectedLength(length)}
-                        className={`flex-shrink-0 min-w-max px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 sm:flex-1 sm:min-w-0 ${
-                          selectedLength === length
-                            ? 'bg-primary text-primary-foreground shadow-sm'
-                            : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-border/50'
-                        }`}
-                      >
-                        {length}
-                      </button>
-                    ))}
+                {/* Scroll container with arrows */}
+                <div className="relative">
+                  {/* Left arrow - desktop only */}
+                  {lengthCanScrollLeft && (
+                    <button
+                      onClick={() => scrollBy(lengthScrollRef, -200)}
+                      className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      aria-label="Scroll left"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                  )}
+
+                  {/* Horizontal scroll container */}
+                  <div
+                    ref={lengthScrollRef}
+                    onScroll={() => handleScrollProgress(lengthScrollRef, setLengthScrollProgress, setLengthCanScroll, setLengthCanScrollLeft, setLengthCanScrollRight)}
+                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide touch-pan-x"
+                  >
+                    <div className="flex gap-2 min-w-max sm:min-w-0">
+                      {NAIL_LENGTHS.map(length => (
+                        <button
+                          key={length}
+                          onClick={() => setSelectedLength(length)}
+                          className={`flex-shrink-0 min-w-max px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 sm:flex-1 sm:min-w-0 ${
+                            selectedLength === length
+                              ? 'bg-primary text-primary-foreground shadow-sm'
+                              : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-border/50'
+                          }`}
+                        >
+                          {length}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Right arrow - desktop only */}
+                  {lengthCanScrollRight && (
+                    <button
+                      onClick={() => scrollBy(lengthScrollRef, 200)}
+                      className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full bg-background/90 shadow-sm border border-border/50 hover:bg-background transition-colors"
+                      aria-label="Scroll right"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
+                {/* Scroll indicator - mobile only */}
+                {lengthCanScroll && (
+                  <div className="sm:hidden mt-3 mx-auto w-16 h-1 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary/50 rounded-full transition-transform duration-150"
+                      style={{
+                        width: '40%',
+                        transform: `translateX(${lengthScrollProgress * 150}%)`
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Nail Sizes */}

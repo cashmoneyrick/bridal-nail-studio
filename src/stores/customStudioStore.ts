@@ -155,7 +155,10 @@ interface CustomStudioActions {
   
   // Pricing
   getPriceBreakdown: () => PriceBreakdown;
-  
+
+  // Validation
+  getStep1ValidationErrors: () => string[];
+
   // Reset
   resetStudio: () => void;
 }
@@ -233,10 +236,11 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         switch (state.currentStep) {
           case 0: // Starting Point
             return state.entryMode === 'fresh' || state.baseProduct !== null;
-          case 1: // Base Look - Require colors selected AND at least one nail painted
+          case 1: { // Base Look - Require colors selected AND at least one nail painted
             const hasColors = state.selectedColors.length > 0;
             const hasNailAssigned = Object.values(state.nailColors).some(color => color && color.length > 0);
             return !!state.shape && !!state.length && !!state.baseFinish && hasColors && hasNailAssigned;
+          }
           case 2: // Accent Nails
             return !state.hasAccentNails || state.accentNails.size > 0;
           case 3: // Effects & Add-ons
@@ -434,7 +438,20 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         
         return { items, subtotal, hasQuoteItems };
       },
-      
+
+      // Validation - Get specific missing fields for Step 1
+      getStep1ValidationErrors: () => {
+        const state = get();
+        const errors: string[] = [];
+        if (!state.shape) errors.push('shape');
+        if (!state.length) errors.push('length');
+        if (!state.baseFinish) errors.push('finish');
+        if (state.selectedColors.length === 0) errors.push('colors');
+        const hasNailPainted = Object.values(state.nailColors).some(c => c && c.length > 0);
+        if (!hasNailPainted) errors.push('nail colors');
+        return errors;
+      },
+
       // Reset - Clear localStorage and all state on reset
       resetStudio: () => {
         localStorage.removeItem(STORAGE_KEY);

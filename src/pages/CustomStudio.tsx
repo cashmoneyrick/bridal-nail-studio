@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
@@ -25,14 +25,15 @@ import {
 import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 const CustomStudio = () => {
-  const { 
-    currentStep, 
-    nextStep, 
-    prevStep, 
-    canProceed, 
+  const {
+    currentStep,
+    nextStep,
+    prevStep,
+    canProceed,
     setStep,
     getPriceBreakdown,
     resetStudio,
+    getStep1ValidationErrors,
     shape,
     length,
     baseFinish,
@@ -41,12 +42,32 @@ const CustomStudio = () => {
 
   // Fix 6: Add reset confirmation dialog state
   const [showResetDialog, setShowResetDialog] = useState(false);
-  
+
   // Mobile BaseLook micro-step state (0 = Shape, 1 = Length, 2 = Finish, 3 = Color)
   const [baseLookMicroStep, setBaseLookMicroStep] = useState(0);
-  
+
   // Mobile AccentNails micro-step state (0 = Yes/No, 1 = Select nails, 2 = Configure)
   const [accentMicroStep, setAccentMicroStep] = useState(0);
+
+  // Mobile Step 3 micro-step state (0 = Effects, 1 = Rhinestones, 2 = Charms)
+  const [step3MicroStep, setStep3MicroStep] = useState(0);
+
+  // Track if user has made any selections
+  const hasProgress = currentStep > 0 || shape !== 'almond' || length !== 'short' ||
+    baseFinish !== 'glossy' || colorPalette !== null;
+
+  // Fix 3: Browser tab/window close warning
+  useEffect(() => {
+    if (!hasProgress) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasProgress]);
 
   // Compute completed steps based on store state
   const completedSteps = useMemo(() => {
@@ -78,10 +99,10 @@ const CustomStudio = () => {
     // Only allow clicking back to completed steps or current step
     if (step <= currentStep || completedSteps.has(step)) {
       setStep(step);
-      // Reset micro-step when navigating away from BaseLook
-      if (step !== 1) {
-        setBaseLookMicroStep(0);
-      }
+      // Reset micro-steps when navigating away
+      if (step !== 1) setBaseLookMicroStep(0);
+      if (step !== 2) setAccentMicroStep(0);
+      if (step !== 3) setStep3MicroStep(0);
     }
   };
 
@@ -94,6 +115,7 @@ const CustomStudio = () => {
     resetStudio();
     setBaseLookMicroStep(0);
     setAccentMicroStep(0);
+    setStep3MicroStep(0);
     setShowResetDialog(false);
   };
   
@@ -103,25 +125,32 @@ const CustomStudio = () => {
     setAccentMicroStep(0);
   };
 
-  // Handle mobile back button (aware of BaseLook and AccentNails micro-steps)
+  // Handle mobile back button (aware of micro-steps)
   const handleMobileBack = () => {
+    // Handle Step 3 micro-steps
+    if (currentStep === 3 && step3MicroStep > 0) {
+      setStep3MicroStep(step3MicroStep - 1);
+      return;
+    }
+
     // Handle AccentNails micro-steps (step 2)
     if (currentStep === 2 && accentMicroStep > 0) {
       setAccentMicroStep(accentMicroStep - 1);
       return;
     }
-    
+
     // Handle BaseLook micro-steps (step 1)
     if (currentStep === 1 && baseLookMicroStep > 0) {
       setBaseLookMicroStep(baseLookMicroStep - 1);
       return;
     }
-    
+
     // Otherwise go to previous main step
     prevStep();
     // Reset micro-steps when leaving a step
     if (currentStep === 1) setBaseLookMicroStep(0);
     if (currentStep === 2) setAccentMicroStep(0);
+    if (currentStep === 3) setStep3MicroStep(0);
   };
 
   const renderStepContent = () => {
@@ -144,7 +173,12 @@ const CustomStudio = () => {
           />
         );
       case 3:
-        return <EffectsAddons />;
+        return (
+          <EffectsAddons
+            microStep={step3MicroStep}
+            setMicroStep={setStep3MicroStep}
+          />
+        );
       case 4:
         return <CustomArtwork />;
       case 5:
@@ -158,7 +192,7 @@ const CustomStudio = () => {
   const isLastStep = currentStep === 5;
   
   // Show back button on mobile if not first step OR if in any step with micro-step > 0
-  const showMobileBack = currentStep > 0 || baseLookMicroStep > 0 || accentMicroStep > 0;
+  const showMobileBack = currentStep > 0 || baseLookMicroStep > 0 || accentMicroStep > 0 || step3MicroStep > 0;
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden w-full max-w-full">
@@ -259,12 +293,16 @@ const CustomStudio = () => {
                   )}
                 </div>
 
-                {/* Help Text */}
-                {!canProceed() && currentStep === 1 && (
-                  <p className="text-xs text-muted-foreground text-center px-2">
-                    Complete all required selections to continue
-                  </p>
-                )}
+                {/* Help Text - Fix 2: Show specific missing fields */}
+                {!canProceed() && currentStep === 1 && (() => {
+                  const errors = getStep1ValidationErrors();
+                  if (errors.length === 0) return null;
+                  return (
+                    <p className="text-xs text-muted-foreground text-center px-2">
+                      Select your {errors.join(', ')} to continue
+                    </p>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -274,7 +312,18 @@ const CustomStudio = () => {
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         priceBreakdown={priceBreakdown}
-        onContinue={nextStep}
+        onContinue={() => {
+          // Handle Step 3 micro-steps (Effects → Rhinestones → Charms)
+          if (currentStep === 3 && step3MicroStep < 2) {
+            setStep3MicroStep(step3MicroStep + 1);
+            return;
+          }
+          // Reset Step 3 micro-step when advancing past Step 3
+          if (currentStep === 3 && step3MicroStep === 2) {
+            setStep3MicroStep(0);
+          }
+          nextStep();
+        }}
         canProceed={canProceed()}
         isLastStep={isLastStep}
         currentStep={currentStep}
@@ -288,7 +337,7 @@ const CustomStudio = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Start over?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will clear all your customization choices and reset the design studio. 
+              This will clear all your customization choices and reset the design studio.
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -300,6 +349,7 @@ const CustomStudio = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </div>
   );
 };

@@ -31,12 +31,17 @@ type EffectScope = 'none' | 'all' | 'accents-only';
 const RHINESTONE_OPTIONS: RhinestoneTier[] = ['none', 'just-a-touch', 'a-little-sparkle', 'full-glam'];
 const CHARM_OPTIONS: CharmTier[] = ['none', 'single-statement', 'a-few-accents', 'charmed-out'];
 
-export function EffectsAddons() {
+interface EffectsAddonsProps {
+  microStep?: number;
+  setMicroStep?: (step: number) => void;
+}
+
+export function EffectsAddons({ microStep = 0, setMicroStep }: EffectsAddonsProps) {
   const isMobile = useIsMobile();
-  const { 
-    effects, 
-    accentNails, 
-    addEffect, 
+  const {
+    effects,
+    accentNails,
+    addEffect,
     removeEffect,
     rhinestoneTier,
     charmTier,
@@ -48,7 +53,12 @@ export function EffectsAddons() {
 
   // Use mobile flow on mobile devices
   if (isMobile) {
-    return <EffectsAddonsMobile />;
+    return (
+      <EffectsAddonsMobile
+        microStep={microStep}
+        setMicroStep={setMicroStep}
+      />
+    );
   }
 
   const getEffectScope = (effectType: EffectType): EffectScope => {

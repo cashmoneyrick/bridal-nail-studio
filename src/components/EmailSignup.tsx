@@ -192,33 +192,41 @@ const EmailSignup = () => {
 
         {/* Countdown Timer */}
         {!isExpired ? (
-          <div className="flex items-start justify-center gap-2 mb-8 font-mono text-xl sm:text-2xl tracking-wider">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8">
             <div className="flex flex-col items-center">
-              <div className="bg-white/50 rounded-lg px-3 py-2">
-                {String(timeLeft.days).padStart(2, '0')}
+              <div className="bg-white/80 rounded-xl px-4 py-2 shadow-sm border border-border/30">
+                <span className="font-semibold text-2xl sm:text-3xl text-foreground">
+                  {String(timeLeft.days).padStart(2, '0')}
+                </span>
               </div>
-              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">days</span>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-2">days</span>
             </div>
-            <span className="text-primary font-light text-xl mt-2">:</span>
+            <span className="text-primary font-light text-xl self-start mt-2">:</span>
             <div className="flex flex-col items-center">
-              <div className="bg-white/50 rounded-lg px-3 py-2">
-                {String(timeLeft.hours).padStart(2, '0')}
+              <div className="bg-white/80 rounded-xl px-4 py-2 shadow-sm border border-border/30">
+                <span className="font-semibold text-2xl sm:text-3xl text-foreground">
+                  {String(timeLeft.hours).padStart(2, '0')}
+                </span>
               </div>
-              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">hrs</span>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-2">hrs</span>
             </div>
-            <span className="text-primary font-light text-xl mt-2">:</span>
+            <span className="text-primary font-light text-xl self-start mt-2">:</span>
             <div className="flex flex-col items-center">
-              <div className="bg-white/50 rounded-lg px-3 py-2">
-                {String(timeLeft.minutes).padStart(2, '0')}
+              <div className="bg-white/80 rounded-xl px-4 py-2 shadow-sm border border-border/30">
+                <span className="font-semibold text-2xl sm:text-3xl text-foreground">
+                  {String(timeLeft.minutes).padStart(2, '0')}
+                </span>
               </div>
-              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">mins</span>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-2">mins</span>
             </div>
-            <span className="text-primary font-light text-xl mt-2">:</span>
+            <span className="text-primary font-light text-xl self-start mt-2">:</span>
             <div className="flex flex-col items-center">
-              <div className="bg-white/50 rounded-lg px-3 py-2">
-                {String(timeLeft.seconds).padStart(2, '0')}
+              <div className="bg-white/80 rounded-xl px-4 py-2 shadow-sm border border-border/30">
+                <span className="font-semibold text-2xl sm:text-3xl text-foreground">
+                  {String(timeLeft.seconds).padStart(2, '0')}
+                </span>
               </div>
-              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">secs</span>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-2">secs</span>
             </div>
           </div>
         ) : (
@@ -227,68 +235,70 @@ const EmailSignup = () => {
           </p>
         )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center justify-center gap-3 sm:gap-4 max-w-xl mx-auto">
-          {/* First Name Input with Floating Label */}
-          <div className="relative w-full sm:w-48">
-            <input
-              type="text"
-              id="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="peer w-full rounded-xl px-4 py-3 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder-transparent"
-              placeholder="First name"
-            />
-            <label
-              htmlFor="firstName"
-              className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-primary transition-all duration-200
-                         peer-placeholder-shown:top-3 peer-placeholder-shown:left-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-muted-foreground peer-placeholder-shown:bg-transparent
-                         peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-xs peer-focus:text-primary peer-focus:bg-white"
+        {/* Form Card */}
+        <div className="bg-white/70 border border-border/50 rounded-2xl p-6 sm:p-8 shadow-sm max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center justify-center gap-3 sm:gap-4">
+            {/* First Name Input with Floating Label */}
+            <div className="relative w-full sm:w-48">
+              <input
+                type="text"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="peer w-full rounded-xl px-4 py-3 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder-transparent"
+                placeholder="First name"
+              />
+              <label
+                htmlFor="firstName"
+                className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-primary transition-all duration-200
+                           peer-placeholder-shown:top-3 peer-placeholder-shown:left-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-muted-foreground peer-placeholder-shown:bg-transparent
+                           peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-xs peer-focus:text-primary peer-focus:bg-white"
+              >
+                First name
+              </label>
+              {errors.firstName && (
+                <p className="text-sm text-destructive mt-1 text-left">{errors.firstName}</p>
+              )}
+            </div>
+
+            {/* Email Input with Floating Label */}
+            <div className="relative w-full sm:w-48">
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="peer w-full rounded-xl px-4 py-3 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder-transparent"
+                placeholder="Email"
+              />
+              <label
+                htmlFor="email"
+                className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-primary transition-all duration-200
+                           peer-placeholder-shown:top-3 peer-placeholder-shown:left-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-muted-foreground peer-placeholder-shown:bg-transparent
+                           peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-xs peer-focus:text-primary peer-focus:bg-white"
+              >
+                Email
+              </label>
+              {errors.email && (
+                <p className="text-sm text-destructive mt-1 text-left">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Shimmer Button */}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="shimmer-button bg-foreground text-white rounded-xl px-6 py-3 font-medium hover:scale-[1.02] transition-transform w-full sm:w-auto"
             >
-              First name
-            </label>
-            {errors.firstName && (
-              <p className="text-sm text-destructive mt-1 text-left">{errors.firstName}</p>
-            )}
-          </div>
+              {isSubmitting ? "..." : "I'M IN 💅"}
+            </Button>
+          </form>
 
-          {/* Email Input with Floating Label */}
-          <div className="relative w-full sm:w-48">
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="peer w-full rounded-xl px-4 py-3 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder-transparent"
-              placeholder="Email"
-            />
-            <label
-              htmlFor="email"
-              className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-primary transition-all duration-200
-                         peer-placeholder-shown:top-3 peer-placeholder-shown:left-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-muted-foreground peer-placeholder-shown:bg-transparent
-                         peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-xs peer-focus:text-primary peer-focus:bg-white"
-            >
-              Email
-            </label>
-            {errors.email && (
-              <p className="text-sm text-destructive mt-1 text-left">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Shimmer Button */}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="shimmer-button bg-foreground text-white rounded-xl px-6 py-3 font-medium hover:scale-[1.02] transition-transform w-full sm:w-auto"
-          >
-            {isSubmitting ? "..." : "I'M IN 💅"}
-          </Button>
-        </form>
-
-        {/* Social Proof */}
-        <p className="text-sm text-muted-foreground text-center mt-6">
-          Join 2,000+ nail lovers 💅
-        </p>
+          {/* Social Proof */}
+          <p className="text-sm text-muted-foreground text-center mt-6">
+            Join 2,000+ nail lovers 💅
+          </p>
+        </div>
       </div>
     </section>
   );

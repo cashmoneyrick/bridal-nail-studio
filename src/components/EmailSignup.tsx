@@ -150,10 +150,12 @@ const EmailSignup = () => {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
+
         .shimmer-button {
           position: relative;
           overflow: hidden;
         }
+
         .shimmer-button::before {
           content: '';
           position: absolute;
@@ -164,8 +166,19 @@ const EmailSignup = () => {
           background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
           transform: translateX(-100%);
         }
-        .shimmer-button:hover::before {
-          animation: shimmer 1.5s;
+
+        /* Mobile: always animate (loop) */
+        @media (hover: none) {
+          .shimmer-button::before {
+            animation: shimmer 2.5s infinite;
+          }
+        }
+
+        /* Desktop: animate on hover only */
+        @media (hover: hover) {
+          .shimmer-button:hover::before {
+            animation: shimmer 1.5s;
+          }
         }
       `}</style>
 
@@ -179,21 +192,33 @@ const EmailSignup = () => {
 
         {/* Countdown Timer */}
         {!isExpired ? (
-          <div className="flex items-center justify-center gap-2 mb-8 font-mono text-xl sm:text-2xl tracking-wider">
-            <div className="bg-white/50 rounded-lg px-3 py-2">
-              {String(timeLeft.days).padStart(2, '0')}
+          <div className="flex items-start justify-center gap-2 mb-8 font-mono text-xl sm:text-2xl tracking-wider">
+            <div className="flex flex-col items-center">
+              <div className="bg-white/50 rounded-lg px-3 py-2">
+                {String(timeLeft.days).padStart(2, '0')}
+              </div>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">days</span>
             </div>
-            <span className="text-primary font-light text-xl">:</span>
-            <div className="bg-white/50 rounded-lg px-3 py-2">
-              {String(timeLeft.hours).padStart(2, '0')}
+            <span className="text-primary font-light text-xl mt-2">:</span>
+            <div className="flex flex-col items-center">
+              <div className="bg-white/50 rounded-lg px-3 py-2">
+                {String(timeLeft.hours).padStart(2, '0')}
+              </div>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">hrs</span>
             </div>
-            <span className="text-primary font-light text-xl">:</span>
-            <div className="bg-white/50 rounded-lg px-3 py-2">
-              {String(timeLeft.minutes).padStart(2, '0')}
+            <span className="text-primary font-light text-xl mt-2">:</span>
+            <div className="flex flex-col items-center">
+              <div className="bg-white/50 rounded-lg px-3 py-2">
+                {String(timeLeft.minutes).padStart(2, '0')}
+              </div>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">mins</span>
             </div>
-            <span className="text-primary font-light text-xl">:</span>
-            <div className="bg-white/50 rounded-lg px-3 py-2">
-              {String(timeLeft.seconds).padStart(2, '0')}
+            <span className="text-primary font-light text-xl mt-2">:</span>
+            <div className="flex flex-col items-center">
+              <div className="bg-white/50 rounded-lg px-3 py-2">
+                {String(timeLeft.seconds).padStart(2, '0')}
+              </div>
+              <span className="text-xs uppercase tracking-wide text-muted-foreground mt-1">secs</span>
             </div>
           </div>
         ) : (

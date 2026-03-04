@@ -77,7 +77,7 @@ const CustomStudioPreview = () => {
             </h2>
 
             <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-8 max-w-md">
-              Send us your inspiration, choose your shape and length, and we handle the rest.
+              Share your vision, pick your style, and we'll create something beautiful just for you.
             </p>
 
             <Link to="/custom-studio">

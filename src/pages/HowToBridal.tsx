@@ -2,7 +2,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Calendar, Check, Heart, Sparkles } from "lucide-react";
+import { Calendar, Check, Heart, Sparkles, Hand, Ruler, ChevronRight } from "lucide-react";
 
 const timelineSteps = [
   {
@@ -59,22 +59,30 @@ const HowToBridal = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 md:pt-40 md:pb-24">
+      <section className="pt-32 pb-10 md:pt-40 md:pb-12">
         <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-10">
+            <Link to="/how-to" className="hover:text-foreground transition-colors">How To</Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-foreground">Prepping for My Wedding</span>
+          </nav>
+
+          <div className="max-w-3xl mx-auto text-center">
+            {/* Icon badge with halo ring */}
+            <div className="flex justify-center mb-8">
+              <div className="w-32 h-32 rounded-full bg-primary/5 flex items-center justify-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-secondary/15 border border-border/30 flex items-center justify-center shadow-sm">
+                  <Heart className="w-12 h-12 text-primary/70" />
+                </div>
+              </div>
+            </div>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
               Prepping for Your Wedding
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl">
               Your nails will be in every photo. Let's make sure they're perfect.
             </p>
-          </div>
-
-          {/* Placeholder Image */}
-          <div className="max-w-4xl mx-auto">
-            <div className="aspect-[16/9] bg-muted/30 rounded-lg flex items-center justify-center">
-              <span className="text-muted-foreground">Wedding Image</span>
-            </div>
           </div>
         </div>
       </section>
@@ -93,24 +101,27 @@ const HowToBridal = () => {
 
           <div className="max-w-3xl mx-auto">
             <div className="relative">
-              {/* Timeline Line */}
-              <div className="absolute left-4 md:left-8 top-0 bottom-0 w-0.5 bg-primary/20" />
+              {/* Timeline Line — desktop only */}
+              <div className="absolute left-4 md:left-8 top-0 bottom-0 w-0.5 bg-primary/20 hidden md:block" />
 
               {/* Timeline Cards */}
-              <div className="space-y-8">
+              <div className="space-y-6 md:space-y-8">
                 {timelineSteps.map((step, index) => (
-                  <div key={index} className="relative pl-12 md:pl-20">
-                    {/* Timeline Dot */}
-                    <div className="absolute left-0 md:left-4 top-0 w-8 h-8 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
+                  <div key={index} className="relative md:pl-20">
+                    {/* Timeline Dot — desktop only */}
+                    <div className="absolute left-0 md:left-4 top-0 w-8 h-8 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center hidden md:flex">
                       <Calendar className="w-4 h-4 text-primary" />
                     </div>
 
                     {/* Card */}
                     <div className="bg-background border border-border/50 rounded-xl p-6 md:p-8 shadow-sm">
                       {/* Timeframe Badge */}
-                      <span className="inline-block px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full mb-3">
-                        {step.timeframe}
-                      </span>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Calendar className="w-4 h-4 text-primary md:hidden flex-shrink-0" />
+                        <span className="inline-block px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
+                          {step.timeframe}
+                        </span>
+                      </div>
 
                       <h3 className="font-serif text-xl md:text-2xl text-foreground mb-4">
                         {step.title}
@@ -118,10 +129,7 @@ const HowToBridal = () => {
 
                       <ul className="space-y-2">
                         {step.items.map((item, itemIndex) => (
-                          <li
-                            key={itemIndex}
-                            className="flex items-start gap-3 text-muted-foreground"
-                          >
+                          <li key={itemIndex} className="flex items-start gap-3 text-muted-foreground">
                             <Check className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
                             <span>{item}</span>
                           </li>
@@ -181,7 +189,7 @@ const HowToBridal = () => {
             </h2>
 
             <p className="text-muted-foreground text-lg leading-relaxed">
-              With proper application, your press-ons will last through the ceremony, 
+              With proper application, your press-ons will last through the ceremony,
               reception, and well into your honeymoon.
             </p>
 
@@ -190,17 +198,43 @@ const HowToBridal = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Related Guides + CTA */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-6">
-          <div className="max-w-xl mx-auto text-center">
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-8">
-              Ready to find your bridal set?
-            </h2>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground text-center mb-4">Continue learning</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+              <Link
+                to="/how-to/application"
+                className="group flex items-center gap-3 bg-secondary/10 border border-border/30 rounded-xl p-4 hover:border-border hover:bg-secondary/20 transition-all"
+              >
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Hand className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">Applying for the First Time</p>
+                  <p className="text-xs text-muted-foreground">Step-by-step guide</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/how-to/sizing"
+                className="group flex items-center gap-3 bg-secondary/10 border border-border/30 rounded-xl p-4 hover:border-border hover:bg-secondary/20 transition-all"
+              >
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Ruler className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">Find Your Size</p>
+                  <p className="text-xs text-muted-foreground">Perfect fit guide</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8 border-t border-border/30">
               <Button variant="outline" size="lg" asChild>
-                <Link to="/how-to">Back to How To</Link>
+                <Link to="/how-to">All Guides</Link>
               </Button>
               <Button size="lg" asChild>
                 <Link to="/shop">Shop Bridal Collection</Link>

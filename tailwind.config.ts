@@ -61,18 +61,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        rose: {
-          DEFAULT: "hsl(var(--rose))",
-          dark: "hsl(var(--rose-dark))",
+        sage: {
+          DEFAULT: "hsl(var(--sage))",
+          dark: "hsl(var(--sage-dark))",
         },
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          dark: "hsl(var(--gold-dark))",
+        dustyblue: {
+          DEFAULT: "hsl(var(--dusty-blue))",
+          dark: "hsl(var(--dusty-blue-dark))",
         },
         cream: "hsl(var(--cream))",
-        burgundy: {
-          DEFAULT: "hsl(var(--burgundy))",
-          light: "hsl(var(--burgundy-light))",
+        forest: {
+          DEFAULT: "hsl(var(--forest))",
+          light: "hsl(var(--forest-light))",
         },
       },
       borderRadius: {

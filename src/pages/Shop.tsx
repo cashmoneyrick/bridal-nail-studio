@@ -147,31 +147,58 @@ const Shop = () => {
       
       <main className="pt-24 pb-16">
         {/* Editorial Hero Section */}
-        <div className="relative overflow-hidden bg-[hsl(30,30%,97%)]">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="relative overflow-hidden">
+          {/* Ambient background blooms */}
+          <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-secondary/20 blur-[100px] pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-primary/[0.12] blur-[80px] pointer-events-none" />
+          {/* Floating decorative rings — desktop only */}
+          <div className="hidden md:block absolute top-8 right-16 w-20 h-20 rounded-full border border-primary/20 pointer-events-none" />
+          <div className="hidden md:block absolute top-14 right-20 w-8 h-8 rounded-full border border-secondary/40 pointer-events-none" />
+
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center max-w-4xl mx-auto py-20 md:py-28">
-              {/* Editorial tagline */}
-              <p className="text-xs font-medium tracking-[0.4em] uppercase text-primary/70 mb-8">
-                Curated Collections
-              </p>
-              
-              {/* Main editorial title */}
-              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight mb-8 leading-[0.95]">
-                <span className="block">Shop All</span>
-                <span className="block italic text-primary/90">Sets</span>
-              </h1>
-              
-              {/* Elegant description */}
-              <p className="text-muted-foreground text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed">
-                Discover our handcrafted press-on nail collections, designed for every moment—from everyday elegance to unforgettable occasions.
-              </p>
-              
-              {/* Decorative divider */}
-              <div className="mt-10 hidden md:flex items-center justify-center gap-4">
-                <div className="w-12 h-px bg-gradient-to-r from-transparent to-primary/30" />
-                <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                <div className="w-12 h-px bg-gradient-to-l from-transparent to-primary/30" />
+
+              {/* Eyebrow with flanking rules */}
+              <div className="flex items-center gap-5 justify-center mb-8 animate-stagger-1">
+                <div className="w-16 h-px bg-gradient-to-r from-transparent to-primary/40" />
+                <p className="text-xs font-medium tracking-[0.4em] uppercase text-primary/70 whitespace-nowrap">
+                  Curated Collections
+                </p>
+                <div className="w-16 h-px bg-gradient-to-l from-transparent to-primary/40" />
               </div>
+
+              {/* Heading with ghost watermark */}
+              <div className="relative inline-block animate-stagger-2">
+                <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight mb-8 leading-[0.95]">
+                  <span className="block">Shop All</span>
+                  <span className="block italic text-primary/90">Sets</span>
+                </h1>
+                {/* Ghost watermark */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 flex items-end justify-center font-display text-[8rem] sm:text-[11rem] md:text-[14rem] italic font-medium text-primary/[0.05] leading-none pointer-events-none select-none translate-y-3 overflow-hidden"
+                >
+                  Sets
+                </span>
+              </div>
+
+              {/* Description with accent rule */}
+              <div className="animate-stagger-3">
+                <div className="w-8 h-px bg-primary/30 mx-auto mb-6" />
+                <p className="text-muted-foreground text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed">
+                  Discover our handcrafted press-on nail collections, designed for every moment—from everyday elegance to unforgettable occasions.
+                </p>
+              </div>
+
+              {/* Bottom editorial badge */}
+              <div className="mt-10 animate-stagger-4 flex items-center justify-center gap-6">
+                <div className="flex-1 max-w-[100px] h-px bg-gradient-to-r from-transparent to-border" />
+                <span className="text-[11px] tracking-[0.3em] uppercase text-muted-foreground/60 font-medium whitespace-nowrap">
+                  Handcrafted · Made to Order
+                </span>
+                <div className="flex-1 max-w-[100px] h-px bg-gradient-to-l from-transparent to-border" />
+              </div>
+
             </div>
           </div>
         </div>

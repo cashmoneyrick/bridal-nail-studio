@@ -36,7 +36,7 @@ const Footer = () => {
               YourPrettySets
             </h2>
             <p className="text-background/70 text-base mb-8 leading-relaxed">
-              Handcrafted luxury press-on nails designed to make every moment beautiful.
+              Handcrafted press-on nails, made to order in small batches.
             </p>
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.2em] text-background/50 font-medium">Follow Us</p>
@@ -128,7 +128,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-background/10 mt-16 pt-10 flex flex-col sm:flex-row justify-between items-center gap-6">
           <p className="text-background/40 text-sm">
-            © 2024 YourPrettySets. All rights reserved.
+            © 2026 YourPrettySets. All rights reserved.
           </p>
           <div className="flex items-center gap-8 text-sm text-background/40">
             <a href="/privacy" className="hover:text-primary transition-colors duration-300">

@@ -3,8 +3,8 @@ import { useCustomStudioStore } from '@/stores/customStudioStore';
 import { SHAPE_PRICES, SHAPE_LABELS, ShapeType } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
 
-interface ShapeSelectorProps {
-  onSelect: () => void;
+interface ShapeCardProps {
+  onNext: () => void;
 }
 
 const shapes: ShapeType[] = ['almond', 'square', 'oval', 'coffin', 'stiletto'];
@@ -19,11 +19,11 @@ const ShapeIcon = ({ shape, isSelected }: { shape: ShapeType; isSelected: boolea
   };
 
   return (
-    <svg viewBox="0 0 100 100" className="w-16 h-20">
+    <svg viewBox="0 0 100 100" className="w-14 h-18 md:w-16 md:h-20">
       <path
         d={paths[shape]}
-        fill={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted))'}
-        stroke={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--border))'}
+        fill={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.15)'}
+        stroke={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.35)'}
         strokeWidth="2"
         className="transition-colors duration-200"
       />
@@ -31,39 +31,43 @@ const ShapeIcon = ({ shape, isSelected }: { shape: ShapeType; isSelected: boolea
   );
 };
 
-const ShapeSelector = ({ onSelect }: ShapeSelectorProps) => {
+export function ShapeCard({ onNext }: ShapeCardProps) {
   const { shape: selectedShape, setShape } = useCustomStudioStore();
 
   const handleSelect = (shape: ShapeType) => {
     setShape(shape);
-    onSelect();
+    setTimeout(onNext, 400);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-foreground">Choose Your Shape</h2>
-        <p className="text-sm text-muted-foreground mt-1">Step 1 of 4</p>
+    <div className="space-y-8">
+      <div className="text-center space-y-3">
+        <h2 className="font-display text-3xl md:text-4xl text-foreground">
+          What shape speaks to you?
+        </h2>
+        <p className="text-muted-foreground">
+          The foundation of your perfect set
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         {shapes.slice(0, 4).map((shape) => {
           const isSelected = selectedShape === shape;
           const price = SHAPE_PRICES[shape];
-          
+
           return (
             <button
               key={shape}
               onClick={() => handleSelect(shape)}
               className={cn(
-                'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all min-h-[120px]',
+                'relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-200',
                 isSelected
-                  ? 'border-primary bg-primary/10 scale-[1.02]'
-                  : 'border-border hover:border-primary/50 active:scale-[0.98]'
+                  ? 'border-primary bg-primary/5 scale-[1.02] shadow-sm'
+                  : 'border-border hover:border-primary/40 active:scale-[0.98]'
               )}
             >
               {isSelected && (
-                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                   <Check className="w-3 h-3 text-primary-foreground" />
                 </div>
               )}
@@ -83,19 +87,19 @@ const ShapeSelector = ({ onSelect }: ShapeSelectorProps) => {
           const shape = shapes[4];
           const isSelected = selectedShape === shape;
           const price = SHAPE_PRICES[shape];
-          
+
           return (
             <button
               onClick={() => handleSelect(shape)}
               className={cn(
-                'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all min-h-[120px] w-[calc(50%-6px)]',
+                'relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all duration-200 w-[calc(50%-6px)]',
                 isSelected
-                  ? 'border-primary bg-primary/10 scale-[1.02]'
-                  : 'border-border hover:border-primary/50 active:scale-[0.98]'
+                  ? 'border-primary bg-primary/5 scale-[1.02] shadow-sm'
+                  : 'border-border hover:border-primary/40 active:scale-[0.98]'
               )}
             >
               {isSelected && (
-                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                   <Check className="w-3 h-3 text-primary-foreground" />
                 </div>
               )}
@@ -110,6 +114,6 @@ const ShapeSelector = ({ onSelect }: ShapeSelectorProps) => {
       </div>
     </div>
   );
-};
+}
 
-export default ShapeSelector;
+export default ShapeCard;

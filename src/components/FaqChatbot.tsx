@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MessageCircle, X, Send, Mail, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,7 @@ const QUICK_REPLIES = [
 const STORAGE_KEY = "yourprettysets-chat-history";
 const DEFAULT_MESSAGE: Message = { 
   role: "assistant", 
-  content: "Hi! 👋 I'm here to help with any questions about YourPrettySets. What can I help you with?" 
+  content: "Hi! I'm here to help with any questions about YourPrettySets. What can I help you with?"
 };
 
 const loadMessages = (): Message[] => {
@@ -40,16 +40,44 @@ const loadMessages = (): Message[] => {
   return [DEFAULT_MESSAGE];
 };
 
+const renderMarkdown = (text: string) => {
+  const paragraphs = text.split(/\n\n/);
+  return paragraphs.map((p, i) => {
+    const parts = p.split(/(\*\*.*?\*\*)/g);
+    const rendered = parts.map((part, j) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={j}>{part.slice(2, -2)}</strong>;
+      }
+      return <span key={j}>{part}</span>;
+    });
+    return <p key={i} className={i > 0 ? "mt-2" : ""}>{rendered}</p>;
+  });
+};
+
 const FaqChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(loadMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showQuickReplies, setShowQuickReplies] = useState(() => loadMessages().length <= 1);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
   }, [messages]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
+  // Auto-focus input when chat opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
@@ -95,7 +123,7 @@ const FaqChatbot = () => {
   const handleEscalate = () => {
     setMessages(prev => [...prev, { 
       role: "assistant", 
-      content: "No problem! Our team is happy to help. You can reach us at:\n\n📧 **hello@yourprettysets.com**\n\nWe typically respond within 24 hours. You can also visit our Contact page for more options!" 
+      content: "No problem! Our team is happy to help. You can reach us at:\n\n**hello@yourprettysets.com**\n\nWe typically respond within 24 hours. You can also visit our Contact page for more options!"
     }]);
     setShowQuickReplies(false);
   };
@@ -122,7 +150,7 @@ const FaqChatbot = () => {
           <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
             <div>
               <h3 className="font-display text-lg font-semibold">Chat Support</h3>
-              <p className="text-xs opacity-80">Ask us anything!</p>
+              <p className="text-xs opacity-80">Shipping, sizing, custom orders</p>
             </div>
             <div className="flex items-center gap-1">
               <button 
@@ -156,7 +184,7 @@ const FaqChatbot = () => {
                         : "bg-muted text-foreground rounded-bl-md"
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === "assistant" ? renderMarkdown(msg.content) : msg.content}
                   </div>
                 </div>
               ))}
@@ -187,6 +215,7 @@ const FaqChatbot = () => {
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
 
@@ -205,6 +234,7 @@ const FaqChatbot = () => {
           <form onSubmit={handleSubmit} className="p-4 pt-2 border-t border-border">
             <div className="flex gap-2">
               <Input
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your question..."

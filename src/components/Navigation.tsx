@@ -10,6 +10,13 @@ import { useCartStore } from "@/stores/cartStore";
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoClicked, setIsLogoClicked] = useState(false);
+
+  const handleLogoClick = () => {
+    if (window.innerWidth < 1024) {
+      setIsLogoClicked(prev => !prev);
+    }
+  };
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, initialized } = useAuthStore();
   const totalCartItems = useCartStore(state => state.getTotalItems());
@@ -72,22 +79,22 @@ const Navigation = () => {
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
-            <a href="/" className="flex-shrink-0">
-              <h1 className="font-display text-xl sm:text-2xl font-semibold tracking-tight">
+            <Link to="/" className="flex-shrink-0" onClick={handleLogoClick}>
+              <h1 className={`font-display text-3xl sm:text-4xl font-semibold tracking-tight transition-colors duration-300 lg:hover:text-primary ${isLogoClicked ? 'text-primary' : ''}`}>
                 YourPrettySets
               </h1>
-            </a>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={link.href}
+                  to={link.href}
                   className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -170,14 +177,14 @@ const Navigation = () => {
         >
           <div className="px-4 py-6 space-y-4" onClick={(e) => e.stopPropagation()}>
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="block py-3 text-lg font-medium text-foreground/80 hover:text-foreground hover:pl-2 transition-all duration-200 border-b border-border/50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
             <div className="pt-4">
               <Link to={user && initialized ? "/account" : "/auth"} onClick={() => setIsMobileMenuOpen(false)}>

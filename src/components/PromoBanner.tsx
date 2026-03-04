@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 const messages = [
-  "💝 Order by Feb 5th for guaranteed Valentine's delivery",
-  "✨ Free sizing kit with every order",
-  "🎀 Custom designs start at $45",
+  "New: Spring Collection — garden-inspired sets, handmade to order",
+  "Every order includes a free sizing kit",
+  "Custom designs start at $45",
 ];
 
 const MarqueeSlide = ({
@@ -81,7 +81,7 @@ const PromoBanner = () => {
   }, [emblaApi]);
 
   return (
-    <div className="bg-[#9D4A54] text-[#FDF8F5] shadow-sm overflow-hidden">
+    <div className="bg-gradient-to-r from-primary/85 via-primary to-primary/85 text-primary-foreground shadow-sm overflow-hidden">
       <style>{`
         @keyframes marquee {
           0%, 10% { transform: translateX(0); }
@@ -99,6 +99,16 @@ const PromoBanner = () => {
             />
           ))}
         </div>
+      </div>
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center gap-1.5 pb-1.5">
+        {messages.map((_, i) => (
+          <div key={i} className={`rounded-full transition-all duration-300 ${
+            i === selectedIndex
+              ? "w-4 h-[3px] bg-primary-foreground"
+              : "w-[3px] h-[3px] bg-primary-foreground/35"
+          }`} />
+        ))}
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import CategoryGrid from "@/components/CategoryGrid";
 import ProductGrid from "@/components/ProductGrid";
 import CustomStudioPreview from "@/components/CustomStudioPreview";
 import ThreeStepProcess from "@/components/ThreeStepProcess";
-import EmailSignup from "@/components/EmailSignup";
 import Footer from "@/components/Footer";
 import PromoBanner from "@/components/PromoBanner";
 
@@ -19,7 +18,6 @@ const Index = () => {
         <ProductGrid />
         <CustomStudioPreview />
         <ThreeStepProcess />
-        <EmailSignup />
       </main>
       <Footer />
     </div>

@@ -560,7 +560,7 @@ const ProductDetail = () => {
             {/* Images */}
             <div className="space-y-4">
               {/* Main Image */}
-              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 relative shadow-sm border border-border/30">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-amber-50 relative shadow-sm border border-border/30">
                 {images[selectedImageIndex] ? (
                   <img
                     src={images[selectedImageIndex]}

@@ -4,106 +4,106 @@
 @tailwind components;
 @tailwind utilities;
 
-/* YourPrettySets - Valentine's Romance Design System
-   Palette: Dusty Rose, Rose Gold, Blush Cream, Deep Burgundy
+/* YourPrettySets - Botanical Garden Design System
+   Palette: Soft Sage, Dusty Blue, Warm Cream, Periwinkle
    Typography: Playfair Display (headings) + Inter (body)
 */
 
 @layer base {
   :root {
-    /* Blush Cream Background */
-    --background: 350 30% 97%;
-    --foreground: 350 30% 15%;
+    /* Warm Cream Background */
+    --background: 30 6% 97%;
+    --foreground: 130 10% 18%;
 
-    /* Card - Soft white with warm undertone */
-    --card: 350 20% 99%;
-    --card-foreground: 350 30% 15%;
+    /* Card - Near-white warm */
+    --card: 30 4% 98%;
+    --card-foreground: 130 10% 18%;
 
-    --popover: 350 20% 99%;
-    --popover-foreground: 350 30% 15%;
+    --popover: 30 4% 98%;
+    --popover-foreground: 130 10% 18%;
 
-    /* Primary - Dusty Rose */
-    --primary: 350 45% 55%;
+    /* Primary - Soft Sage Green #859987 */
+    --primary: 125 9% 56%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Rose Gold */
-    --secondary: 25 60% 80%;
-    --secondary-foreground: 350 30% 15%;
+    /* Secondary - Dusty Blue #ADCCE6 */
+    --secondary: 207 53% 79%;
+    --secondary-foreground: 130 10% 18%;
 
-    /* Muted - Light blush tint */
-    --muted: 350 25% 94%;
-    --muted-foreground: 350 15% 40%;
+    /* Muted - Light warm gray */
+    --muted: 30 4% 92%;
+    --muted-foreground: 30 6% 42%;
 
-    /* Accent - Soft pink */
-    --accent: 350 70% 88%;
-    --accent-foreground: 350 30% 15%;
+    /* Accent - Periwinkle #9DAAD1 */
+    --accent: 225 36% 72%;
+    --accent-foreground: 130 10% 18%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 350 20% 88%;
-    --input: 350 20% 88%;
-    --ring: 350 45% 55%;
+    --border: 30 6% 86%;
+    --input: 30 6% 86%;
+    --ring: 125 9% 56%;
 
     --radius: 1rem;
 
     /* Custom brand colors */
-    --rose: 350 45% 55%;
-    --rose-dark: 350 50% 40%;
-    --gold: 25 60% 80%;
-    --gold-dark: 25 50% 60%;
-    --cream: 350 30% 97%;
-    --burgundy: 350 60% 20%;
-    --burgundy-light: 350 40% 35%;
+    --sage: 125 9% 56%;
+    --sage-dark: 125 12% 42%;
+    --dusty-blue: 207 53% 79%;
+    --dusty-blue-dark: 207 40% 60%;
+    --cream: 30 6% 97%;
+    --forest: 130 15% 20%;
+    --forest-light: 130 10% 35%;
 
     /* Sidebar */
-    --sidebar-background: 350 30% 97%;
-    --sidebar-foreground: 350 30% 15%;
-    --sidebar-primary: 350 45% 55%;
+    --sidebar-background: 30 6% 97%;
+    --sidebar-foreground: 130 10% 18%;
+    --sidebar-primary: 125 9% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 350 70% 88%;
-    --sidebar-accent-foreground: 350 30% 15%;
-    --sidebar-border: 350 20% 88%;
-    --sidebar-ring: 350 45% 55%;
+    --sidebar-accent: 225 36% 72%;
+    --sidebar-accent-foreground: 130 10% 18%;
+    --sidebar-border: 30 6% 86%;
+    --sidebar-ring: 125 9% 56%;
   }
 
   .dark {
-    --background: 350 30% 8%;
-    --foreground: 350 20% 95%;
+    --background: 130 10% 8%;
+    --foreground: 30 6% 95%;
 
-    --card: 350 25% 12%;
-    --card-foreground: 350 20% 95%;
+    --card: 130 8% 12%;
+    --card-foreground: 30 6% 95%;
 
-    --popover: 350 25% 12%;
-    --popover-foreground: 350 20% 95%;
+    --popover: 130 8% 12%;
+    --popover-foreground: 30 6% 95%;
 
-    --primary: 350 45% 60%;
-    --primary-foreground: 350 30% 10%;
+    --primary: 125 12% 60%;
+    --primary-foreground: 130 10% 10%;
 
-    --secondary: 25 40% 25%;
-    --secondary-foreground: 350 20% 95%;
+    --secondary: 207 35% 30%;
+    --secondary-foreground: 30 6% 95%;
 
-    --muted: 350 20% 18%;
-    --muted-foreground: 350 15% 65%;
+    --muted: 130 8% 18%;
+    --muted-foreground: 30 6% 65%;
 
-    --accent: 350 40% 25%;
-    --accent-foreground: 350 20% 95%;
+    --accent: 225 25% 30%;
+    --accent-foreground: 30 6% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 350 20% 95%;
+    --destructive-foreground: 30 6% 95%;
 
-    --border: 350 20% 22%;
-    --input: 350 20% 22%;
-    --ring: 350 45% 60%;
+    --border: 130 8% 22%;
+    --input: 130 8% 22%;
+    --ring: 125 12% 60%;
 
-    --sidebar-background: 350 30% 8%;
-    --sidebar-foreground: 350 20% 95%;
-    --sidebar-primary: 350 45% 60%;
-    --sidebar-primary-foreground: 350 30% 10%;
-    --sidebar-accent: 350 40% 25%;
-    --sidebar-accent-foreground: 350 20% 95%;
-    --sidebar-border: 350 20% 22%;
-    --sidebar-ring: 350 45% 60%;
+    --sidebar-background: 130 10% 8%;
+    --sidebar-foreground: 30 6% 95%;
+    --sidebar-primary: 125 12% 60%;
+    --sidebar-primary-foreground: 130 10% 10%;
+    --sidebar-accent: 225 25% 30%;
+    --sidebar-accent-foreground: 30 6% 95%;
+    --sidebar-border: 130 8% 22%;
+    --sidebar-ring: 125 12% 60%;
   }
 }
 
@@ -141,7 +141,7 @@
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-[hsl(var(--rose-dark))] transition-all duration-300 rounded-full px-8 py-3 font-medium;
+    @apply bg-primary text-primary-foreground hover:bg-[hsl(var(--sage-dark))] transition-all duration-300 rounded-full px-8 py-3 font-medium;
   }
 
   .btn-secondary {
@@ -164,6 +164,108 @@
   }
 }
 
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-stagger-1,
+  .animate-stagger-2,
+  .animate-stagger-3,
+  .animate-stagger-4,
+  .animate-float {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .reveal.not-revealed,
+  .reveal-scale.not-revealed,
+  .reveal-children > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Staggered hero animation delays */
+.animate-stagger-1 {
+  animation: fade-in-up 0.8s ease-out 0ms both;
+}
+.animate-stagger-2 {
+  animation: fade-in-up 0.8s ease-out 200ms both;
+}
+.animate-stagger-3 {
+  animation: fade-in-up 0.8s ease-out 400ms both;
+}
+.animate-stagger-4 {
+  animation: fade-in-up 0.8s ease-out 600ms both;
+}
+
+/* Floating badge animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Scroll-reveal animations */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal.not-revealed {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.reveal-scale {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal-scale.not-revealed {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+/* Staggered children reveal */
+.reveal-children > * {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal-children.revealed > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
+.reveal-children.revealed > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0); }
+.reveal-children.revealed > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
+.reveal-children.revealed > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
+.reveal-children.revealed > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
+.reveal-children.revealed > *:nth-child(6) { transition-delay: 500ms; opacity: 1; transform: translateY(0); }
+
 /* Confetti animation for Nail Club signup */
 @keyframes confetti-fall {
   0% {
@@ -180,6 +282,23 @@
   animation: confetti-fall 3s ease-out forwards;
 }
 
+/* Gentle pulse glow for premium tier card */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-glow-pulse {
+    animation: none !important;
+    opacity: 0.7;
+  }
+}
+
 /* Hide scrollbar for horizontal scroll elements */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -187,4 +306,32 @@
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Infinite marquee scroll — Contact page Instagram section */
+@keyframes marquee-scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee-left {
+  animation: marquee-scroll-left 40s linear infinite;
+  width: max-content;
+}
+
+.animate-marquee-right {
+  animation: marquee-scroll-right 45s linear infinite;
+  width: max-content;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation: none !important;
+  }
 }

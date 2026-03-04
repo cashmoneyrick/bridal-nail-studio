@@ -8,8 +8,10 @@ import { Link } from "react-router-dom";
 import QuickViewModal from "@/components/QuickViewModal";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const ProductGrid = () => {
+  const sectionRef = useScrollReveal();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -134,19 +136,29 @@ const ProductGrid = () => {
   }
 
   return (
-    <section className="pt-4 sm:pt-6 pb-16 sm:pb-20 bg-background" id="shop">
+    <section ref={sectionRef} className="py-20 sm:py-28 lg:py-32 bg-secondary/5 reveal" id="shop">
       <div className="container mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <p className="text-sm font-medium tracking-[0.2em] uppercase text-primary mb-3">
-            Shop
-          </p>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium mb-4">
-            Shop Our Bestsellers
-          </h2>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-            Handcrafted press-on nail sets designed for every occasion
-          </p>
+        <div className="mb-12 sm:mb-16">
+          {/* Rule-flanked eyebrow */}
+          <div className="flex items-center gap-5 mb-8">
+            <div className="flex-1 h-px bg-border/40" />
+            <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 shrink-0">
+              Shop
+            </p>
+            <div className="flex-1 h-px bg-border/40" />
+          </div>
+
+          {/* Heading + descriptor — editorial split on desktop */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-12">
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-medium leading-[1.05] shrink-0">
+              <span className="italic font-light text-foreground/60">Shop</span>{" "}
+              Our Bestsellers
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base sm:text-right sm:max-w-[220px] sm:pb-1 leading-relaxed">
+              Our most popular sets, ready to ship
+            </p>
+          </div>
         </div>
 
         {/* Mobile/Tablet Carousel (< 1024px) */}
@@ -257,7 +269,7 @@ const ProductGrid = () => {
                       alt={product.title}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-secondary/20">

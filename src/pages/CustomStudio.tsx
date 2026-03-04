@@ -1,355 +1,246 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
-import StepIndicator from '@/components/custom-studio/StepIndicator';
-import StartingPoint from '@/components/custom-studio/StartingPoint';
-import BaseLook from '@/components/custom-studio/BaseLook';
-import AccentNails from '@/components/custom-studio/AccentNails';
-import { EffectsAddons } from '@/components/custom-studio/EffectsAddons';
-import CustomArtwork from '@/components/custom-studio/CustomArtwork';
-import ReviewSubmit from '@/components/custom-studio/ReviewSubmit';
-import PriceDisplay from '@/components/custom-studio/PriceDisplay';
-import MobileBottomNav from '@/components/custom-studio/MobileBottomNav';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import QuizProgress from '@/components/custom-studio/QuizProgress';
+import ShapeCard from '@/components/custom-studio/ShapeCard';
+import LengthCard from '@/components/custom-studio/LengthCard';
+import FinishCard from '@/components/custom-studio/FinishCard';
+import ColorCard from '@/components/custom-studio/ColorCard';
+import SelectionSummary from '@/components/custom-studio/SelectionSummary';
+import ExtrasSection from '@/components/custom-studio/ExtrasSection';
+import AccentExtras from '@/components/custom-studio/AccentExtras';
+import EffectsExtras from '@/components/custom-studio/EffectsExtras';
+import SparkleExtras from '@/components/custom-studio/SparkleExtras';
+import ArtworkExtras from '@/components/custom-studio/ArtworkExtras';
+import PriceSidebar from '@/components/custom-studio/PriceSidebar';
+import MobileOrderBar from '@/components/custom-studio/MobileOrderBar';
+import ReviewSheet from '@/components/custom-studio/ReviewSheet';
+import { Textarea } from '@/components/ui/textarea';
+import { Hand, Sparkles, Gem, Palette, ChevronLeft } from 'lucide-react';
 
 const CustomStudio = () => {
   const {
-    currentStep,
-    nextStep,
-    prevStep,
-    canProceed,
-    setStep,
+    quizStep,
+    setQuizStep,
+    nextQuizStep,
+    prevQuizStep,
+    goToHub,
     getPriceBreakdown,
-    resetStudio,
-    getStep1ValidationErrors,
+    accentNails,
+    effects,
+    rhinestoneTier,
+    charmTier,
+    predefinedArtwork,
+    customArtwork,
+    notes,
+    setNotes,
     shape,
     length,
     baseFinish,
-    colorPalette
+    colorPalette,
   } = useCustomStudioStore();
 
-  // Fix 6: Add reset confirmation dialog state
-  const [showResetDialog, setShowResetDialog] = useState(false);
-
-  // Mobile BaseLook micro-step state (0 = Shape, 1 = Length, 2 = Finish, 3 = Color)
-  const [baseLookMicroStep, setBaseLookMicroStep] = useState(0);
-
-  // Mobile AccentNails micro-step state (0 = Yes/No, 1 = Select nails, 2 = Configure)
-  const [accentMicroStep, setAccentMicroStep] = useState(0);
-
-  // Mobile Step 3 micro-step state (0 = Effects, 1 = Rhinestones, 2 = Charms)
-  const [step3MicroStep, setStep3MicroStep] = useState(0);
-
-  // Track if user has made any selections
-  const hasProgress = currentStep > 0 || shape !== 'almond' || length !== 'short' ||
-    baseFinish !== 'glossy' || colorPalette !== null;
-
-  // Fix 3: Browser tab/window close warning
-  useEffect(() => {
-    if (!hasProgress) return;
-
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = '';
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasProgress]);
-
-  // Compute completed steps based on store state
-  const completedSteps = useMemo(() => {
-    const completed = new Set<number>();
-    
-    // Step 0 (Starting Point) is complete once we've moved past it
-    if (currentStep > 0) completed.add(0);
-    
-    // Step 1 (Base Look) is complete when required selections are made
-    if (shape && length && baseFinish && colorPalette) {
-      completed.add(1);
-    }
-    
-    // Step 2 (Accent Nails) is always completable (optional step)
-    if (currentStep > 2) completed.add(2);
-    
-    // Step 3 (Effects & Add-ons) is always completable (optional step)
-    if (currentStep > 3) completed.add(3);
-    
-    // Step 4 (Custom Artwork) is always completable (optional step)
-    if (currentStep > 4) completed.add(4);
-    
-    return completed;
-  }, [currentStep, shape, length, baseFinish, colorPalette]);
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   const priceBreakdown = getPriceBreakdown();
+  const hasCustomArtwork = customArtwork !== null;
+  const isHub = quizStep >= 4;
 
-  const handleStepClick = (step: number) => {
-    // Only allow clicking back to completed steps or current step
-    if (step <= currentStep || completedSteps.has(step)) {
-      setStep(step);
-      // Reset micro-steps when navigating away
-      if (step !== 1) setBaseLookMicroStep(0);
-      if (step !== 2) setAccentMicroStep(0);
-      if (step !== 3) setStep3MicroStep(0);
+  // Build extras badges
+  const accentBadge = accentNails.size > 0 ? `${accentNails.size} nail${accentNails.size !== 1 ? 's' : ''}` : undefined;
+  const effectsBadge = effects.length > 0 ? `${effects.length} effect${effects.length !== 1 ? 's' : ''}` : undefined;
+  const sparkleBadge = (rhinestoneTier !== 'none' || charmTier !== 'none')
+    ? [rhinestoneTier !== 'none' && 'Rhinestones', charmTier !== 'none' && 'Charms'].filter(Boolean).join(' + ')
+    : undefined;
+  const artBadge = (predefinedArtwork.length > 0 || customArtwork)
+    ? [predefinedArtwork.length > 0 && `${predefinedArtwork.length} design${predefinedArtwork.length !== 1 ? 's' : ''}`, customArtwork && 'Custom'].filter(Boolean).join(' + ')
+    : undefined;
+
+  // Handlers for quiz navigation
+  const handleQuizNext = () => {
+    if (quizStep < 3) {
+      nextQuizStep();
+    } else {
+      goToHub();
     }
   };
 
-  // Fix 6: Show confirmation dialog instead of immediate reset
-  const handleReset = () => {
-    setShowResetDialog(true);
+  const handleQuizBack = () => {
+    prevQuizStep();
   };
 
-  const confirmReset = () => {
-    resetStudio();
-    setBaseLookMicroStep(0);
-    setAccentMicroStep(0);
-    setStep3MicroStep(0);
-    setShowResetDialog(false);
-  };
-  
-  // Handle skip-to-next when user selects "No accents"
-  const handleAccentSkip = () => {
-    nextStep();
-    setAccentMicroStep(0);
+  const handleEditBasics = () => {
+    setQuizStep(0);
   };
 
-  // Handle mobile back button (aware of micro-steps)
-  const handleMobileBack = () => {
-    // Handle Step 3 micro-steps
-    if (currentStep === 3 && step3MicroStep > 0) {
-      setStep3MicroStep(step3MicroStep - 1);
-      return;
-    }
+  // Stub handlers for ordering (passed to PriceSidebar and ReviewSheet)
+  const handleAddToCart = () => setReviewOpen(true);
+  const handleRequestQuote = () => setReviewOpen(true);
 
-    // Handle AccentNails micro-steps (step 2)
-    if (currentStep === 2 && accentMicroStep > 0) {
-      setAccentMicroStep(accentMicroStep - 1);
-      return;
-    }
-
-    // Handle BaseLook micro-steps (step 1)
-    if (currentStep === 1 && baseLookMicroStep > 0) {
-      setBaseLookMicroStep(baseLookMicroStep - 1);
-      return;
-    }
-
-    // Otherwise go to previous main step
-    prevStep();
-    // Reset micro-steps when leaving a step
-    if (currentStep === 1) setBaseLookMicroStep(0);
-    if (currentStep === 2) setAccentMicroStep(0);
-    if (currentStep === 3) setStep3MicroStep(0);
+  const quizCards: Record<number, React.ReactNode> = {
+    0: <ShapeCard onNext={handleQuizNext} />,
+    1: <LengthCard onNext={handleQuizNext} />,
+    2: <FinishCard onNext={handleQuizNext} />,
+    3: <ColorCard onNext={handleQuizNext} />,
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return <StartingPoint />;
-      case 1:
-        return (
-          <BaseLook 
-            microStep={baseLookMicroStep} 
-            setMicroStep={setBaseLookMicroStep} 
-          />
-        );
-      case 2:
-        return (
-          <AccentNails
-            microStep={accentMicroStep}
-            setMicroStep={setAccentMicroStep}
-            onSkipToNext={handleAccentSkip}
-          />
-        );
-      case 3:
-        return (
-          <EffectsAddons
-            microStep={step3MicroStep}
-            setMicroStep={setStep3MicroStep}
-          />
-        );
-      case 4:
-        return <CustomArtwork />;
-      case 5:
-        return <ReviewSubmit />;
-      default:
-        return null;
-    }
-  };
+  const renderQuizCard = () => {
+    const card = quizCards[quizStep];
+    if (!card) return null;
 
-  const isFirstStep = currentStep === 0;
-  const isLastStep = currentStep === 5;
-  
-  // Show back button on mobile if not first step OR if in any step with micro-step > 0
-  const showMobileBack = currentStep > 0 || baseLookMicroStep > 0 || accentMicroStep > 0 || step3MicroStep > 0;
+    return (
+      <div key={quizStep} className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] px-4 py-8">
+        <div className="w-full max-w-xl mx-auto">
+          {quizStep > 0 && (
+            <button
+              onClick={handleQuizBack}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 group"
+            >
+              <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              Back
+            </button>
+          )}
+          {card}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden w-full max-w-full">
       <Navigation />
-      
+
       <main className="flex-1 pt-20">
-        {/* Header */}
-        <div className="bg-gradient-to-b from-primary/5 to-transparent py-8 md:py-12 w-full max-w-full overflow-hidden">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-2xl mx-auto">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Design Your Dream Set
-              </h1>
-              <p className="text-muted-foreground">
-                Create your perfect custom press-on nails in just a few steps
-              </p>
+        {!isHub ? (
+          /* ===== QUIZ PHASE ===== */
+          <div className="relative">
+            {/* Progress bar */}
+            <div className="pt-6 pb-2">
+              <QuizProgress currentStep={quizStep} />
             </div>
+
+            {/* Quiz cards */}
+            {renderQuizCard()}
           </div>
-        </div>
-
-        {/* Step Indicator */}
-        <div className="container mx-auto px-4 py-6">
-          <StepIndicator 
-            currentStep={currentStep}
-            onStepClick={handleStepClick}
-            completedSteps={completedSteps}
-          />
-        </div>
-
-        {/* Main Content Area */}
-        <div className="container mx-auto px-4 pb-24 lg:pb-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Step Content */}
-            <div className="lg:col-span-2">
-              <div className="bg-card border border-border rounded-xl p-6 md:p-8">
-                {/* Mobile back button */}
-                {showMobileBack && (
-                  <button
-                    onClick={handleMobileBack}
-                    className="lg:hidden flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 -mt-2"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Back
-                  </button>
-                )}
-                {renderStepContent()}
+        ) : (
+          /* ===== HUB PHASE ===== */
+          <div>
+            {/* Header */}
+            <div className="bg-gradient-to-b from-primary/5 to-transparent py-8 md:py-10">
+              <div className="container mx-auto px-4">
+                <div className="text-center max-w-2xl mx-auto">
+                  <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">
+                    Make It Yours
+                  </h1>
+                  <p className="text-muted-foreground">
+                    Your base set is ready — now add the extras that make it uniquely you
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Sidebar - Price & Navigation */}
-            <div className="lg:col-span-1">
-              <div className="lg:sticky lg:top-24 space-y-4">
-                {/* Price Display */}
-                {currentStep > 0 && (
-                  <PriceDisplay 
-                    breakdown={priceBreakdown}
-                    collapsible={true}
-                  />
-                )}
+            {/* Hub content */}
+            <div className="container mx-auto px-4 pb-32 lg:pb-12">
+              <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+                {/* Main content */}
+                <div className="lg:col-span-2 space-y-4">
+                  {/* Selection summary */}
+                  <SelectionSummary onEditBasics={handleEditBasics} />
 
-                {/* Navigation Buttons */}
-                <div className="hidden lg:block bg-card border border-border rounded-lg p-4 space-y-3">
-                  <div className="flex gap-3">
-                    {!isFirstStep && (
-                      <Button
-                        variant="outline"
-                        onClick={prevStep}
-                        className="flex-1"
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-1" />
-                        Back
-                      </Button>
-                    )}
-                    
-                    {!isLastStep && (
-                      <Button
-                        onClick={nextStep}
-                        disabled={!canProceed()}
-                        className="flex-1"
-                      >
-                        Continue
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    )}
+                  {/* Extras heading */}
+                  <div className="pt-2">
+                    <h2 className="text-lg font-semibold text-foreground mb-1">Customize further</h2>
+                    <p className="text-sm text-muted-foreground">All optional — skip what you don't need</p>
                   </div>
 
-                  {/* Reset Button */}
-                  {currentStep > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleReset}
-                      className="w-full text-muted-foreground hover:text-foreground"
-                    >
-                      <RotateCcw className="w-3 h-3 mr-2" />
-                      Start Over
-                    </Button>
-                  )}
+                  {/* Accordion extras */}
+                  <ExtrasSection
+                    id="accents"
+                    title="Accent Nails"
+                    subtitle="Make specific nails stand out"
+                    icon={<Hand className="w-5 h-5" />}
+                    badge={accentBadge}
+                  >
+                    <AccentExtras />
+                  </ExtrasSection>
+
+                  <ExtrasSection
+                    id="effects"
+                    title="Special Effects"
+                    subtitle="Chrome, glitter, French tips"
+                    icon={<Sparkles className="w-5 h-5" />}
+                    badge={effectsBadge}
+                  >
+                    <EffectsExtras />
+                  </ExtrasSection>
+
+                  <ExtrasSection
+                    id="sparkle"
+                    title="Rhinestones & Charms"
+                    subtitle="Add 3D sparkle and dimension"
+                    icon={<Gem className="w-5 h-5" />}
+                    badge={sparkleBadge}
+                  >
+                    <SparkleExtras />
+                  </ExtrasSection>
+
+                  <ExtrasSection
+                    id="artwork"
+                    title="Nail Art"
+                    subtitle="Hand-painted designs & custom artwork"
+                    icon={<Palette className="w-5 h-5" />}
+                    badge={artBadge}
+                  >
+                    <ArtworkExtras />
+                  </ExtrasSection>
+
+                  {/* Notes */}
+                  <div className="pt-2 space-y-2">
+                    <label className="text-sm font-medium text-foreground">
+                      Additional notes (optional)
+                    </label>
+                    <Textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Any special requests or details for our nail artist..."
+                      className="min-h-[80px] resize-none rounded-xl text-sm"
+                    />
+                  </div>
                 </div>
 
-                {/* Help Text - Fix 2: Show specific missing fields */}
-                {!canProceed() && currentStep === 1 && (() => {
-                  const errors = getStep1ValidationErrors();
-                  if (errors.length === 0) return null;
-                  return (
-                    <p className="text-xs text-muted-foreground text-center px-2">
-                      Select your {errors.join(', ')} to continue
-                    </p>
-                  );
-                })()}
+                {/* Desktop sidebar */}
+                <div className="hidden lg:block lg:col-span-1">
+                  <div className="lg:sticky lg:top-24">
+                    <PriceSidebar
+                      breakdown={priceBreakdown}
+                      onAddToCart={handleAddToCart}
+                      onRequestQuote={handleRequestQuote}
+                      isSubmitting={false}
+                      hasCustomArtwork={hasCustomArtwork}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Mobile bottom bar */}
+            <MobileOrderBar
+              breakdown={priceBreakdown}
+              onReview={() => setReviewOpen(true)}
+            />
+
+            {/* Review sheet (mobile) */}
+            <ReviewSheet
+              isOpen={reviewOpen}
+              onClose={() => setReviewOpen(false)}
+              breakdown={priceBreakdown}
+            />
           </div>
-        </div>
+        )}
       </main>
 
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav
-        priceBreakdown={priceBreakdown}
-        onContinue={() => {
-          // Handle Step 3 micro-steps (Effects → Rhinestones → Charms)
-          if (currentStep === 3 && step3MicroStep < 2) {
-            setStep3MicroStep(step3MicroStep + 1);
-            return;
-          }
-          // Reset Step 3 micro-step when advancing past Step 3
-          if (currentStep === 3 && step3MicroStep === 2) {
-            setStep3MicroStep(0);
-          }
-          nextStep();
-        }}
-        canProceed={canProceed()}
-        isLastStep={isLastStep}
-        currentStep={currentStep}
-      />
-
-      <Footer />
-
-      {/* Fix 6: Reset Confirmation Dialog */}
-      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Start over?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will clear all your customization choices and reset the design studio.
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmReset}>
-              Yes, start over
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
+      {isHub && <Footer />}
     </div>
   );
 };

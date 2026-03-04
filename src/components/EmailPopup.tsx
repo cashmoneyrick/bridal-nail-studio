@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import ConfettiEffect from "./ConfettiEffect";
@@ -82,7 +83,7 @@ const EmailPopup = () => {
     });
 
     toast({
-      title: "Welcome to the family!",
+      title: "You're in!",
       description: "Check your email for your 17% discount code.",
     });
   };
@@ -90,6 +91,7 @@ const EmailPopup = () => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border-0 bg-transparent shadow-2xl gap-0">
+        <DialogTitle className="sr-only">Get 17% Off Your First Order</DialogTitle>
         <div className="relative overflow-hidden rounded-2xl">
           {/* Confetti */}
           {showConfetti && <ConfettiEffect count={40} />}
@@ -104,38 +106,50 @@ const EmailPopup = () => {
 
           {!isSubmitted ? (
             <>
-              {/* Mobile layout - Centered Elegance */}
-              <div className="sm:hidden bg-background p-8 text-center space-y-6">
-                <div className="space-y-4">
-                  <h2 className="font-display text-2xl font-bold text-foreground">
-                    17% OFF YOUR FIRST ORDER
-                  </h2>
-                  <div className="w-16 h-0.5 bg-primary mx-auto" />
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Join 10,000+ nail lovers and get your exclusive discount
+              {/* Mobile layout — Two-zone editorial */}
+              <div className="sm:hidden overflow-hidden">
+                {/* Top zone — primary/sage bg */}
+                <div className="bg-primary px-8 pt-12 pb-8 relative overflow-hidden">
+                  <span className="absolute -top-4 -right-2 font-display text-[130px] font-bold italic text-primary-foreground/[0.07] leading-none select-none pointer-events-none">
+                    17
+                  </span>
+                  <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-primary-foreground/60 mb-3">
+                    Exclusive Offer
+                  </p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-display text-7xl font-bold italic text-primary-foreground leading-none">17</span>
+                    <span className="font-display text-3xl font-medium text-primary-foreground/80 leading-none">%</span>
+                  </div>
+                  <p className="font-display text-lg italic font-light text-primary-foreground/80 mt-1 leading-snug">
+                    off your first order
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-12 rounded-xl bg-muted/50 border-border focus:border-primary text-center"
-                  />
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-12 rounded-xl font-medium bg-primary hover:bg-primary/90"
-                  >
-                    {isLoading ? "Joining..." : "Unlock Discount"}
-                  </Button>
-                </form>
-
-                <p className="text-xs text-muted-foreground">
-                  No spam, unsubscribe anytime
-                </p>
+                {/* Bottom zone — cream bg, left-aligned */}
+                <div className="bg-background px-8 py-7">
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                    Join our list and receive your welcome discount — handcrafted just like our nails.
+                  </p>
+                  <form onSubmit={handleSubmit} className="space-y-3">
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-11 rounded-lg bg-muted/40 border-border/60 focus:border-primary text-sm"
+                    />
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-11 rounded-lg font-medium bg-foreground text-background hover:bg-foreground/90 text-sm"
+                    >
+                      {isLoading ? "Joining..." : "Claim My 17% Off"}
+                    </Button>
+                  </form>
+                  <p className="text-[11px] text-muted-foreground/50 mt-4 text-center">
+                    No spam · Unsubscribe anytime
+                  </p>
+                </div>
               </div>
 
               {/* Desktop layout - Keep as-is */}
@@ -157,10 +171,10 @@ const EmailPopup = () => {
                   <div className="space-y-4">
                     <div>
                       <h2 className="font-display text-xl font-semibold text-foreground leading-tight">
-                        Unlock Your Exclusive Discount
+                        Get 17% Off Your First Order
                       </h2>
                       <p className="text-muted-foreground text-sm mt-2">
-                        Join 10,000+ nail lovers and get your first order discount.
+                        Sign up and get your first-order discount.
                       </p>
                     </div>
 
@@ -177,7 +191,7 @@ const EmailPopup = () => {
                         disabled={isLoading}
                         className="w-full h-11 rounded-lg font-medium"
                       >
-                        {isLoading ? "Joining..." : "Unlock Discount"}
+                        {isLoading ? "Joining..." : "Get My Code"}
                       </Button>
                     </form>
 
@@ -191,23 +205,25 @@ const EmailPopup = () => {
           ) : (
             /* Success State */
             <>
-              {/* Mobile success - Centered Elegance */}
-              <div className="sm:hidden bg-background p-8 text-center relative z-10 space-y-6">
-                <div className="space-y-4">
-                  <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Check className="h-7 w-7 text-primary" />
-                  </div>
-                  <h3 className="font-display text-2xl font-bold text-foreground">
+              {/* Mobile success — Two-zone editorial */}
+              <div className="sm:hidden overflow-hidden relative z-10">
+                {/* Top zone */}
+                <div className="bg-primary px-8 pt-10 pb-8 relative overflow-hidden">
+                  <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-primary-foreground/60 mb-3">
+                    Thank You
+                  </p>
+                  <h3 className="font-display text-4xl font-bold italic text-primary-foreground leading-none mb-1">
                     You're In!
                   </h3>
-                  <div className="w-16 h-0.5 bg-primary mx-auto" />
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Your exclusive discount is ready to use
+                  <p className="font-display text-base italic font-light text-primary-foreground/80 leading-snug">
+                    your gift is ready to use
                   </p>
                 </div>
 
-                <div className="bg-muted/50 rounded-xl p-4 border border-border/50">
-                  <div className="flex items-center justify-center gap-2">
+                {/* Bottom zone */}
+                <div className="bg-background px-8 py-7">
+                  <p className="text-xs text-muted-foreground mb-3">Your exclusive code:</p>
+                  <div className="bg-muted/50 rounded-xl p-4 border border-border/50 flex items-center justify-between mb-5">
                     <span className="font-mono text-2xl font-bold text-primary tracking-widest">
                       WELCOME17
                     </span>
@@ -222,15 +238,16 @@ const EmailPopup = () => {
                       )}
                     </button>
                   </div>
+                  <Button
+                    onClick={handleClose}
+                    className="w-full h-11 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-sm"
+                  >
+                    Start Shopping
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground/50 mt-4 text-center">
+                    Code saved to your account
+                  </p>
                 </div>
-
-                <Button onClick={handleClose} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90">
-                  Start Shopping
-                </Button>
-
-                <p className="text-xs text-muted-foreground">
-                  Code saved to your account
-                </p>
               </div>
 
               {/* Desktop success - Keep as-is */}

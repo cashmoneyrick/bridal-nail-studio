@@ -16,7 +16,7 @@ export const COLLECTIONS = [
   'the-basics',
   'all-the-extras',
   'pop-of-color',
-  'valentines',
+  'spring',
 ] as const;
 
 export type CollectionSlug = typeof COLLECTIONS[number];

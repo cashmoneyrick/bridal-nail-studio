@@ -98,7 +98,7 @@ const HeroSection = () => {
               </span>
             </Button>
             <Link
-              to="/custom-studio"
+              to="/create"
               className="group text-sm font-medium text-foreground/50 hover:text-foreground/80 transition-colors duration-300"
             >
               <span className="relative">

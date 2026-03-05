@@ -80,7 +80,7 @@ const CustomStudioPreview = () => {
               Share your vision, pick your style, and we'll create something beautiful just for you.
             </p>
 
-            <Link to="/custom-studio">
+            <Link to="/create">
               <Button className="rounded-full px-8 font-medium">
                 Start Designing
               </Button>

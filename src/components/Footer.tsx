@@ -11,7 +11,7 @@ const emailSchema = z.string().email("Please enter a valid email").max(255);
 const footerLinks = {
   explore: [
     { name: "Shop All", to: "/shop" },
-    { name: "Custom Studio", to: "/custom-studio" },
+    { name: "Custom Studio", to: "/create" },
     { name: "Nail Club", to: "/club" },
     { name: "Favorites", to: "/favorites" },
   ],
@@ -256,7 +256,7 @@ const Footer = () => {
                   </a>
                 </li>
                 <li>
-                  <Link to="/custom-studio" className={linkClasses}>
+                  <Link to="/create" className={linkClasses}>
                     Start a Custom Order
                   </Link>
                 </li>

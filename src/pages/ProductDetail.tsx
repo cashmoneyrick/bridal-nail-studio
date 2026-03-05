@@ -1007,7 +1007,7 @@ const ProductDetail = () => {
 
                 <button
                   className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors py-2"
-                  onClick={() => navigate(`/custom-studio?base=${product.handle}`)}
+                  onClick={() => navigate(`/create?base=${product.handle}`)}
                 >
                   <Sparkles className="h-4 w-4" />
                   Customize This Design

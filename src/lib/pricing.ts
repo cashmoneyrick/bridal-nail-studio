@@ -1,9 +1,10 @@
 // Custom Studio Pricing Configuration
 // All prices in USD
 
-export type ShapeType = 'almond' | 'square' | 'oval' | 'coffin' | 'stiletto';
-export type LengthType = 'short' | 'medium' | 'long' | 'extra-long';
-export type FinishType = 'glossy' | 'matte';
+export type ShapeType = 'almond' | 'square' | 'oval' | 'coffin' | 'stiletto' | 'squoval' | 'round' | 'lipstick';
+export type LengthType = 'extra-short' | 'short' | 'medium' | 'long' | 'extra-long';
+export type FinishType = 'glossy' | 'matte' | 'velvet-matte' | 'chrome-finish' | 'holographic' | 'cat-eye' | 'sugar' | 'glass-aurora' | 'glitter-topcoat';
+export type BaseType = 'solid' | 'french-tip-base' | 'ombre' | 'chrome-base' | 'jelly' | 'clear';
 export type EffectType = 'chrome' | 'glitter' | 'french-tip';
 export type RhinestoneTier = 'none' | 'just-a-touch' | 'a-little-sparkle' | 'full-glam';
 export type CharmTier = 'none' | 'single-statement' | 'a-few-accents' | 'charmed-out';
@@ -13,11 +14,15 @@ export const SHAPE_PRICES: Record<ShapeType, number> = {
   almond: 0,
   square: 0,
   oval: 0,
+  squoval: 0,
+  round: 0,
   coffin: 5,
   stiletto: 8,
+  lipstick: 5,
 };
 
 export const LENGTH_PRICES: Record<LengthType, number> = {
+  'extra-short': 0,
   short: 0,
   medium: 5,
   long: 10,
@@ -27,6 +32,13 @@ export const LENGTH_PRICES: Record<LengthType, number> = {
 export const FINISH_PRICES: Record<FinishType, number> = {
   glossy: 0,
   matte: 5,
+  'velvet-matte': 8,
+  'chrome-finish': 15,
+  holographic: 12,
+  'cat-eye': 12,
+  sugar: 8,
+  'glass-aurora': 12,
+  'glitter-topcoat': 10,
 };
 
 export const EFFECTS_PRICES: Record<EffectType, { allNails: number; perNail: number }> = {
@@ -67,11 +79,15 @@ export const SHAPE_LABELS: Record<ShapeType, string> = {
   almond: 'Almond',
   square: 'Square',
   oval: 'Oval',
+  squoval: 'Squoval',
+  round: 'Round',
   coffin: 'Coffin',
   stiletto: 'Stiletto',
+  lipstick: 'Lipstick',
 };
 
 export const LENGTH_LABELS: Record<LengthType, string> = {
+  'extra-short': 'Extra Short',
   short: 'Short',
   medium: 'Medium',
   long: 'Long',
@@ -81,6 +97,22 @@ export const LENGTH_LABELS: Record<LengthType, string> = {
 export const FINISH_LABELS: Record<FinishType, string> = {
   glossy: 'Glossy',
   matte: 'Matte',
+  'velvet-matte': 'Velvet Matte',
+  'chrome-finish': 'Chrome Mirror',
+  holographic: 'Holographic',
+  'cat-eye': 'Cat Eye',
+  sugar: 'Sugar Textured',
+  'glass-aurora': 'Glass Aurora',
+  'glitter-topcoat': 'Glitter Topcoat',
+};
+
+export const BASE_TYPE_LABELS: Record<BaseType, string> = {
+  solid: 'Solid',
+  'french-tip-base': 'French Tip',
+  ombre: 'Ombré',
+  'chrome-base': 'Chrome',
+  jelly: 'Jelly',
+  clear: 'Clear',
 };
 
 export const EFFECT_LABELS: Record<EffectType, string> = {
@@ -184,3 +216,22 @@ export const COLOR_PALETTES: PresetColorPalette[] = [
     colors: ['#A8D8EA', '#AA96DA', '#FCBAD3'],
   },
 ];
+
+// Individual color swatches for the color picker
+export const PRESET_COLORS = [
+  { name: 'Soft Pink', hex: '#F8C8D4' },
+  { name: 'Dusty Rose', hex: '#C9A0A0' },
+  { name: 'Blush', hex: '#F8E8E0' },
+  { name: 'Nude', hex: '#E8D4C4' },
+  { name: 'Cream', hex: '#FDF5E6' },
+  { name: 'White', hex: '#FFFFFF' },
+  { name: 'Black', hex: '#1A1A1A' },
+  { name: 'Red', hex: '#C41E3A' },
+  { name: 'Burgundy', hex: '#722F37' },
+  { name: 'Coral', hex: '#FF6B6B' },
+  { name: 'Lavender', hex: '#B4A7D6' },
+  { name: 'Sage', hex: '#9CAF88' },
+  { name: 'Navy', hex: '#1A1A2E' },
+  { name: 'Gold', hex: '#D4A574' },
+  { name: 'Silver', hex: '#C0C0C0' },
+] as const;

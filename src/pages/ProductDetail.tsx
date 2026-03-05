@@ -1159,20 +1159,22 @@ const ProductDetail = () => {
       />
 
       {/* Sticky Mobile CTA Bar */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-background/95 backdrop-blur-md border-t border-border/30 p-4 z-40">
-        <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="font-display text-lg font-medium truncate">{product.title}</p>
-            <p className="text-sm text-primary font-display">${(price * quantity).toFixed(2)}</p>
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-50 px-4 pb-[env(safe-area-inset-bottom,8px)] pt-0 pointer-events-none">
+        <div className="pointer-events-auto bg-foreground/95 backdrop-blur-md rounded-2xl mb-2 px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.12)]">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="font-display text-sm font-medium text-background/90 truncate">{product.title}</p>
+              <p className="text-base font-semibold text-background font-display">${(price * quantity).toFixed(2)}</p>
+            </div>
+            <Button
+              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-5 h-11 text-sm font-medium tracking-wide flex-shrink-0 shadow-sm"
+              onClick={handleAddToCart}
+              disabled={!currentVariant?.availableForSale}
+            >
+              <ShoppingBag className="h-4 w-4 mr-1.5" />
+              {currentVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'}
+            </Button>
           </div>
-          <Button
-            className="btn-primary px-6 py-5 text-sm tracking-wide flex-shrink-0"
-            onClick={handleAddToCart}
-            disabled={!currentVariant?.availableForSale}
-          >
-            <ShoppingBag className="h-4 w-4 mr-1.5" />
-            Add to Bag
-          </Button>
         </div>
       </div>
 

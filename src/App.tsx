@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import Create from "./pages/Create";
@@ -34,6 +34,12 @@ import { useAuthStore } from "./stores/authStore";
 
 const queryClient = new QueryClient();
 
+function FaqChatbotConditional() {
+  const { pathname } = useLocation();
+  if (pathname === '/create') return null;
+  return <FaqChatbot />;
+}
+
 // Auth initializer component
 const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
   const { initialize, initialized } = useAuthStore();
@@ -63,8 +69,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <EmailPopup />
-          <FaqChatbot />
           <BrowserRouter>
+            <FaqChatbotConditional />
             <ScrollToTop />
             <Routes>
               {/* Standalone route — no nav/footer */}

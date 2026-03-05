@@ -74,6 +74,12 @@ const PerfectFitProfile = () => {
       return;
     }
 
+    const filled = Object.values(sizes).filter(size => size !== '').length;
+    if (filled < 10) {
+      toast.error(`Please fill in all 10 nail sizes (${filled}/10 entered)`, { position: "top-center" });
+      return;
+    }
+
     setIsSaving(true);
     try {
       if (isCreating) {
@@ -396,7 +402,7 @@ const PerfectFitProfile = () => {
                 </div>
                 <Button 
                   onClick={handleSave}
-                  disabled={!profileName.trim() || isSaving}
+                  disabled={!profileName.trim() || filledCount < 10 || isSaving}
                   className="btn-primary min-w-[160px]"
                 >
                   {isSaving ? (

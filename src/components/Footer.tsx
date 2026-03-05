@@ -30,8 +30,7 @@ const Footer = () => {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const newsletterRef = useScrollReveal<HTMLDivElement>({ threshold: 0.05 });
-  const linksRef = useScrollReveal<HTMLDivElement>({ threshold: 0.05 });
+  const footerRef = useScrollReveal<HTMLDivElement>({ threshold: 0.05 });
 
   const alreadySubscribed = typeof window !== "undefined" && localStorage.getItem("emailSignupCompleted") === "true";
 
@@ -77,134 +76,126 @@ const Footer = () => {
       <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-primary/[0.06] blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] rounded-full bg-secondary/[0.04] blur-[100px] pointer-events-none" />
 
-      {/* ─── Section A: Newsletter / Brand Statement ─── */}
-      <div ref={newsletterRef} className="reveal border-b border-background/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Brand statement */}
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-background/40 font-medium mb-4">
-                Stay Connected
-              </p>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-light italic leading-[1.1] tracking-tight text-background/90">
-                Be the first to know
-              </h2>
-              <p className="text-background/50 text-base sm:text-lg mt-5 leading-relaxed max-w-md">
-                New drops, style inspiration, and exclusive offers — delivered to your inbox.
-              </p>
-            </div>
+      <div ref={footerRef} className="reveal">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14">
 
-            {/* Newsletter form */}
-            <div className="lg:flex lg:justify-end">
-              {alreadySubscribed || status === "success" ? (
-                <div className="flex items-center gap-3 text-background/70">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Check className="w-5 h-5 text-primary" />
+          {/* ─── Newsletter banner ─── */}
+          <div className="rounded-2xl bg-primary/[0.12] border border-primary/20 px-6 sm:px-10 py-8 sm:py-10 mb-10 sm:mb-14">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-12">
+              <div className="lg:max-w-md">
+                <h2 className="font-display text-2xl sm:text-3xl font-light italic leading-tight tracking-tight text-background/90">
+                  Be the first to know
+                </h2>
+                <p className="text-background/45 text-sm mt-2 leading-relaxed">
+                  New drops, style inspiration, and exclusive offers — delivered to your inbox.
+                </p>
+              </div>
+
+              <div className="flex-1 lg:max-w-sm">
+                {alreadySubscribed || status === "success" ? (
+                  <div className="flex items-center gap-3 text-background/70">
+                    <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-sm">You're on the list. Welcome to the family.</span>
                   </div>
-                  <span className="text-sm">You're on the list. Welcome to the family.</span>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="w-full max-w-md space-y-3">
-                  {/* Honeypot */}
-                  <input
-                    type="text"
-                    name="website"
-                    value={honeypot}
-                    onChange={(e) => setHoneypot(e.target.value)}
-                    className="absolute -left-[9999px] opacity-0 pointer-events-none"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    aria-hidden="true"
-                  />
-                  <div className="flex flex-col sm:flex-row gap-3">
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-2">
+                    {/* Honeypot */}
                     <input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (status === "error") setStatus("idle");
-                      }}
-                      required
-                      maxLength={255}
-                      className="flex-1 h-12 px-5 rounded-full bg-background/[0.06] border border-background/15 text-background placeholder:text-background/30 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-300"
+                      type="text"
+                      name="website"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      className="absolute -left-[9999px] opacity-0 pointer-events-none"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
                     />
-                    <button
-                      type="submit"
-                      disabled={status === "loading"}
-                      className="h-12 px-8 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                      {status === "loading" ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        "Subscribe"
-                      )}
-                    </button>
-                  </div>
-                  {status === "error" && (
-                    <p className="text-sm text-red-400 pl-1">{errorMsg}</p>
-                  )}
-                  <p className="text-xs text-background/30 pl-1">
-                    No spam, ever. Unsubscribe anytime.
-                  </p>
-                </form>
-              )}
+                    <div className="flex flex-col sm:flex-row gap-2.5">
+                      <input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (status === "error") setStatus("idle");
+                        }}
+                        required
+                        maxLength={255}
+                        className="sm:flex-1 h-14 sm:h-11 px-4 rounded-full bg-background/[0.08] border border-background/15 text-background placeholder:text-background/30 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-300"
+                      />
+                      <button
+                        type="submit"
+                        disabled={status === "loading"}
+                        className="h-14 sm:h-11 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
+                      >
+                        {status === "loading" ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Subscribe"
+                        )}
+                      </button>
+                    </div>
+                    {status === "error" && (
+                      <p className="text-sm text-red-400 pl-1">{errorMsg}</p>
+                    )}
+                    <p className="text-xs text-background/25 pl-1">
+                      No spam, ever. Unsubscribe anytime.
+                    </p>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ─── Section B: Navigation Links ─── */}
-      <div ref={linksRef} className="reveal-children border-b border-background/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-12 gap-10 lg:gap-8">
+          {/* ─── Footer grid: Brand + Links ─── */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-12 gap-8 lg:gap-6 pb-10 sm:pb-12">
             {/* Brand column */}
-            <div className="col-span-2 sm:col-span-3 lg:col-span-5">
+            <div className="col-span-2 sm:col-span-3 lg:col-span-4">
               <Link to="/" className="inline-block group">
-                <h3 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight group-hover:text-primary transition-colors duration-300">
+                <h3 className="font-display text-2xl font-semibold tracking-tight group-hover:text-primary transition-colors duration-300">
                   YourPrettySets
                 </h3>
               </Link>
-              <p className="text-background/50 text-sm mt-3 leading-relaxed max-w-xs">
-                Handcrafted press-on nails, made to order in small batches. Designed for your prettiest moments.
+              <p className="text-background/45 text-sm mt-2.5 leading-relaxed max-w-xs">
+                Handcrafted press-on nails, made to order in small batches.
               </p>
-
-              {/* Social icons */}
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-2.5 mt-5">
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/yourprettysets"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="w-10 h-10 rounded-full bg-background/[0.05] border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group/icon"
+                  className="w-9 h-9 rounded-full bg-background/[0.05] border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group/icon"
                 >
-                  <Instagram className="w-4 h-4 text-background/60 group-hover/icon:text-primary-foreground" />
+                  <Instagram className="w-3.5 h-3.5 text-background/60 group-hover/icon:text-primary-foreground" />
                 </a>
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/yourprettysets"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="w-10 h-10 rounded-full bg-background/[0.05] border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group/icon"
+                  className="w-9 h-9 rounded-full bg-background/[0.05] border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group/icon"
                 >
-                  <Facebook className="w-4 h-4 text-background/60 group-hover/icon:text-primary-foreground" />
+                  <Facebook className="w-3.5 h-3.5 text-background/60 group-hover/icon:text-primary-foreground" />
                 </a>
                 <a
                   href="mailto:hello@yourprettysets.com"
                   aria-label="Email us"
-                  className="w-10 h-10 rounded-full bg-background/[0.05] border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group/icon"
+                  className="w-9 h-9 rounded-full bg-background/[0.05] border border-background/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:scale-110 transition-all duration-300 group/icon"
                 >
-                  <Mail className="w-4 h-4 text-background/60 group-hover/icon:text-primary-foreground" />
+                  <Mail className="w-3.5 h-3.5 text-background/60 group-hover/icon:text-primary-foreground" />
                 </a>
               </div>
             </div>
 
             {/* Explore links */}
-            <div className="lg:col-span-2">
-              <h4 className="text-xs uppercase tracking-[0.25em] text-background/40 font-medium mb-5">
+            <div className="lg:col-span-2 lg:col-start-6">
+              <h4 className="text-xs uppercase tracking-[0.25em] text-background/40 font-medium mb-4">
                 Explore
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {footerLinks.explore.map((link) => (
                   <li key={link.name}>
                     <Link to={link.to} className={linkClasses}>
@@ -217,10 +208,10 @@ const Footer = () => {
 
             {/* Help links */}
             <div className="lg:col-span-2">
-              <h4 className="text-xs uppercase tracking-[0.25em] text-background/40 font-medium mb-5">
+              <h4 className="text-xs uppercase tracking-[0.25em] text-background/40 font-medium mb-4">
                 Help
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {footerLinks.help.map((link) => (
                   <li key={link.name}>
                     <Link to={link.to} className={linkClasses}>
@@ -232,22 +223,19 @@ const Footer = () => {
             </div>
 
             {/* Connect column */}
-            <div className="col-span-2 sm:col-span-1 lg:col-span-3">
-              <h4 className="text-xs uppercase tracking-[0.25em] text-background/40 font-medium mb-5">
+            <div className="col-span-2 sm:col-span-1 lg:col-span-2">
+              <h4 className="text-xs uppercase tracking-[0.25em] text-background/40 font-medium mb-4">
                 Get in Touch
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 <li>
-                  <a
-                    href="mailto:hello@yourprettysets.com"
-                    className={linkClasses}
-                  >
+                  <a href="mailto:hello@yourprettysets.com" className={linkClasses}>
                     hello@yourprettysets.com
                   </a>
                 </li>
                 <li>
                   <a
-                    href="https://instagram.com"
+                    href="https://www.instagram.com/yourprettysets"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={linkClasses}
@@ -263,25 +251,25 @@ const Footer = () => {
               </ul>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ─── Section C: Bottom Bar ─── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-background/30 text-xs tracking-wide">
-            &copy; {new Date().getFullYear()} YourPrettySets. All rights reserved.
-          </p>
-          <button
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className="group flex items-center gap-2 text-xs text-background/30 hover:text-background/70 transition-colors duration-300"
-          >
-            <span className="tracking-wide">Back to top</span>
-            <span className="w-8 h-8 rounded-full border border-background/15 flex items-center justify-center group-hover:border-background/30 group-hover:-translate-y-0.5 transition-all duration-300">
-              <ArrowUp className="w-3.5 h-3.5" />
-            </span>
-          </button>
+          {/* ─── Bottom bar ─── */}
+          <div className="border-t border-background/10 py-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-background/30 text-xs tracking-wide">
+                &copy; {new Date().getFullYear()} YourPrettySets. All rights reserved.
+              </p>
+              <button
+                onClick={scrollToTop}
+                aria-label="Back to top"
+                className="group flex items-center gap-2 text-xs text-background/30 hover:text-background/70 transition-colors duration-300"
+              >
+                <span className="tracking-wide">Back to top</span>
+                <span className="w-8 h-8 rounded-full border border-background/15 flex items-center justify-center group-hover:border-background/30 group-hover:-translate-y-0.5 transition-all duration-300">
+                  <ArrowUp className="w-3.5 h-3.5" />
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

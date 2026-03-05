@@ -177,9 +177,9 @@ const CategoryGrid = () => {
       {/* Auto-scrolling Carousel — full viewport width */}
       <div className="relative">
         {/* Left fade gradient — scoped to carousel only */}
-        <div className="absolute left-0 top-0 bottom-0 w-28 md:w-52 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-12 md:w-52 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
         {/* Right fade gradient */}
-        <div className="absolute right-0 top-0 bottom-0 w-28 md:w-52 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 md:w-52 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
         <div className="overflow-hidden pl-4 md:pl-6" ref={emblaRef}>
             <div className="flex -ml-4 md:-ml-6">

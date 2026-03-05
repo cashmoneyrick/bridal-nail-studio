@@ -13,8 +13,19 @@ const DiscountCodesSection = () => {
   const cartItems = useCartStore(state => state.items);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = code;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
     setCopiedCode(code);
     toast.success(`${code} copied to clipboard!`, { position: "top-center" });
     setTimeout(() => setCopiedCode(null), 2000);

@@ -28,6 +28,8 @@ import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 import EmailPopup from "./components/EmailPopup";
 import FaqChatbot from "./components/FaqChatbot";
+import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import { useAuthStore } from "./stores/authStore";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,7 @@ const App = () => (
           <EmailPopup />
           <FaqChatbot />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/product/:handle" element={<ProductDetail />} />
@@ -80,6 +83,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Footer />
           </BrowserRouter>
         </AuthInitializer>
       </TooltipProvider>

@@ -1,5 +1,4 @@
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Calendar, Check, Heart, Sparkles, Hand, Ruler, ChevronRight } from "lucide-react";
@@ -77,7 +76,7 @@ const HowToBridal = () => {
                 </div>
               </div>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
               Prepping for Your Wedding
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl">
@@ -91,7 +90,7 @@ const HowToBridal = () => {
       <section className="py-16 md:py-24 bg-secondary/5">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
               Your Wedding Nail Timeline
             </h2>
             <p className="text-muted-foreground text-lg">
@@ -123,7 +122,7 @@ const HowToBridal = () => {
                         </span>
                       </div>
 
-                      <h3 className="font-serif text-xl md:text-2xl text-foreground mb-4">
+                      <h3 className="font-display text-xl md:text-2xl text-foreground mb-4">
                         {step.title}
                       </h3>
 
@@ -148,7 +147,7 @@ const HowToBridal = () => {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
               Pack an Emergency Kit
             </h2>
             <p className="text-muted-foreground text-lg">
@@ -184,7 +183,7 @@ const HowToBridal = () => {
               <Heart className="w-8 h-8 text-primary" />
             </div>
 
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
               Honeymoon Ready
             </h2>
 
@@ -244,7 +243,6 @@ const HowToBridal = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

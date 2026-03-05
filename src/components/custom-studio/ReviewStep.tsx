@@ -38,6 +38,7 @@ export function ReviewStep() {
   const addItem = useCartStore((state) => state.addItem);
 
   const {
+    orderPath,
     inspirationImages,
     inspirationText,
     shape,
@@ -206,59 +207,62 @@ export function ReviewStep() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="font-display text-3xl md:text-4xl text-foreground">
+      <div className="text-center space-y-3">
+        <h1 className="font-studio-display text-4xl md:text-5xl font-light text-foreground">
           Looking good!
         </h1>
-        <p className="text-muted-foreground">Here's what you've created</p>
+        <p className="font-studio-body text-muted-foreground">Here's what you've created</p>
       </div>
 
       {/* Summary card */}
-      <div className="bg-muted/30 rounded-2xl p-5 space-y-4">
-        {/* Inspiration */}
+      <div className="bg-gradient-to-b from-studio-warm-white to-studio-cream-dark rounded-2xl p-6 space-y-4 border border-studio-taupe-light/30">
+        {/* Inspiration — polaroid-style images */}
         {inspirationImages.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {inspirationImages.map((url) => (
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {inspirationImages.map((url, i) => (
               <img
                 key={url}
                 src={url}
                 alt="Inspiration"
-                className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                className={cn(
+                  'w-16 h-16 rounded-lg object-cover flex-shrink-0 border-2 border-white shadow-sm',
+                  i % 2 === 0 ? '-rotate-1' : 'rotate-1'
+                )}
               />
             ))}
           </div>
         )}
         {inspirationText && (
-          <p className="text-sm text-muted-foreground italic">
+          <p className="font-studio-body text-sm text-muted-foreground italic leading-relaxed">
             "{inspirationText}"
           </p>
         )}
 
         {/* Basics */}
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-2 font-studio-body text-sm">
           {shape && <span className="font-medium">{SHAPE_LABELS[shape]}</span>}
-          <span className="text-muted-foreground">·</span>
+          <span className="text-studio-taupe-light">·</span>
           {length && <span>{LENGTH_LABELS[length]}</span>}
-          <span className="text-muted-foreground">·</span>
+          <span className="text-studio-taupe-light">·</span>
           {finish && <span>{FINISH_LABELS[finish]}</span>}
         </div>
 
-        {/* Colors */}
-        <div className="flex items-center gap-2">
-          {selectedColors.map((color) => (
+        {/* Colors — overlapping swatches */}
+        <div className="flex items-center">
+          {selectedColors.map((color, i) => (
             <div
               key={color}
               className={cn(
-                'w-6 h-6 rounded-full',
-                color === '#FFFFFF' || color === '#F5F0E8' ? 'border border-border' : ''
+                'w-7 h-7 rounded-full shadow-sm border-2 border-white',
+                i > 0 ? '-ml-1.5' : ''
               )}
-              style={{ backgroundColor: color }}
+              style={{ backgroundColor: color, zIndex: selectedColors.length - i }}
             />
           ))}
           {colorNotes && (
-            <span className="text-xs text-muted-foreground ml-2">{colorNotes}</span>
+            <span className="font-studio-body text-xs text-muted-foreground ml-3">{colorNotes}</span>
           )}
         </div>
 
@@ -266,17 +270,17 @@ export function ReviewStep() {
         {(effects.length > 0 || rhinestones !== 'none' || charms !== 'none') && (
           <div className="flex flex-wrap gap-1.5">
             {effects.map((e) => (
-              <span key={e} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full capitalize">
+              <span key={e} className="font-studio-body text-xs bg-primary/10 text-primary px-2.5 py-0.5 rounded-full capitalize">
                 {e}
               </span>
             ))}
             {rhinestones !== 'none' && (
-              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <span className="font-studio-body text-xs bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
                 {rhinestones} rhinestones
               </span>
             )}
             {charms !== 'none' && (
-              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <span className="font-studio-body text-xs bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
                 {charms === 'few' ? 'a few' : 'lots of'} charms
               </span>
             )}
@@ -284,73 +288,61 @@ export function ReviewStep() {
         )}
 
         {extraNotes && (
-          <p className="text-xs text-muted-foreground">{extraNotes}</p>
+          <p className="font-studio-body text-xs text-muted-foreground">{extraNotes}</p>
         )}
       </div>
 
-      {/* Price breakdown */}
-      <div className="space-y-2">
+      {/* Price breakdown — receipt style */}
+      <div className="space-y-2.5 px-1">
         {lineItems.map((item, i) => (
-          <div key={i} className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{item.label}</span>
-            <span className="font-medium text-foreground">${item.amount.toFixed(2)}</span>
+          <div key={i} className="flex items-baseline">
+            <span className="font-studio-body text-sm text-muted-foreground">{item.label}</span>
+            <span className="dotted-leader" />
+            <span className="font-studio-body text-sm font-medium text-foreground">${item.amount.toFixed(2)}</span>
           </div>
         ))}
-        <div className="flex justify-between text-base font-bold pt-2 border-t border-border">
-          <span>Estimated total</span>
-          <span>${estimatedPrice.toFixed(2)}</span>
+        <div className="flex items-baseline pt-3 mt-1 border-t border-studio-taupe-light/40">
+          <span className="font-studio-display text-lg text-foreground">Estimated total</span>
+          <span className="dotted-leader" />
+          <span className="font-studio-display text-xl font-semibold text-foreground">${estimatedPrice.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Edit link */}
       <button
         onClick={() => store.setStep(0)}
-        className="text-sm text-primary hover:underline mx-auto block"
+        className="font-studio-body text-sm text-studio-taupe hover:text-primary transition-colors duration-200 mx-auto block"
       >
-        Edit selections
+        Edit selections &rarr;
       </button>
 
-      {/* Two CTA cards */}
-      <div className="space-y-3">
-        <button
-          onClick={() => handleSubmit('cart')}
-          disabled={submitting !== null}
-          className={cn(
-            'w-full p-4 rounded-2xl border-2 text-left transition-all duration-200',
-            submitting === 'cart' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary'
-          )}
-        >
-          <span className="font-medium text-foreground flex items-center gap-2">
+      {/* Single CTA based on intent chosen in Step 0 */}
+      <div className="pt-1">
+        {orderPath === 'cart' ? (
+          <button
+            onClick={() => handleSubmit('cart')}
+            disabled={submitting !== null}
+            className="w-full p-4 rounded-full bg-gradient-to-r from-studio-rose to-studio-rose-soft text-white font-studio-body font-medium text-base flex items-center justify-center gap-2 shadow-lg shadow-studio-rose/20 hover:shadow-xl hover:shadow-studio-rose/25 transition-all duration-300 disabled:opacity-50"
+          >
             {submitting === 'cart' ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Adding to cart...</>
             ) : (
-              <><ShoppingCart className="w-4 h-4" /> I know what I want</>
+              <><ShoppingCart className="w-4 h-4" /> Add to Cart — ${estimatedPrice.toFixed(2)}</>
             )}
-          </span>
-          <span className="text-sm text-muted-foreground block mt-0.5">
-            Add to cart · ${estimatedPrice.toFixed(2)}
-          </span>
-        </button>
-
-        <button
-          onClick={() => handleSubmit('quote')}
-          disabled={submitting !== null}
-          className={cn(
-            'w-full p-4 rounded-2xl border-2 text-left transition-all duration-200',
-            submitting === 'quote' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary'
-          )}
-        >
-          <span className="font-medium text-foreground flex items-center gap-2">
+          </button>
+        ) : (
+          <button
+            onClick={() => handleSubmit('quote')}
+            disabled={submitting !== null}
+            className="w-full p-4 rounded-full bg-gradient-to-r from-studio-rose to-studio-rose-soft text-white font-studio-body font-medium text-base flex items-center justify-center gap-2 shadow-lg shadow-studio-rose/20 hover:shadow-xl hover:shadow-studio-rose/25 transition-all duration-300 disabled:opacity-50"
+          >
             {submitting === 'quote' ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
             ) : (
-              <><Send className="w-4 h-4" /> Let's collaborate</>
+              <><Send className="w-4 h-4" /> Submit for Quote</>
             )}
-          </span>
-          <span className="text-sm text-muted-foreground block mt-0.5">
-            Request a custom quote
-          </span>
-        </button>
+          </button>
+        )}
       </div>
     </div>
   );

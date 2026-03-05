@@ -110,7 +110,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
   };
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.01]">
+    <div className="bg-card rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -134,7 +134,7 @@ const ReviewCard = ({ review }: { review: Review }) => {
         <div className="flex gap-2 mb-3">
           {review.images.map((img, idx) => (
             <div key={idx} className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
-              <img src={img} alt="Review" className="w-full h-full object-cover" />
+              <img src={img} alt={`Review by ${review.author}`} className="w-full h-full object-cover" />
             </div>
           ))}
         </div>
@@ -228,12 +228,15 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
     });
   };
 
+  // Featured review — highest helpful count
+  const featuredReview = [...reviews].sort((a, b) => b.helpful - a.helpful)[0];
+
   return (
     <section className="mt-16 lg:mt-20 pt-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2">
+          <h2 className="font-display text-2xl sm:text-3xl font-medium tracking-tight mb-2">
             Customer Reviews
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -350,8 +353,20 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
         </Dialog>
       </div>
 
+      {/* Featured Review Pullquote */}
+      {featuredReview && (
+        <div className="border-l-2 border-primary pl-6 mb-10">
+          <p className="font-display text-xl italic text-foreground/90 leading-relaxed mb-3">
+            "{featuredReview.title}"
+          </p>
+          <p className="text-sm text-muted-foreground">
+            — {featuredReview.author}
+          </p>
+        </div>
+      )}
+
       {/* Rating Summary */}
-      <div className="bg-gradient-to-br from-primary/5 via-card to-card rounded-2xl p-8 shadow-sm border border-border/30 mb-8">
+      <div className="bg-secondary/5 rounded-2xl p-8 shadow-sm border border-border/20 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Average Rating */}
           <div className="text-center md:text-left">
@@ -384,18 +399,6 @@ export const ProductReviews = ({ productTitle }: ProductReviewsProps) => {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Trust Badges */}
-      <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full text-sm">
-          <CheckCircle2 className="h-4 w-4 text-primary" />
-          <span className="text-foreground/80 font-medium">All reviews verified</span>
-        </div>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full text-sm">
-          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-          <span className="text-foreground/80 font-medium">Honest feedback</span>
         </div>
       </div>
 

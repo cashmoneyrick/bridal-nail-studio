@@ -32,11 +32,11 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Loader2, Minus, Plus, Heart, Sparkles, Tag, User, ChevronRight, ChevronLeft, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag, Droplets, FileText, Clock, Hand, Gift, RotateCcw, Check } from "lucide-react";
+import { Loader2, Minus, Plus, Heart, Sparkles, User, ChevronRight, ChevronLeft, Package, PlayCircle, ShieldCheck, Truck, ShoppingBag, Droplets, FileText, Clock, Hand, Gift, RotateCcw, Check } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { ProductReviews } from "@/components/ProductReviews";
+import ColorRecipe from "@/components/ColorRecipe";
 import AddToCartSuccessModal from "@/components/AddToCartSuccessModal";
 
 // Shape icons as simple SVG components
@@ -126,10 +126,11 @@ const PairsWellWithCarousel = ({ products }: PairsWellWithCarouselProps) => {
   }, [api]);
 
   return (
-    <section className="mt-20 mb-12">
+    <section className="mt-24 mb-12">
       {/* Header with Editorial Title and Navigation */}
       <div className="flex justify-between items-end mb-8">
         <div>
+          <div className="w-12 h-px bg-primary/30 mb-3" />
           <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2 block">
             COMPLETE THE LOOK
           </span>
@@ -519,7 +520,6 @@ const ProductDetail = () => {
         <div className="flex justify-center items-center min-h-[60vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-        <Footer />
       </div>
     );
   }
@@ -534,7 +534,6 @@ const ProductDetail = () => {
             Return to homepage
           </Link>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -545,22 +544,22 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-24 pb-28 lg:pb-16 scroll-smooth">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+          <nav className="flex items-center gap-2 text-xs tracking-wide uppercase text-muted-foreground mb-10">
             <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-            <span>/</span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
             <Link to="/#shop" className="hover:text-foreground transition-colors">Shop</Link>
-            <span>/</span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
             <span className="text-foreground">{product.title}</span>
           </nav>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
             {/* Images */}
-            <div className="space-y-4">
+            <div className="space-y-4 lg:sticky lg:top-28 lg:self-start">
               {/* Main Image */}
-              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-green-50 via-blue-50 to-amber-50 relative shadow-sm border border-border/30">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-secondary/10 via-background to-primary/5 relative shadow-sm border border-border/30">
                 {images[selectedImageIndex] ? (
                   <img
                     src={images[selectedImageIndex]}
@@ -573,7 +572,14 @@ const ProductDetail = () => {
                     <span className="text-muted-foreground">No image</span>
                   </div>
                 )}
-                
+
+                {/* Product Badge */}
+                {product.badge && (
+                  <span className="absolute top-4 left-4 px-3 py-1.5 text-xs font-medium tracking-wide uppercase bg-foreground text-background rounded-full shadow-md">
+                    {product.badge}
+                  </span>
+                )}
+
                 {/* Image pagination dots */}
                 {images.length > 1 && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -617,47 +623,58 @@ const ProductDetail = () => {
             </div>
 
             {/* Product Info */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Title & Wishlist */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="font-display text-3xl sm:text-4xl font-medium mb-2 tracking-tight">
+              <div>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-[1.1]">
                     {product.title}
                   </h1>
-                  <p className="text-2xl font-display text-primary mb-3">
-                    ${price.toFixed(2)}
-                  </p>
-                  {/* Star Rating - clicks to scroll to reviews */}
-                  <button 
-                    onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                  <button
+                    onClick={handleToggleFavorite}
+                    className="flex-shrink-0 w-10 h-10 rounded-full border border-border/50 flex items-center justify-center hover:bg-muted hover:scale-105 transition-all duration-200"
                   >
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg
-                          key={star}
-                          className="w-4 h-4 text-amber-400 fill-amber-400"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="group-hover:underline">47 reviews</span>
+                    <Heart
+                      className={`h-5 w-5 transition-colors ${product && isFavorite(product.id) ? 'fill-primary text-primary' : 'text-muted-foreground'}`}
+                    />
                   </button>
                 </div>
-                <button 
-                  onClick={handleToggleFavorite}
-                  className="p-2.5 rounded-full hover:bg-muted hover:scale-110 transition-all duration-200"
+                <p className="text-3xl font-display text-primary/90 font-light mb-4">
+                  ${price.toFixed(2)}
+                </p>
+
+                {/* Decorative divider */}
+                <div className="w-12 h-px bg-primary/30 mb-4" />
+
+                {/* Star Rating - clicks to scroll to reviews */}
+                <button
+                  onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
                 >
-                  <Heart 
-                    className={`h-6 w-6 transition-colors ${product && isFavorite(product.id) ? 'fill-primary text-primary' : 'text-muted-foreground'}`} 
-                  />
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        className="w-4 h-4 text-amber-400 fill-amber-400"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="group-hover:underline">47 reviews</span>
                 </button>
               </div>
 
+              {/* Product Description — Editorial Narrative */}
+              {product.description && (
+                <p className="text-muted-foreground text-[15px] leading-relaxed max-w-md">
+                  {product.description}
+                </p>
+              )}
+
               {/* Key Features */}
-              <div className="py-6 border-y border-border/50">
+              <div className="bg-secondary/5 rounded-xl p-6">
                 {/* Mobile Carousel */}
                 <div className="md:hidden">
                   <div className="overflow-hidden" ref={benefitsEmblaRef}>
@@ -665,7 +682,7 @@ const ProductDetail = () => {
                       {benefits.map((feature, idx) => (
                         <div key={idx} className="flex-none" style={{ width: '33.33%' }}>
                           <div className="flex flex-col items-center text-center group cursor-default px-2">
-                            <div className="text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
+                            <div className="text-primary mb-1.5 group-hover:scale-110 transition-transform duration-200">
                               {feature.icon}
                             </div>
                             <span className="text-xs text-muted-foreground leading-tight">{feature.label}</span>
@@ -692,13 +709,13 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Desktop Grid */}
-                <div className="hidden md:grid md:grid-cols-6 gap-x-4 gap-y-6">
+                <div className="hidden md:grid md:grid-cols-3 gap-x-8 gap-y-4">
                   {benefits.map((feature, idx) => (
-                    <div key={idx} className="flex flex-col items-center text-center group cursor-default">
-                      <div className="text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
+                    <div key={idx} className="flex items-center gap-3 border-l-2 border-primary/20 pl-3 group cursor-default">
+                      <div className="text-primary flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
                         {feature.icon}
                       </div>
-                      <span className="text-xs text-muted-foreground leading-tight">{feature.label}</span>
+                      <span className="text-sm text-muted-foreground leading-tight">{feature.label}</span>
                     </div>
                   ))}
                 </div>
@@ -706,11 +723,9 @@ const ProductDetail = () => {
 
               {/* Shape Selector */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Shape</label>
-                  <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                    {selectedShape}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground">Shape</label>
+                  <span className="text-sm text-foreground font-medium">{selectedShape}</span>
                 </div>
                 {/* Scroll container with arrows */}
                 <div className="relative">
@@ -736,10 +751,10 @@ const ProductDetail = () => {
                         <button
                           key={shape}
                           onClick={() => setSelectedShape(shape)}
-                          className={`flex-shrink-0 w-[72px] sm:flex-1 sm:w-auto flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-200 ${
+                          className={`flex-shrink-0 w-20 sm:flex-1 sm:w-auto flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 transition-all duration-200 ${
                             selectedShape === shape
-                              ? 'border-primary bg-primary/5 shadow-sm'
-                              : 'border-border/60 hover:border-primary/40 hover:bg-muted/30'
+                              ? 'border-primary/60 bg-primary/5 shadow-sm ring-1 ring-primary/10'
+                              : 'border-border/40 hover:border-primary/30 hover:bg-secondary/10'
                           }`}
                         >
                           <ShapeIcon shape={shape} selected={selectedShape === shape} />
@@ -782,11 +797,9 @@ const ProductDetail = () => {
 
               {/* Length Selector */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Length</label>
-                  <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                    {selectedLength}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground">Length</label>
+                  <span className="text-sm text-foreground font-medium">{selectedLength}</span>
                 </div>
                 {/* Scroll container with arrows */}
                 <div className="relative">
@@ -807,15 +820,15 @@ const ProductDetail = () => {
                     onScroll={() => handleScrollProgress(lengthScrollRef, setLengthScrollProgress, setLengthCanScroll, setLengthCanScrollLeft, setLengthCanScrollRight)}
                     className="overflow-x-auto -mx-4 px-4 scrollbar-hide scroll-smooth touch-pan-x"
                   >
-                    <div className="flex gap-2 min-w-max sm:min-w-0">
+                    <div className="flex gap-1 min-w-max sm:min-w-0 bg-muted/30 rounded-xl p-1">
                       {NAIL_LENGTHS.map(length => (
                         <button
                           key={length}
                           onClick={() => setSelectedLength(length)}
-                          className={`flex-shrink-0 min-w-max px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 sm:flex-1 sm:min-w-0 ${
+                          className={`flex-shrink-0 min-w-max px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 sm:flex-1 sm:min-w-0 ${
                             selectedLength === length
-                              ? 'bg-primary text-primary-foreground shadow-sm'
-                              : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-border/50'
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
                           }`}
                         >
                           {length}
@@ -851,24 +864,24 @@ const ProductDetail = () => {
 
               {/* Nail Sizes */}
               <div className="space-y-3">
-                <label className="text-sm font-medium">Nail Sizes</label>
-                <div className="grid grid-cols-2 gap-2">
+                <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground">Nail Sizes</label>
+                <div className="grid grid-cols-2 gap-1 bg-muted/30 rounded-xl p-1">
                   <button
                     onClick={() => setSizingOption('kit')}
-                    className={`px-4 py-3 rounded-full text-sm font-medium transition-all ${
+                    className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                       sizingOption === 'kit'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     I need a sizing kit
                   </button>
                   <button
                     onClick={() => setSizingOption('known')}
-                    className={`px-4 py-3 rounded-full text-sm font-medium transition-all ${
+                    className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                       sizingOption === 'known'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     I know my sizes
@@ -878,26 +891,26 @@ const ProductDetail = () => {
 
               {/* Sizing Kit Info Card */}
               {sizingOption === 'kit' && (
-                <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-3">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-muted flex items-center justify-center">
-                    <Tag className="h-5 w-5 text-muted-foreground" />
+                <div className="bg-gradient-to-br from-secondary/8 to-primary/3 border border-border/20 rounded-2xl p-6 text-center space-y-3">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-primary/8 flex items-center justify-center">
+                    <Gift className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-display text-lg font-medium">Get the Perfect Fit</h3>
-                  <p className="text-sm text-muted-foreground">
-                    We'll send you a sizing kit first to ensure your nails fit perfectly. 
-                    Once you know your sizes, you can email us or update your order.
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Your first sizing kit is FREE with the purchase of any nail set.
+                    Once you know your sizes, email us or update your profile.
                   </p>
-                  <span className="inline-block text-xs text-muted-foreground border border-border rounded-full px-3 py-1">
-                    Sizing Kit will be added to order
+                  <span className="inline-block text-xs text-primary/80 bg-primary/8 rounded-full px-3 py-1 font-medium">
+                    Free sizing kit included with your first set
                   </span>
                 </div>
               )}
 
               {/* Profile Selector - when "I know my sizes" is selected */}
               {sizingOption === 'known' && (
-                <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+                <div className="bg-gradient-to-br from-secondary/8 to-primary/3 border border-border/20 rounded-2xl p-6 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/8 flex items-center justify-center">
                       <User className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1">
@@ -927,13 +940,13 @@ const ProductDetail = () => {
                       </Select>
 
                       {getSelectedProfile() && (
-                        <div className="bg-muted/50 rounded-xl p-3">
+                        <div className="bg-secondary/10 rounded-xl p-3">
                           <p className="text-xs text-muted-foreground mb-2">Selected sizes:</p>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {Object.entries(getSelectedProfile()?.sizes || {}).map(([key, size], idx) => (
-                              <span 
+                              <span
                                 key={key}
-                                className="px-2 py-1 bg-background rounded text-xs font-medium"
+                                className="px-2.5 py-1 bg-background rounded-lg text-xs font-medium shadow-sm"
                               >
                                 {idx + 1}: {size}
                               </span>
@@ -962,29 +975,29 @@ const ProductDetail = () => {
               )}
 
               {/* Quantity & Add to Cart */}
-              <div className="space-y-4 pt-4 border-t border-border">
-                {/* Quantity selector - matching action button style */}
-                <div className="flex items-center justify-between w-full py-2.5 px-4 rounded-full border border-border hover:border-primary/50 transition-colors">
-                  <label className="text-sm font-medium">Quantity</label>
-                  <div className="flex items-center gap-2">
+              <div className="space-y-4 pt-6 border-t border-border/30">
+                {/* Quantity selector */}
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium tracking-wide uppercase text-muted-foreground">Quantity</label>
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-7 h-7 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-full border border-border/50 hover:border-primary/50 flex items-center justify-center transition-colors"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
                     <span className="w-6 text-center text-sm font-medium">{quantity}</span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="w-7 h-7 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-full border border-border/50 hover:border-primary/50 flex items-center justify-center transition-colors"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full btn-primary text-base py-6"
+                <Button
+                  className="w-full btn-primary text-[15px] tracking-wide py-6"
                   onClick={handleAddToCart}
                   disabled={!currentVariant?.availableForSale}
                 >
@@ -992,157 +1005,119 @@ const ProductDetail = () => {
                   {currentVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'} — ${(price * quantity).toFixed(2)}
                 </Button>
 
-                <Button
-                  variant="outline"
-                  className="w-full rounded-full"
+                <button
+                  className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors py-2"
                   onClick={() => navigate(`/custom-studio?base=${product.handle}`)}
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <Sparkles className="h-4 w-4" />
                   Customize This Design
-                </Button>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
               </div>
 
-              {/* Separator */}
-              <div className="border-t border-border/50 my-6" />
+              {/* Accordion Info — Consolidated */}
+              <Accordion type="single" collapsible className="border-t border-border/30">
+                <AccordionItem value="how-to-apply" className="border-b border-border/20">
+                  <AccordionTrigger className="py-4 hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <Hand className="h-5 w-5 text-primary" />
+                      <span className="text-[15px] font-medium">How to Apply</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="pl-7">
+                      <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                        <li>Clean and prep your natural nails</li>
+                        <li>Push back cuticles gently</li>
+                        <li>Buff the surface of your nails</li>
+                        <li>Apply glue or adhesive tab</li>
+                        <li>Press and hold for 30 seconds</li>
+                      </ol>
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto mt-3 text-primary text-sm"
+                        onClick={() => setIsTutorialOpen(true)}
+                      >
+                        <PlayCircle className="h-4 w-4 mr-1" />
+                        Watch Tutorial
+                      </Button>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-              {/* Accordion Info - Luxury Card Design */}
-              <div className="space-y-3">
-                {/* How to Apply */}
-                <Accordion type="single" collapsible>
-                  <AccordionItem
-                    value="how-to-apply"
-                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
-                  >
-                    <AccordionTrigger className="p-5 hover:no-underline group">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
-                          <Hand className="h-5 w-5" />
-                        </div>
-                        <span className="text-base font-medium">How to Apply</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-5 pt-0">
-                      <div className="pl-12">
-                        <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-                          <li>Clean and prep your natural nails</li>
-                          <li>Push back cuticles gently</li>
-                          <li>Buff the surface of your nails</li>
-                          <li>Apply glue or adhesive tab</li>
-                          <li>Press and hold for 30 seconds</li>
-                        </ol>
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto mt-3 text-primary"
-                          onClick={() => setIsTutorialOpen(true)}
-                        >
-                          <PlayCircle className="h-4 w-4 mr-1" />
-                          Watch Tutorial
-                        </Button>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+                <AccordionItem value="whats-included" className="border-b border-border/20">
+                  <AccordionTrigger className="py-4 hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <Package className="h-5 w-5 text-primary" />
+                      <span className="text-[15px] font-medium">What's Included</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="pl-7">
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          10 press-on nails (full set)
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          Nail prep kit & application tools
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          Nail glue & adhesive tabs
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          Mini nail file & buffer
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          Cuticle pusher
+                        </li>
+                      </ul>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-                {/* What's Included */}
-                <Accordion type="single" collapsible>
-                  <AccordionItem
-                    value="whats-included"
-                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
-                  >
-                    <AccordionTrigger className="p-5 hover:no-underline group">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
-                          <Package className="h-5 w-5" />
-                        </div>
-                        <span className="text-base font-medium">What's Included</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-5 pt-0">
-                      <div className="pl-12">
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                          <li className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-primary" />
-                            10 press-on nails (full set)
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-primary" />
-                            Nail prep kit & application tools
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-primary" />
-                            Nail glue & adhesive tabs
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-primary" />
-                            Mini nail file & buffer
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-primary" />
-                            Cuticle pusher
-                          </li>
-                        </ul>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+                <AccordionItem value="care" className="border-b border-border/20">
+                  <AccordionTrigger className="py-4 hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <Droplets className="h-5 w-5 text-primary" />
+                      <span className="text-[15px] font-medium">Care & Maintenance</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="pl-7">
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        <li>• Avoid prolonged water exposure</li>
+                        <li>• Wear gloves when cleaning</li>
+                        <li>• Apply cuticle oil daily for longer wear</li>
+                        <li>• Gently file any rough edges</li>
+                        <li>• Store unused nails in a cool, dry place</li>
+                      </ul>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-                {/* Care & Maintenance */}
-                <Accordion type="single" collapsible>
-                  <AccordionItem
-                    value="care"
-                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
-                  >
-                    <AccordionTrigger className="p-5 hover:no-underline group">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
-                          <Droplets className="h-5 w-5" />
-                        </div>
-                        <span className="text-base font-medium">Care & Maintenance</span>
+                <AccordionItem value="shipping" className="border-0">
+                  <AccordionTrigger className="py-4 hover:no-underline">
+                    <div className="flex items-center gap-3">
+                      <Truck className="h-5 w-5 text-primary" />
+                      <span className="text-[15px] font-medium">Shipping & Returns</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="pl-7">
+                      <div className="space-y-3 text-sm text-muted-foreground">
+                        <p><strong className="text-foreground">Shipping:</strong> Free standard shipping on orders over $50. Orders ship within 1-3 business days.</p>
+                        <p><strong className="text-foreground">Returns:</strong> We accept returns within 14 days of delivery for unused items in original packaging.</p>
+                        <p><strong className="text-foreground">Custom Orders:</strong> Custom nail sets are final sale and cannot be returned.</p>
                       </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-5 pt-0">
-                      <div className="pl-12">
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                          <li>• Avoid prolonged water exposure</li>
-                          <li>• Wear gloves when cleaning</li>
-                          <li>• Apply cuticle oil daily for longer wear</li>
-                          <li>• Gently file any rough edges</li>
-                          <li>• Store unused nails in a cool, dry place</li>
-                        </ul>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-
-                {/* Shipping */}
-                <Accordion type="single" collapsible>
-                  <AccordionItem
-                    value="shipping"
-                    className="bg-background rounded-xl shadow-sm border border-border/30 overflow-hidden data-[state=open]:bg-gradient-to-br data-[state=open]:from-primary/5 data-[state=open]:to-transparent transition-all duration-300 hover:shadow-md hover:border-primary/20"
-                  >
-                    <AccordionTrigger className="p-5 hover:no-underline group">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15 transition-colors">
-                          <Truck className="h-5 w-5" />
-                        </div>
-                        <span className="text-base font-medium">Shipping</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-5 pt-0">
-                      <div className="pl-12">
-                        <div className="space-y-3 text-sm text-muted-foreground">
-                          <p><strong className="text-foreground">Shipping:</strong> Free standard shipping on orders over $50. Orders ship within 1-3 business days.</p>
-                          <p><strong className="text-foreground">Returns:</strong> We accept returns within 14 days of delivery for unused items in original packaging.</p>
-                          <p><strong className="text-foreground">Custom Orders:</strong> Custom nail sets are final sale and cannot be returned.</p>
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-
-              {/* Separator */}
-              <div className="border-t border-border/50" />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
 
@@ -1151,8 +1126,11 @@ const ProductDetail = () => {
             <PairsWellWithCarousel products={relatedProducts} />
           )}
 
+          {/* Color Recipe */}
+          <ColorRecipe productId={product.id} />
+
           {/* Reviews */}
-          <section id="reviews" className="scroll-mt-28 mt-8 pt-8 border-t border-border/50">
+          <section id="reviews" className="scroll-mt-32 mt-8 pt-8 border-t border-border/30">
             <ProductReviews productTitle={product.title} />
           </section>
         </div>
@@ -1180,7 +1158,24 @@ const ProductDetail = () => {
         relatedProducts={relatedProducts}
       />
 
-      <Footer />
+      {/* Sticky Mobile CTA Bar */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-background/95 backdrop-blur-md border-t border-border/30 p-4 z-40">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="font-display text-lg font-medium truncate">{product.title}</p>
+            <p className="text-sm text-primary font-display">${(price * quantity).toFixed(2)}</p>
+          </div>
+          <Button
+            className="btn-primary px-6 py-5 text-sm tracking-wide flex-shrink-0"
+            onClick={handleAddToCart}
+            disabled={!currentVariant?.availableForSale}
+          >
+            <ShoppingBag className="h-4 w-4 mr-1.5" />
+            Add to Bag
+          </Button>
+        </div>
+      </div>
+
     </div>
   );
 };

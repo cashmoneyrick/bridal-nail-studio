@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Heart, User, ShoppingBag } from "lucide-react";
+import { Menu, X, Heart, User, ShoppingBag, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartDrawer from "@/components/CartDrawer";
 import { Link } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
+import SearchOverlay from "@/components/SearchOverlay";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoClicked, setIsLogoClicked] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleLogoClick = () => {
     if (window.innerWidth < 1024) {
@@ -100,6 +102,15 @@ const Navigation = () => {
 
             {/* Desktop Icons */}
             <div className="hidden lg:flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setIsSearchOpen(true)}
+                aria-label="Search products"
+              >
+                <Search className="h-5 w-5" />
+              </Button>
               <Link to="/favorites" className="relative">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10">
                   <Heart className="h-5 w-5" />
@@ -132,6 +143,15 @@ const Navigation = () => {
 
             {/* Mobile Menu Button */}
             <div className="flex lg:hidden items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-primary/10"
+                onClick={() => setIsSearchOpen(true)}
+                aria-label="Search products"
+              >
+                <Search className="h-5 w-5" />
+              </Button>
               <Link to="/favorites" className="relative">
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10">
                   <Heart className="h-5 w-5" />
@@ -197,6 +217,8 @@ const Navigation = () => {
           </div>
         </div>
       )}
+
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 };

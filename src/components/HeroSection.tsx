@@ -43,10 +43,10 @@ const HeroSection = () => {
           >
             <defs>
               <radialGradient id="heartRadial" cx="50%" cy="42%" r="52%">
-                <stop offset="0%"  stopColor="#D4A0B0" stopOpacity="0.95" />
-                <stop offset="40%" stopColor="#D4A0B0" stopOpacity="0.8" />
-                <stop offset="75%" stopColor="#D4A0B0" stopOpacity="0.45" />
-                <stop offset="100%" stopColor="#D4A0B0" stopOpacity="0" />
+                <stop offset="0%"  stopColor="#C5D0C0" stopOpacity="0.95" />
+                <stop offset="40%" stopColor="#C5D0C0" stopOpacity="0.8" />
+                <stop offset="75%" stopColor="#C5D0C0" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#C5D0C0" stopOpacity="0" />
               </radialGradient>
               <filter id="heartBlur" x="-10%" y="-10%" width="120%" height="120%">
                 <feGaussianBlur stdDeviation="3" />

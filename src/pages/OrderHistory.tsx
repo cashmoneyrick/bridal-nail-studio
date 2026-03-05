@@ -4,7 +4,6 @@ import { ArrowLeft, Package, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { useAuthStore } from "@/stores/authStore";
 
 const OrderHistory = () => {
@@ -33,7 +32,7 @@ const OrderHistory = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 sm:pb-12">
         <Link 
           to="/account" 
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
@@ -44,7 +43,7 @@ const OrderHistory = () => {
 
         <div className="flex items-center gap-3 mb-2">
           <Package className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Order History</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Order History</h1>
         </div>
         <p className="text-muted-foreground mb-8">View your past orders</p>
 
@@ -64,7 +63,6 @@ const OrderHistory = () => {
         </Card>
       </main>
 
-      <Footer />
     </div>
   );
 };

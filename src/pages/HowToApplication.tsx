@@ -1,5 +1,4 @@
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +18,7 @@ const kitItems = [
 // Helper: styled icon panel replacing image placeholders
 const StepPanel = ({ icon: Icon, label, stepNumber }: { icon: React.ElementType; label: string; stepNumber: string }) => (
   <div className="hidden md:flex aspect-[4/3] bg-gradient-to-br from-secondary/25 to-primary/8 rounded-xl border border-border/20 flex-col items-center justify-center gap-4 relative overflow-hidden">
-    <span className="absolute text-[120px] font-serif font-bold text-primary/5 leading-none select-none pointer-events-none -translate-y-2">
+    <span className="absolute text-[120px] font-display font-bold text-primary/5 leading-none select-none pointer-events-none -translate-y-2">
       {stepNumber}
     </span>
     <Icon className="w-14 h-14 text-primary/40 relative z-10" />
@@ -51,7 +50,7 @@ const HowToApplication = () => {
                 </div>
               </div>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
               Applying for the First Time
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
@@ -92,7 +91,7 @@ const HowToApplication = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+              <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
                 What's In Your Kit
               </h2>
               <p className="text-muted-foreground text-lg">
@@ -127,7 +126,7 @@ const HowToApplication = () => {
                   <span className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
                     1
                   </span>
-                  <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+                  <h3 className="font-display text-2xl md:text-3xl text-foreground">
                     Prep Your Nails
                   </h3>
                 </div>
@@ -159,7 +158,7 @@ const HowToApplication = () => {
                   <span className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
                     2
                   </span>
-                  <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+                  <h3 className="font-display text-2xl md:text-3xl text-foreground">
                     Apply Adhesive
                   </h3>
                 </div>
@@ -192,7 +191,7 @@ const HowToApplication = () => {
                   <span className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
                     3
                   </span>
-                  <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+                  <h3 className="font-display text-2xl md:text-3xl text-foreground">
                     Press & Hold
                   </h3>
                 </div>
@@ -220,7 +219,7 @@ const HowToApplication = () => {
             <div className="bg-muted/20 border border-border/50 rounded-xl p-8 md:p-10">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="hidden md:flex aspect-[4/3] bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl border border-border/20 flex-col items-center justify-center gap-4 relative overflow-hidden">
-                  <span className="absolute text-[120px] font-serif font-bold text-primary/5 leading-none select-none pointer-events-none -translate-y-2">
+                  <span className="absolute text-[120px] font-display font-bold text-primary/5 leading-none select-none pointer-events-none -translate-y-2">
                     04
                   </span>
                   <RotateCcw className="w-14 h-14 text-primary/40 relative z-10" />
@@ -231,7 +230,7 @@ const HowToApplication = () => {
                     <span className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
                       4
                     </span>
-                    <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+                    <h3 className="font-display text-2xl md:text-3xl text-foreground">
                       Messed Up? Quick Fix
                     </h3>
                   </div>
@@ -257,7 +256,7 @@ const HowToApplication = () => {
                   <span className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold flex-shrink-0">
                     5
                   </span>
-                  <h3 className="font-serif text-2xl md:text-3xl text-foreground">
+                  <h3 className="font-display text-2xl md:text-3xl text-foreground">
                     Final Touches
                   </h3>
                 </div>
@@ -319,7 +318,6 @@ const HowToApplication = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

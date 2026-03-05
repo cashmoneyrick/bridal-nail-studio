@@ -15,7 +15,7 @@ const steps = [
     number: "02",
     title: "Get Your Sizing Kit",
     description:
-      "We'll send you a free sizing kit with your first order. Try each size on, find your fit — no guesswork.",
+      "Your first sizing kit is FREE with the purchase of any nail set. Try each size on, find your fit — no guesswork.",
     src: "https://placehold.co/300x400/e8e4df/a0998f?text=Step+2",
     alt: "Step 2: Receive your sizing kit",
   },

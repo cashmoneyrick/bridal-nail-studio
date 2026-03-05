@@ -42,19 +42,19 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="font-display text-3xl md:text-4xl text-foreground">
+      <div className="text-center space-y-3">
+        <h1 className="font-studio-display text-4xl md:text-5xl font-light text-foreground">
           Your nail basics
         </h1>
-        <p className="text-muted-foreground">The foundation of your set</p>
+        <p className="font-studio-body text-muted-foreground">The foundation of your set</p>
       </div>
 
       {/* Shape */}
       <div className="space-y-3">
-        <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <label className="font-studio-body text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
           Shape
         </label>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5">
           {shapes.map((s) => {
             const isSelected = shape === s;
             const price = SHAPE_PRICES[s];
@@ -63,10 +63,10 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
                 key={s}
                 onClick={() => setShape(s)}
                 className={cn(
-                  'relative flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200',
+                  'relative flex flex-col items-center gap-2 p-3 transition-all duration-250 card-soft',
                   isSelected
-                    ? 'border-primary bg-primary/5 scale-[1.02]'
-                    : 'border-border hover:border-primary/40 active:scale-[0.98]'
+                    ? 'card-soft-selected scale-[1.02]'
+                    : 'hover:-translate-y-0.5 active:scale-[0.98]'
                 )}
               >
                 {isSelected && (
@@ -77,17 +77,17 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
                 <svg viewBox="0 0 100 100" className="w-10 h-14">
                   <path
                     d={shapePaths[s]}
-                    fill={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.15)'}
-                    stroke={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.35)'}
-                    strokeWidth="2"
-                    className="transition-colors duration-200"
+                    fill={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.12)'}
+                    stroke={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.25)'}
+                    strokeWidth="1.5"
+                    className="transition-colors duration-250"
                   />
                 </svg>
-                <span className="text-xs font-medium text-foreground">
+                <span className="font-studio-body text-xs font-medium text-foreground">
                   {SHAPE_LABELS[s]}
                 </span>
                 {price > 0 && (
-                  <span className="text-[10px] text-primary font-medium">+${price}</span>
+                  <span className="font-studio-body text-[10px] text-primary font-medium">+${price}</span>
                 )}
               </button>
             );
@@ -95,12 +95,12 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
         </div>
       </div>
 
-      {/* Length */}
+      {/* Length — pill buttons */}
       <div className="space-y-3">
-        <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <label className="font-studio-body text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
           Length
         </label>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="flex flex-wrap gap-2">
           {lengths.map((l) => {
             const isSelected = length === l;
             const price = LENGTH_PRICES[l];
@@ -109,17 +109,17 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
                 key={l}
                 onClick={() => setLength(l)}
                 className={cn(
-                  'flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200',
+                  'flex items-center gap-2 py-2.5 px-5 rounded-full transition-all duration-200 font-studio-body text-sm',
                   isSelected
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/40'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-studio-cream-dark text-foreground hover:bg-studio-taupe-light/40'
                 )}
               >
-                <span className="text-sm font-medium text-foreground">
-                  {LENGTH_LABELS[l]}
-                </span>
+                <span className="font-medium">{LENGTH_LABELS[l]}</span>
                 {price > 0 && (
-                  <span className="text-[10px] text-primary font-medium">+${price}</span>
+                  <span className={cn('text-[10px]', isSelected ? 'text-primary-foreground/80' : 'text-primary')}>
+                    +${price}
+                  </span>
                 )}
               </button>
             );
@@ -129,7 +129,7 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
 
       {/* Finish */}
       <div className="space-y-3">
-        <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <label className="font-studio-body text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
           Finish
         </label>
         <div className="grid grid-cols-2 gap-3">
@@ -141,28 +141,28 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
                 key={f}
                 onClick={() => setFinish(f)}
                 className={cn(
-                  'flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200',
+                  'flex flex-col items-center gap-3 p-5 transition-all duration-250 card-soft',
                   isSelected
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/40'
+                    ? 'card-soft-selected'
+                    : 'hover:-translate-y-0.5'
                 )}
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full border border-border/50',
+                    'w-14 h-14 rounded-full',
                     f === 'glossy'
-                      ? 'bg-gradient-to-br from-white via-gray-100 to-gray-200 shadow-inner'
-                      : 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400'
+                      ? 'bg-gradient-to-br from-white via-gray-50 to-gray-200 shadow-[inset_0_-3px_6px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.06)]'
+                      : 'bg-gradient-to-br from-stone-200 via-stone-300 to-stone-400 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3)]'
                   )}
                 />
-                <span className="text-sm font-medium text-foreground">
+                <span className="font-studio-body text-sm font-medium text-foreground">
                   {FINISH_LABELS[f]}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="font-studio-body text-xs text-muted-foreground">
                   {finishDescriptions[f]}
                 </span>
                 {price > 0 && (
-                  <span className="text-[10px] text-primary font-medium">+${price}</span>
+                  <span className="font-studio-body text-[10px] text-primary font-medium">+${price}</span>
                 )}
               </button>
             );
@@ -174,7 +174,7 @@ export function BasicsStep({ onNext }: BasicsStepProps) {
       <Button
         onClick={onNext}
         disabled={!canAdvance()}
-        className="w-full rounded-xl h-12 text-base font-medium"
+        className="w-full rounded-full h-12 text-base font-studio-body font-medium"
       >
         Continue
       </Button>

@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Check, Copy, Percent } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { X, Check, Copy, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +8,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import ConfettiEffect from "./ConfettiEffect";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
+
+const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`;
 
 const EmailPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +20,12 @@ const EmailPopup = () => {
   const [copied, setCopied] = useState(false);
   const addCode = useDiscountCodesStore(state => state.addCode);
 
+  const prefersReducedMotion = typeof window !== "undefined"
+    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    : false;
+
   useEffect(() => {
-    // Never show if user already submitted email
     if (localStorage.getItem("emailSignupCompleted")) return;
-    // Don't show again this session
     if (sessionStorage.getItem("popupShownThisSession")) return;
 
     const handleScroll = () => {
@@ -39,13 +41,30 @@ const EmailPopup = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleClose = () => {
-    setIsOpen(false);
-    // No need to set localStorage here - only on submit
-  };
+  const handleClose = () => setIsOpen(false);
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText("WELCOME17");
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText("WELCOME17");
+    } catch {
+      // Fallback for non-secure contexts
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = 'WELCOME17';
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } catch {
+        toast({
+          title: "Couldn't copy",
+          description: "Your code is WELCOME17",
+        });
+        return;
+      }
+    }
     setCopied(true);
     toast({
       title: "Code copied!",
@@ -56,7 +75,7 @@ const EmailPopup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !email.includes("@")) {
       toast({
         title: "Invalid email",
@@ -68,7 +87,7 @@ const EmailPopup = () => {
 
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     setIsLoading(false);
     setIsSubmitted(true);
     setShowConfetti(true);
@@ -88,209 +107,216 @@ const EmailPopup = () => {
     });
   };
 
+  const stagger = (delayMs: number) =>
+    prefersReducedMotion
+      ? undefined
+      : { animation: `fade-in-up 0.6s ease-out ${delayMs}ms both` };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border-0 bg-transparent shadow-2xl gap-0">
+      <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden border-0 bg-transparent shadow-2xl gap-0">
         <DialogTitle className="sr-only">Get 17% Off Your First Order</DialogTitle>
-        <div className="relative overflow-hidden rounded-2xl">
-          {/* Confetti */}
+
+        <div className="relative overflow-hidden rounded-3xl bg-background">
+          {/* Inline keyframes */}
+          <style>{`
+            @keyframes fade-in-up {
+              from { opacity: 0; transform: translateY(16px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes editorial-drift {
+              0%, 100% { transform: translateY(-50%) translateX(0); }
+              50% { transform: translateY(-50%) translateX(-6px); }
+            }
+            @keyframes shimmer-sweep {
+              from { transform: translateX(-100%); }
+              to { transform: translateX(100%); }
+            }
+          `}</style>
+
+          {/* Confetti layer */}
           {showConfetti && <ConfettiEffect count={40} />}
-          
+
+          {/* Paper grain texture */}
+          <div
+            className="absolute inset-0 z-[1] pointer-events-none opacity-[0.03]"
+            style={{ backgroundImage: GRAIN_SVG, backgroundRepeat: "repeat" }}
+          />
+
+          {/* Gradient orb — sage green */}
+          <div className="absolute -top-20 -right-20 w-[300px] h-[300px] rounded-full bg-primary/[0.08] blur-[80px] pointer-events-none z-0" />
+
+          {/* Secondary orb — dusty blue (mobile only) */}
+          <div className="sm:hidden absolute -bottom-16 -left-16 w-[200px] h-[200px] rounded-full bg-secondary/[0.06] blur-[60px] pointer-events-none z-0" />
+
+          {/* Ghosted editorial "17%" */}
+          <span
+            className="absolute right-[-20px] sm:right-[-30px] top-[50%] font-display text-[160px] sm:text-[220px] font-bold italic text-foreground/[0.04] leading-none select-none pointer-events-none z-0"
+            style={
+              prefersReducedMotion
+                ? { transform: "translateY(-50%)" }
+                : { animation: "editorial-drift 8s ease-in-out infinite" }
+            }
+          >
+            17%
+          </span>
+
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 z-20 p-2 rounded-full bg-foreground/10 hover:bg-foreground/20 backdrop-blur-sm transition-colors"
+            aria-label="Close"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 w-8 h-8 rounded-full flex items-center justify-center bg-foreground/[0.05] hover:bg-foreground/[0.1] backdrop-blur-sm transition-all duration-300 group/close"
           >
-            <X className="h-4 w-4 text-foreground" />
+            <X className="h-3.5 w-3.5 text-foreground/40 group-hover/close:text-foreground/60 group-hover/close:rotate-90 transition-all duration-300" />
           </button>
 
-          {!isSubmitted ? (
-            <>
-              {/* Mobile layout — Two-zone editorial */}
-              <div className="sm:hidden overflow-hidden">
-                {/* Top zone — primary/sage bg */}
-                <div className="bg-primary px-8 pt-12 pb-8 relative overflow-hidden">
-                  <span className="absolute -top-4 -right-2 font-display text-[130px] font-bold italic text-primary-foreground/[0.07] leading-none select-none pointer-events-none">
-                    17
-                  </span>
-                  <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-primary-foreground/60 mb-3">
-                    Exclusive Offer
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-display text-7xl font-bold italic text-primary-foreground leading-none">17</span>
-                    <span className="font-display text-3xl font-medium text-primary-foreground/80 leading-none">%</span>
-                  </div>
-                  <p className="font-display text-lg italic font-light text-primary-foreground/80 mt-1 leading-snug">
-                    off your first order
-                  </p>
-                </div>
+          {/* ─── Content ─── */}
+          <div className="relative z-10 px-7 pt-12 pb-8 sm:px-10 sm:pt-14 sm:pb-10">
+            {!isSubmitted ? (
+              /* ═══ FORM STATE ═══ */
+              <>
+                <p
+                  className="text-[10px] sm:text-[11px] font-medium tracking-[0.3em] uppercase text-foreground/40"
+                  style={stagger(100)}
+                >
+                  Exclusive Offer
+                </p>
 
-                {/* Bottom zone — cream bg, left-aligned */}
-                <div className="bg-background px-8 py-7">
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                    Join our list and receive your welcome discount — handcrafted just like our nails.
-                  </p>
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <Input
+                <h2 className="mt-3">
+                  <span
+                    className="block font-display text-2xl sm:text-3xl font-light text-foreground/90 leading-none"
+                    style={stagger(200)}
+                  >
+                    Unlock
+                  </span>
+                  <span
+                    className="block font-display text-5xl sm:text-6xl font-bold italic text-foreground leading-none mt-1"
+                    style={stagger(300)}
+                  >
+                    17% Off
+                  </span>
+                  <span
+                    className="block font-display text-lg sm:text-xl italic font-light text-primary/80 leading-snug mt-1"
+                    style={stagger(400)}
+                  >
+                    your first order
+                  </span>
+                </h2>
+
+                <p
+                  className="text-sm text-muted-foreground/80 leading-relaxed mt-5 max-w-[300px]"
+                  style={stagger(500)}
+                >
+                  Join our list and receive your welcome discount — handcrafted just like our nails.
+                </p>
+
+                <form
+                  onSubmit={handleSubmit}
+                  className="mt-6 flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4"
+                  style={stagger(600)}
+                >
+                  <div className="flex-1">
+                    <input
                       type="email"
                       placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="h-11 rounded-lg bg-muted/40 border-border/60 focus:border-primary text-sm"
+                      required
+                      className="w-full h-12 bg-transparent border-0 border-b border-foreground/15 px-0 text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-foreground/40 transition-colors duration-300 font-light tracking-wide"
                     />
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full h-11 rounded-lg font-medium bg-foreground text-background hover:bg-foreground/90 text-sm"
-                    >
-                      {isLoading ? "Joining..." : "Claim My 17% Off"}
-                    </Button>
-                  </form>
-                  <p className="text-[11px] text-muted-foreground/50 mt-4 text-center">
-                    No spam · Unsubscribe anytime
-                  </p>
-                </div>
-              </div>
-
-              {/* Desktop layout - Keep as-is */}
-              <div className="hidden sm:grid grid-cols-5">
-                {/* Left accent bar */}
-                <div className="col-span-2 bg-primary relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%)]" />
-                  <div className="h-full flex flex-col items-center justify-center p-6 text-primary-foreground">
-                    <div className="w-16 h-16 rounded-full bg-primary-foreground/20 flex items-center justify-center mb-4 backdrop-blur-sm">
-                      <Percent className="h-8 w-8" />
-                    </div>
-                    <span className="font-display text-6xl font-bold leading-none">17</span>
-                    <span className="text-lg font-medium -mt-1">% OFF</span>
                   </div>
-                </div>
-
-                {/* Main content */}
-                <div className="col-span-3 bg-background p-8">
-                  <div className="space-y-4">
-                    <div>
-                      <h2 className="font-display text-xl font-semibold text-foreground leading-tight">
-                        Get 17% Off Your First Order
-                      </h2>
-                      <p className="text-muted-foreground text-sm mt-2">
-                        Sign up and get your first-order discount.
-                      </p>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="h-11 rounded-lg bg-muted/50 border-border focus:border-primary"
-                      />
-                      <Button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full h-11 rounded-lg font-medium"
-                      >
-                        {isLoading ? "Joining..." : "Get My Code"}
-                      </Button>
-                    </form>
-
-                    <p className="text-xs text-muted-foreground text-center">
-                      No spam, ever. Unsubscribe anytime.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            /* Success State */
-            <>
-              {/* Mobile success — Two-zone editorial */}
-              <div className="sm:hidden overflow-hidden relative z-10">
-                {/* Top zone */}
-                <div className="bg-primary px-8 pt-10 pb-8 relative overflow-hidden">
-                  <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-primary-foreground/60 mb-3">
-                    Thank You
-                  </p>
-                  <h3 className="font-display text-4xl font-bold italic text-primary-foreground leading-none mb-1">
-                    You're In!
-                  </h3>
-                  <p className="font-display text-base italic font-light text-primary-foreground/80 leading-snug">
-                    your gift is ready to use
-                  </p>
-                </div>
-
-                {/* Bottom zone */}
-                <div className="bg-background px-8 py-7">
-                  <p className="text-xs text-muted-foreground mb-3">Your exclusive code:</p>
-                  <div className="bg-muted/50 rounded-xl p-4 border border-border/50 flex items-center justify-between mb-5">
-                    <span className="font-mono text-2xl font-bold text-primary tracking-widest">
-                      WELCOME17
-                    </span>
-                    <button
-                      onClick={handleCopyCode}
-                      className="p-2 rounded-md hover:bg-muted transition-colors"
-                    >
-                      {copied ? (
-                        <Check className="h-4 w-4 text-primary" />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="relative w-full sm:w-auto sm:px-8 h-12 rounded-full bg-primary text-primary-foreground font-medium text-sm tracking-wide overflow-hidden hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {/* Shimmer sweep on hover */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full pointer-events-none" />
+                    <span className="relative">
+                      {isLoading ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Joining...
+                        </span>
                       ) : (
-                        <Copy className="h-4 w-4 text-muted-foreground" />
+                        "Unlock My 17% Off"
                       )}
-                    </button>
-                  </div>
-                  <Button
+                    </span>
+                  </button>
+                </form>
+
+                <p
+                  className="text-[11px] text-muted-foreground/40 mt-5"
+                  style={stagger(700)}
+                >
+                  No spam · Unsubscribe anytime
+                </p>
+              </>
+            ) : (
+              /* ═══ SUCCESS STATE ═══ */
+              <>
+                <p
+                  className="text-[10px] sm:text-[11px] font-medium tracking-[0.3em] uppercase text-foreground/40"
+                  style={stagger(100)}
+                >
+                  Thank You
+                </p>
+
+                <h3 className="mt-3">
+                  <span
+                    className="block font-display text-4xl sm:text-5xl font-bold italic text-foreground leading-none"
+                    style={stagger(200)}
+                  >
+                    You're In
+                  </span>
+                  <span
+                    className="block font-display text-lg italic font-light text-primary/80 leading-snug mt-1"
+                    style={stagger(300)}
+                  >
+                    your code is ready
+                  </span>
+                </h3>
+
+                {/* Discount code pill */}
+                <div
+                  className="mt-6 inline-flex items-center gap-3 bg-foreground/[0.04] rounded-full px-6 py-3 border border-foreground/[0.06]"
+                  style={stagger(400)}
+                >
+                  <span className="font-mono text-lg sm:text-xl font-bold tracking-[0.2em] text-foreground">
+                    WELCOME17
+                  </span>
+                  <button
+                    onClick={handleCopyCode}
+                    className="p-1.5 rounded-full hover:bg-foreground/[0.06] transition-all duration-200"
+                    aria-label="Copy code"
+                  >
+                    {copied ? (
+                      <Check className="h-4 w-4 text-primary" />
+                    ) : (
+                      <Copy className="h-4 w-4 text-foreground/30 hover:text-foreground/50 transition-colors" />
+                    )}
+                  </button>
+                </div>
+
+                <div style={stagger(500)} className="mt-6">
+                  <a
+                    href="/shop"
                     onClick={handleClose}
-                    className="w-full h-11 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-sm"
+                    className="inline-flex items-center justify-center w-full sm:w-auto px-8 h-12 rounded-full bg-primary text-primary-foreground font-medium text-sm tracking-wide hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                   >
                     Start Shopping
-                  </Button>
-                  <p className="text-[11px] text-muted-foreground/50 mt-4 text-center">
-                    Code saved to your account
-                  </p>
+                  </a>
                 </div>
-              </div>
 
-              {/* Desktop success - Keep as-is */}
-              <div className="hidden sm:block bg-background p-8 text-center relative z-10">
-                <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Check className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                  You're In!
-                </h3>
-                <p className="text-muted-foreground text-sm mb-5">
-                  Your exclusive discount is ready to use.
+                <p
+                  className="text-[11px] text-muted-foreground/40 mt-5"
+                  style={stagger(600)}
+                >
+                  Code saved to your account
                 </p>
-
-                <div className="bg-muted/50 rounded-lg p-4 mb-5 border border-border/50">
-                  <p className="text-xs text-muted-foreground mb-1.5">Your code:</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="font-mono text-2xl font-bold text-primary tracking-widest">
-                      WELCOME17
-                    </span>
-                    <button
-                      onClick={handleCopyCode}
-                      className="p-2 rounded-md hover:bg-muted transition-colors"
-                    >
-                      {copied ? (
-                        <Check className="h-4 w-4 text-primary" />
-                      ) : (
-                        <Copy className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <Button onClick={handleClose} className="w-full h-11 rounded-lg">
-                  Start Shopping
-                </Button>
-
-                <p className="text-xs text-muted-foreground mt-3">
-                  Code saved to your account.
-                </p>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

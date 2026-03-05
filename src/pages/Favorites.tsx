@@ -1,5 +1,4 @@
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -27,7 +26,7 @@ const Favorites = () => {
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl text-foreground mb-4">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-4">
             My Favorites
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -117,7 +116,6 @@ const Favorites = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { AlertCircle, Wrench, ShieldCheck, Hand, Ruler, ChevronRight } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 
 const issues = [
@@ -61,7 +60,7 @@ const HowToTroubleshooting = () => {
                 </div>
               </div>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
               Troubleshooting
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl">
@@ -81,7 +80,7 @@ const HowToTroubleshooting = () => {
                   key={index}
                   className="bg-secondary/10 border border-border/30 rounded-xl p-6 md:p-8"
                 >
-                  <h3 className="font-serif text-xl md:text-2xl text-foreground mb-6">
+                  <h3 className="font-display text-xl md:text-2xl text-foreground mb-6">
                     {issue.title}
                   </h3>
 
@@ -130,7 +129,7 @@ const HowToTroubleshooting = () => {
       <section className="pb-20 md:pb-28">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto text-center bg-secondary/20 rounded-2xl p-10 md:p-14">
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-4">
+            <h2 className="font-display text-2xl md:text-3xl text-foreground mb-4">
               Still Having Issues?
             </h2>
             <p className="text-muted-foreground mb-8">
@@ -189,7 +188,6 @@ const HowToTroubleshooting = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

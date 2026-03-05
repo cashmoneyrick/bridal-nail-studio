@@ -7,7 +7,6 @@ import { useDiscountCodesStore } from "@/stores/discountCodesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import {
   Collapsible,
   CollapsibleContent,
@@ -93,7 +92,7 @@ const Cart = () => {
       <main className="flex-1 container mx-auto px-4 py-8 pt-24">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
             Shopping Bag
           </h1>
           <p className="text-muted-foreground mt-2">
@@ -345,7 +344,6 @@ const Cart = () => {
         )}
       </main>
 
-      <Footer />
     </div>
   );
 };

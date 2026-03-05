@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
   AlertTriangle, Droplets, Bath, FlaskConical, Sparkles, RotateCcw,
@@ -90,7 +89,7 @@ const HowToRemoval = () => {
                 </div>
               </div>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
               Removing Your Set
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto">
@@ -119,7 +118,7 @@ const HowToRemoval = () => {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
               Choose Your Method
             </h2>
           </div>
@@ -142,7 +141,7 @@ const HowToRemoval = () => {
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                       <Icon className="w-5 h-5 text-primary" />
                     </div>
-                    <h3 className="font-serif text-xl text-foreground">
+                    <h3 className="font-display text-xl text-foreground">
                       {method.title}
                     </h3>
                   </div>
@@ -186,7 +185,7 @@ const HowToRemoval = () => {
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-8">
+            <h2 className="font-display text-2xl md:text-3xl text-foreground mb-8">
               After Removal: Nail Care
             </h2>
             <ul className="space-y-4 text-left max-w-md mx-auto">
@@ -208,7 +207,7 @@ const HowToRemoval = () => {
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
               <RotateCcw className="w-6 h-6 text-primary" />
             </div>
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-8">
+            <h2 className="font-display text-2xl md:text-3xl text-foreground mb-8">
               Want to Reuse Your Set?
             </h2>
             <ul className="space-y-4 text-left max-w-md mx-auto">
@@ -269,7 +268,6 @@ const HowToRemoval = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

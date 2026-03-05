@@ -102,9 +102,26 @@ const EmailSignup = () => {
   };
 
   // Copy code to clipboard
-  const copyCode = () => {
-    navigator.clipboard.writeText('PRETTY17');
-    toast.success("Code copied to clipboard!", { position: "top-center" });
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText('PRETTY17');
+      toast.success("Code copied to clipboard!", { position: "top-center" });
+    } catch {
+      // Fallback for non-secure contexts
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = 'PRETTY17';
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        toast.success("Code copied to clipboard!", { position: "top-center" });
+      } catch {
+        toast.error("Couldn't copy — your code is PRETTY17", { position: "top-center" });
+      }
+    }
   };
 
   if (submitState === 'success') {

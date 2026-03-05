@@ -44,7 +44,10 @@ export const CHARM_TO_TIER: Record<CharmLevel, CharmTier> = {
 interface CustomStudioState {
   currentStep: number;
 
-  // Step 0: Inspiration
+  // Step 0: Intent
+  orderPath: 'cart' | 'quote' | null;
+
+  // Step 1: Inspiration
   inspirationImages: string[];
   inspirationText: string;
 
@@ -77,6 +80,9 @@ interface CustomStudioActions {
   canAdvance: () => boolean;
 
   // Step 0
+  setOrderPath: (path: 'cart' | 'quote') => void;
+
+  // Step 1
   addInspirationImage: (url: string) => void;
   removeInspirationImage: (url: string) => void;
   setInspirationText: (text: string) => void;
@@ -110,6 +116,7 @@ interface CustomStudioActions {
 
 const initialState: CustomStudioState = {
   currentStep: 0,
+  orderPath: null,
   inspirationImages: [],
   inspirationText: '',
   shape: null,
@@ -134,11 +141,11 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
       ...initialState,
 
       // Navigation
-      setStep: (step) => set({ currentStep: Math.max(0, Math.min(4, step)) }),
+      setStep: (step) => set({ currentStep: Math.max(0, Math.min(5, step)) }),
 
       nextStep: () => {
         const { currentStep, canAdvance } = get();
-        if (canAdvance() && currentStep < 4) {
+        if (canAdvance() && currentStep < 5) {
           set({ currentStep: currentStep + 1 });
         }
       },
@@ -154,21 +161,26 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         const state = get();
         switch (state.currentStep) {
           case 0:
-            return state.inspirationImages.length > 0 || state.inspirationText.trim().length > 0;
+            return state.orderPath !== null;
           case 1:
-            return state.shape !== null && state.length !== null && state.finish !== null;
+            return state.inspirationImages.length > 0 || state.inspirationText.trim().length > 0;
           case 2:
-            return state.selectedColors.length > 0;
+            return state.shape !== null && state.length !== null && state.finish !== null;
           case 3:
-            return true;
+            return state.selectedColors.length > 0;
           case 4:
+            return true;
+          case 5:
             return true;
           default:
             return false;
         }
       },
 
-      // Step 0: Inspiration
+      // Step 0: Intent
+      setOrderPath: (path) => set({ orderPath: path }),
+
+      // Step 1: Inspiration
       addInspirationImage: (url) => set((state) => ({
         inspirationImages: state.inspirationImages.length < 5
           ? [...state.inspirationImages, url]
@@ -243,6 +255,7 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
       name: STORAGE_KEY,
       partialize: (state) => ({
         currentStep: state.currentStep,
+        orderPath: state.orderPath,
         inspirationImages: state.inspirationImages,
         inspirationText: state.inspirationText,
         shape: state.shape,

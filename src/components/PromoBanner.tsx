@@ -3,7 +3,7 @@ import useEmblaCarousel from "embla-carousel-react";
 
 const messages = [
   "New: Spring Collection — garden-inspired sets, handmade to order",
-  "Every order includes a free sizing kit",
+  "Your first sizing kit is FREE with any nail set purchase",
   "Custom designs start at $45",
 ];
 

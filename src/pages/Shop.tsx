@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Filter, X, Heart, Eye } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 import { toast } from "sonner";
 import QuickViewModal from "@/components/QuickViewModal";
@@ -391,7 +390,6 @@ const Shop = () => {
         onClose={() => setQuickViewProduct(null)} 
       />
 
-      <Footer />
     </div>
   );
 };

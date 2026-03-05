@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -333,5 +333,63 @@
   .animate-marquee-left,
   .animate-marquee-right {
     animation: none !important;
+  }
+}
+
+/* ============================================
+   Custom Studio — Scoped Visual Overrides
+   Warm rose + cream palette, Cormorant Garamond + Jost
+   Applied via .custom-studio wrapper class on CustomStudio.tsx
+   ============================================ */
+
+.custom-studio {
+  --primary: 354 42% 58%;
+  --primary-foreground: 0 0% 100%;
+  --background: 38 44% 96%;
+  --foreground: 12 9% 22%;
+  --card: 40 100% 99%;
+  --card-foreground: 12 9% 22%;
+  --border: 30 18% 82%;
+  --input: 30 18% 82%;
+  --muted: 36 38% 92%;
+  --muted-foreground: 24 12% 48%;
+  --ring: 354 42% 58%;
+  --accent: 41 49% 59%;
+  --accent-foreground: 0 0% 100%;
+}
+
+/* Studio heading typography override */
+.custom-studio h1,
+.custom-studio h2,
+.custom-studio h3,
+.custom-studio h4 {
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: -0.02em;
+}
+
+/* Paper grain texture — subtle noise overlay */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Dotted leader line for receipt-style price breakdown */
+.dotted-leader {
+  flex: 1;
+  border-bottom: 1px dotted hsl(var(--border));
+  margin: 0 0.75rem;
+  min-width: 2rem;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-studio .grain-overlay {
+    display: none;
   }
 }

@@ -36,7 +36,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 
 const contactSchema = z.object({
   name: z
@@ -734,7 +733,6 @@ const Contact = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

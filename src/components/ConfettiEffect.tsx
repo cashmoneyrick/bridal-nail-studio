@@ -12,9 +12,6 @@ const ConfettiEffect = ({ count = 25 }: ConfettiEffectProps) => {
       "hsl(var(--primary))",
       "hsl(var(--secondary))",
       "hsl(var(--accent))",
-      "#FFD700",
-      "#FF69B4",
-      "#87CEEB",
     ];
     
     const newPieces = Array.from({ length: count }, (_, i) => ({

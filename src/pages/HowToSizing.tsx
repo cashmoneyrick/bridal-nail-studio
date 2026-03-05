@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
@@ -21,7 +20,7 @@ const shapes = [
 // Styled icon panel for steps (hidden on mobile)
 const StepPanel = ({ icon: Icon, label, stepNumber }: { icon: React.ElementType; label: string; stepNumber: string }) => (
   <div className="hidden md:flex aspect-[4/3] bg-gradient-to-br from-secondary/25 to-primary/8 rounded-xl border border-border/20 flex-col items-center justify-center gap-4 relative overflow-hidden">
-    <span className="absolute text-[120px] font-serif font-bold text-primary/5 leading-none select-none pointer-events-none -translate-y-2">
+    <span className="absolute text-[120px] font-display font-bold text-primary/5 leading-none select-none pointer-events-none -translate-y-2">
       {stepNumber}
     </span>
     <Icon className="w-14 h-14 text-primary/40 relative z-10" />
@@ -97,7 +96,7 @@ const HowToSizing = () => {
                 </div>
               </div>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
               I Don't Know My Size
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl">
@@ -139,7 +138,7 @@ const HowToSizing = () => {
             <div className="bg-secondary/30 rounded-xl p-6 md:p-8 flex gap-4 items-start">
               <Gift className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-foreground">
-                <span className="font-medium">Good news!</span> Your first set includes a free sizing kit in the shape you order.
+                <span className="font-medium">Good news!</span> Your first sizing kit is FREE with the purchase of any nail set.
               </p>
             </div>
           </div>
@@ -165,11 +164,14 @@ const HowToSizing = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-              <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+              <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
                 Need a Sizing Kit?
               </h2>
               <p className="text-muted-foreground text-lg">
                 Select your shape and add to cart — $5
+              </p>
+              <p className="text-sm text-primary font-medium mt-2">
+                Your first sizing kit is FREE with the purchase of any nail set
               </p>
             </div>
 
@@ -221,7 +223,7 @@ const HowToSizing = () => {
         <div className="container mx-auto px-6 py-16 md:py-24">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
+              <h2 className="font-display text-3xl md:text-4xl text-foreground mb-4">
                 How to Use Your Sizing Kit
               </h2>
               <p className="text-muted-foreground text-lg">
@@ -235,7 +237,7 @@ const HowToSizing = () => {
                 <StepPanel icon={Package} label="Step 1" stepNumber="01" />
                 <div>
                   <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">Step 1</span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
+                  <h3 className="font-display text-2xl text-foreground mb-4">
                     Lay Out Your Sizing Nails
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
@@ -248,7 +250,7 @@ const HowToSizing = () => {
               <div id="step-2" className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="md:order-1">
                   <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">Step 2</span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
+                  <h3 className="font-display text-2xl text-foreground mb-4">
                     Try Each Size
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
@@ -265,7 +267,7 @@ const HowToSizing = () => {
                 <StepPanel icon={ClipboardList} label="Step 3" stepNumber="03" />
                 <div>
                   <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">Step 3</span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
+                  <h3 className="font-display text-2xl text-foreground mb-4">
                     Record Your Sizes
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">
@@ -278,7 +280,7 @@ const HowToSizing = () => {
               <div id="step-4" className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="md:order-1">
                   <span className="text-sm text-muted-foreground uppercase tracking-wider mb-2 block">Step 4</span>
-                  <h3 className="font-serif text-2xl text-foreground mb-4">
+                  <h3 className="font-display text-2xl text-foreground mb-4">
                     Save to Your Account
                   </h3>
                   <p className="text-muted-foreground leading-relaxed mb-6">
@@ -346,7 +348,6 @@ const HowToSizing = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

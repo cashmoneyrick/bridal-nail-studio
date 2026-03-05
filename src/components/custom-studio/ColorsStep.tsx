@@ -26,37 +26,39 @@ const SWATCH_COLORS = [
   { name: 'Silver', hex: '#C0C0C0' },
 ];
 
+// Light colors that need dark check marks
+const LIGHT_HEXES = new Set(['#FFFFFF', '#F5F0E8', '#C0C0C0', '#D4AF37', '#F4D1D1', '#E8C4C4', '#E5D3C8']);
+
 export function ColorsStep({ onNext }: ColorsStepProps) {
   const { selectedColors, colorNotes, toggleColor, setColorNotes, canAdvance } =
     useCustomStudioStore();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="font-display text-3xl md:text-4xl text-foreground">
+      <div className="text-center space-y-3">
+        <h1 className="font-studio-display text-4xl md:text-5xl font-light text-foreground">
           What colors are you feeling?
         </h1>
-        <p className="text-muted-foreground">Select any that speak to you</p>
+        <p className="font-studio-body text-muted-foreground">Select any that speak to you</p>
       </div>
 
       {/* Swatches */}
-      <div className="grid grid-cols-5 sm:grid-cols-5 gap-3 justify-items-center">
+      <div className="grid grid-cols-5 gap-4 justify-items-center">
         {SWATCH_COLORS.map(({ name, hex }) => {
           const isSelected = selectedColors.includes(hex);
+          const isLight = hex === '#FFFFFF' || hex === '#F5F0E8';
           return (
             <button
               key={hex}
               onClick={() => toggleColor(hex)}
               title={name}
               className={cn(
-                'w-12 h-12 rounded-full transition-all duration-200 relative flex items-center justify-center',
-                hex === '#FFFFFF' || hex === '#F5F0E8'
-                  ? 'border border-border'
-                  : 'border border-transparent',
+                'w-14 h-14 rounded-full transition-all duration-200 relative flex items-center justify-center shadow-inner',
+                isLight ? 'border border-studio-taupe-light/50' : '',
                 isSelected
-                  ? 'ring-2 ring-primary ring-offset-2 scale-110'
-                  : 'hover:scale-105'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+                  : 'hover:scale-110'
               )}
               style={{ backgroundColor: hex }}
             >
@@ -64,9 +66,7 @@ export function ColorsStep({ onNext }: ColorsStepProps) {
                 <Check
                   className={cn(
                     'w-4 h-4',
-                    hex === '#FFFFFF' || hex === '#F5F0E8' || hex === '#C0C0C0' || hex === '#D4AF37' || hex === '#F4D1D1' || hex === '#E8C4C4' || hex === '#E5D3C8'
-                      ? 'text-foreground'
-                      : 'text-white'
+                    LIGHT_HEXES.has(hex) ? 'text-studio-charcoal' : 'text-white'
                   )}
                   strokeWidth={3}
                 />
@@ -84,7 +84,7 @@ export function ColorsStep({ onNext }: ColorsStepProps) {
             return (
               <span
                 key={hex}
-                className="text-xs bg-muted px-2.5 py-1 rounded-full text-muted-foreground"
+                className="font-studio-body text-xs bg-studio-cream-dark border border-studio-taupe-light/40 px-3 py-1 rounded-full text-foreground"
               >
                 {color?.name || hex}
               </span>
@@ -95,14 +95,14 @@ export function ColorsStep({ onNext }: ColorsStepProps) {
 
       {/* Notes */}
       <div className="space-y-2">
-        <label className="text-sm text-muted-foreground">
+        <label className="font-studio-body text-sm text-muted-foreground">
           Anything specific?
         </label>
         <Input
           value={colorNotes}
           onChange={(e) => setColorNotes(e.target.value)}
           placeholder="e.g., 'dusty mauve to match my dress'"
-          className="rounded-xl"
+          className="rounded-2xl bg-studio-cream-dark/30 border-studio-taupe-light/60 focus:border-primary font-studio-body placeholder:text-studio-taupe/60"
         />
       </div>
 
@@ -110,7 +110,7 @@ export function ColorsStep({ onNext }: ColorsStepProps) {
       <Button
         onClick={onNext}
         disabled={!canAdvance()}
-        className="w-full rounded-xl h-12 text-base font-medium"
+        className="w-full rounded-full h-12 text-base font-studio-body font-medium"
       >
         Continue
       </Button>

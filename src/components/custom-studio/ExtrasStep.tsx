@@ -40,23 +40,23 @@ export function ExtrasStep({ onNext }: ExtrasStepProps) {
   } = useCustomStudioStore();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="font-display text-3xl md:text-4xl text-foreground">
+      <div className="text-center space-y-3">
+        <h1 className="font-studio-display text-4xl md:text-5xl font-light text-foreground">
           Any extras?
         </h1>
-        <p className="text-muted-foreground">
+        <p className="font-studio-body text-muted-foreground">
           All optional — skip if you want to keep it simple
         </p>
       </div>
 
-      {/* Effects */}
+      {/* Effects — horizontal cards */}
       <div className="space-y-3">
-        <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <label className="font-studio-body text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
           Special Finishes
         </label>
-        <div className="space-y-2">
+        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
           {EFFECTS.map(({ id, label, price, icon: Icon }) => {
             const isActive = effects.includes(id);
             return (
@@ -64,67 +64,71 @@ export function ExtrasStep({ onNext }: ExtrasStepProps) {
                 key={id}
                 onClick={() => toggleEffect(id)}
                 className={cn(
-                  'w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+                  'min-w-[110px] flex flex-col items-center gap-2.5 p-4 transition-all duration-250 card-soft',
                   isActive
-                    ? 'border-primary/30 bg-primary/5'
-                    : 'border-border hover:border-primary/30'
+                    ? 'card-soft-selected'
+                    : 'hover:-translate-y-0.5'
                 )}
               >
-                <Icon className={cn('w-5 h-5 flex-shrink-0', isActive ? 'text-primary' : 'text-muted-foreground')} />
-                <span className="flex-1 font-medium text-foreground">{label}</span>
-                <span className="text-sm text-muted-foreground">+${price}</span>
+                <Icon className={cn('w-5 h-5', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                <span className="font-studio-body text-sm font-medium text-foreground">{label}</span>
+                <span className="font-studio-body text-xs text-muted-foreground">+${price}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Rhinestones */}
+      {/* Rhinestones — pill buttons */}
       <div className="space-y-3">
-        <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <label className="font-studio-body text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
           Rhinestones
         </label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-wrap gap-2">
           {RHINESTONE_OPTIONS.map(({ level, label, price }) => (
             <button
               key={level}
               onClick={() => setRhinestones(level)}
               className={cn(
-                'flex flex-col items-center gap-1 py-3 px-2 rounded-xl border-2 transition-all duration-200',
+                'flex items-center gap-1.5 py-2.5 px-5 rounded-full transition-all duration-200 font-studio-body text-sm',
                 rhinestones === level
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/40'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-studio-cream-dark text-foreground hover:bg-studio-taupe-light/40'
               )}
             >
-              <span className="text-sm font-medium text-foreground">{label}</span>
+              <span className="font-medium">{label}</span>
               {price > 0 && (
-                <span className="text-[10px] text-primary font-medium">+${price}</span>
+                <span className={cn('text-[10px]', rhinestones === level ? 'text-primary-foreground/80' : 'text-primary')}>
+                  +${price}
+                </span>
               )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Charms */}
+      {/* Charms — pill buttons */}
       <div className="space-y-3">
-        <label className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <label className="font-studio-body text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
           Charms
         </label>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex flex-wrap gap-2">
           {CHARM_OPTIONS.map(({ level, label, price }) => (
             <button
               key={level}
               onClick={() => setCharms(level)}
               className={cn(
-                'flex flex-col items-center gap-1 py-3 px-2 rounded-xl border-2 transition-all duration-200',
+                'flex items-center gap-1.5 py-2.5 px-5 rounded-full transition-all duration-200 font-studio-body text-sm',
                 charms === level
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/40'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-studio-cream-dark text-foreground hover:bg-studio-taupe-light/40'
               )}
             >
-              <span className="text-sm font-medium text-foreground">{label}</span>
+              <span className="font-medium">{label}</span>
               {price > 0 && (
-                <span className="text-[10px] text-primary font-medium">+${price}</span>
+                <span className={cn('text-[10px]', charms === level ? 'text-primary-foreground/80' : 'text-primary')}>
+                  +${price}
+                </span>
               )}
             </button>
           ))}
@@ -133,29 +137,28 @@ export function ExtrasStep({ onNext }: ExtrasStepProps) {
 
       {/* Notes */}
       <div className="space-y-2">
-        <label className="text-sm text-muted-foreground">
+        <label className="font-studio-body text-sm text-muted-foreground">
           Anything else we should know?
         </label>
         <Textarea
           value={extraNotes}
           onChange={(e) => setExtraNotes(e.target.value)}
           placeholder="e.g., 'gold butterfly charms', 'rhinestones on ring fingers only'"
-          className="min-h-[80px] rounded-xl resize-none"
+          className="min-h-[80px] rounded-2xl resize-none bg-studio-cream-dark/30 border-studio-taupe-light/60 focus:border-primary font-studio-body placeholder:text-studio-taupe/60"
         />
       </div>
 
       {/* Buttons */}
       <div className="flex gap-3">
-        <Button
-          variant="outline"
+        <button
           onClick={onNext}
-          className="flex-1 rounded-xl h-12 text-base"
+          className="flex-1 rounded-full h-12 text-base font-studio-body text-studio-taupe hover:text-foreground transition-colors duration-200"
         >
-          Skip
-        </Button>
+          Skip this step
+        </button>
         <Button
           onClick={onNext}
-          className="flex-1 rounded-xl h-12 text-base font-medium"
+          className="flex-1 rounded-full h-12 text-base font-studio-body font-medium"
         >
           Continue
         </Button>

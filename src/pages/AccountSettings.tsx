@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Settings, User, Mail, Lock, AlertTriangle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { useAuthStore } from "@/stores/authStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -160,7 +159,7 @@ const AccountSettings = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 sm:pb-12">
         {/* Back Link */}
         <Link
           to="/account"
@@ -174,7 +173,7 @@ const AccountSettings = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Settings className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Account Settings</h1>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Account Settings</h1>
           </div>
           <p className="text-muted-foreground">Manage your account preferences</p>
         </div>
@@ -384,7 +383,6 @@ const AccountSettings = () => {
                       />
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>
                       Cancel
                     </AlertDialogCancel>
@@ -402,7 +400,6 @@ const AccountSettings = () => {
                         "Delete Account"
                       )}
                     </AlertDialogAction>
-                  </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </CardContent>
@@ -410,7 +407,6 @@ const AccountSettings = () => {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 };

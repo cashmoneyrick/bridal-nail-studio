@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { useNailProfilesStore, NailSizes, NailProfile } from "@/stores/nailProfilesStore";
 import { useNailProfileSync } from "@/hooks/useNailProfileSync";
 
@@ -16,8 +15,8 @@ import { useNailProfileSync } from "@/hooks/useNailProfileSync";
 const LEFT_HAND_FINGERS = ['Pinky', 'Ring', 'Middle', 'Index', 'Thumb'];
 const RIGHT_HAND_FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
 
-// Size options 00-10
-const SIZE_OPTIONS = ['00', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+// Size options 0-9
+const SIZE_OPTIONS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 const DEFAULT_SIZES: NailSizes = {
   leftPinky: '',
@@ -125,7 +124,7 @@ const PerfectFitProfile = () => {
             <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-secondary/50 to-primary/30 flex items-center justify-center mb-4">
               <Hand className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="font-display text-3xl sm:text-4xl font-medium mb-3">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium mb-3">
               My Perfect Fit Profiles
             </h1>
             <p className="text-muted-foreground max-w-md mx-auto">
@@ -276,8 +275,12 @@ const PerfectFitProfile = () => {
                     <div>
                       <h3 className="font-medium mb-1">How to find your sizes</h3>
                       <p className="text-sm text-muted-foreground">
-                        Use our sizing kit to measure each nail. Match your natural nail width to the numbered tips 
+                        Use our sizing kit to measure each nail. Match your natural nail width to the numbered tips
                         and record each size below. If you're between sizes, choose the larger size for the most comfortable fit.
+                      </p>
+                      <p className="text-sm text-primary font-medium mt-2">
+                        Don't have a sizing kit? Your first one is FREE with any nail set purchase.{' '}
+                        <a href="/how-to/sizing" className="underline underline-offset-2 hover:text-primary/80">Learn more</a>
                       </p>
                     </div>
                   </div>
@@ -420,7 +423,6 @@ const PerfectFitProfile = () => {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 };

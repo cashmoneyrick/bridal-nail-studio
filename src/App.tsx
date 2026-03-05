@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
-import CustomStudio from "./pages/CustomStudio";
+import Create from "./pages/Create";
 import Shop from "./pages/Shop";
 import NailClub from "./pages/NailClub";
 import HowTo from "./pages/HowTo";
@@ -47,6 +47,14 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Layout with footer for all main site pages
+const MainLayout = () => (
+  <>
+    <Outlet />
+    <Footer />
+  </>
+);
+
 const App = () => (
   <div className="overflow-x-hidden w-full max-w-full">
     <QueryClientProvider client={queryClient}>
@@ -59,31 +67,35 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/product/:handle" element={<ProductDetail />} />
-              <Route path="/custom-studio" element={<CustomStudio />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/club" element={<NailClub />} />
-              <Route path="/how-to" element={<HowTo />} />
-              <Route path="/how-to/sizing" element={<HowToSizing />} />
-              <Route path="/how-to/application" element={<HowToApplication />} />
-              <Route path="/how-to/troubleshooting" element={<HowToTroubleshooting />} />
-              <Route path="/how-to/removal" element={<HowToRemoval />} />
-              <Route path="/how-to/bridal" element={<HowToBridal />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/account/perfect-fit" element={<PerfectFitProfile />} />
-              <Route path="/settings" element={<AccountSettings />} />
-              <Route path="/settings/addresses" element={<Addresses />} />
-              <Route path="/orders" element={<OrderHistory />} />
-              <Route path="/payment" element={<PaymentMethods />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/cart" element={<Cart />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+              {/* Standalone route — no nav/footer */}
+              <Route path="/create" element={<Create />} />
+
+              {/* Main site routes with footer */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/product/:handle" element={<ProductDetail />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/club" element={<NailClub />} />
+                <Route path="/how-to" element={<HowTo />} />
+                <Route path="/how-to/sizing" element={<HowToSizing />} />
+                <Route path="/how-to/application" element={<HowToApplication />} />
+                <Route path="/how-to/troubleshooting" element={<HowToTroubleshooting />} />
+                <Route path="/how-to/removal" element={<HowToRemoval />} />
+                <Route path="/how-to/bridal" element={<HowToBridal />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/account/perfect-fit" element={<PerfectFitProfile />} />
+                <Route path="/settings" element={<AccountSettings />} />
+                <Route path="/settings/addresses" element={<Addresses />} />
+                <Route path="/orders" element={<OrderHistory />} />
+                <Route path="/payment" element={<PaymentMethods />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/cart" element={<Cart />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Route>
             </Routes>
-            <Footer />
           </BrowserRouter>
         </AuthInitializer>
       </TooltipProvider>

@@ -144,14 +144,14 @@ const EmailPopup = () => {
           />
 
           {/* Gradient orb — sage green */}
-          <div className="absolute -top-20 -right-20 w-[300px] h-[300px] rounded-full bg-primary/[0.08] blur-[80px] pointer-events-none z-0" />
+          <div className="absolute -top-20 -right-20 w-[300px] h-[300px] rounded-full bg-primary/[0.12] blur-[80px] pointer-events-none z-0" />
 
           {/* Secondary orb — dusty blue (mobile only) */}
           <div className="sm:hidden absolute -bottom-16 -left-16 w-[200px] h-[200px] rounded-full bg-secondary/[0.06] blur-[60px] pointer-events-none z-0" />
 
           {/* Ghosted editorial "17%" */}
           <span
-            className="absolute right-[-20px] sm:right-[-30px] top-[50%] font-display text-[160px] sm:text-[220px] font-bold italic text-foreground/[0.04] leading-none select-none pointer-events-none z-0"
+            className="absolute right-[-20px] sm:right-[-30px] top-[50%] font-display text-[160px] sm:text-[220px] font-bold italic text-foreground/[0.06] leading-none select-none pointer-events-none z-0"
             style={
               prefersReducedMotion
                 ? { transform: "translateY(-50%)" }
@@ -167,7 +167,7 @@ const EmailPopup = () => {
             aria-label="Close"
             className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 w-8 h-8 rounded-full flex items-center justify-center bg-foreground/[0.05] hover:bg-foreground/[0.1] backdrop-blur-sm transition-all duration-300 group/close"
           >
-            <X className="h-3.5 w-3.5 text-foreground/40 group-hover/close:text-foreground/60 group-hover/close:rotate-90 transition-all duration-300" />
+            <X className="h-3.5 w-3.5 text-foreground/50 group-hover/close:text-foreground/70 group-hover/close:rotate-90 transition-all duration-300" />
           </button>
 
           {/* ─── Content ─── */}
@@ -176,7 +176,7 @@ const EmailPopup = () => {
               /* ═══ FORM STATE ═══ */
               <>
                 <p
-                  className="text-[10px] sm:text-[11px] font-medium tracking-[0.3em] uppercase text-foreground/40"
+                  className="text-[10px] sm:text-[11px] font-medium tracking-[0.3em] uppercase text-foreground/60"
                   style={stagger(100)}
                 >
                   Exclusive Offer
@@ -184,7 +184,7 @@ const EmailPopup = () => {
 
                 <h2 className="mt-3">
                   <span
-                    className="block font-display text-2xl sm:text-3xl font-light text-foreground/90 leading-none"
+                    className="block font-display text-2xl sm:text-3xl font-light text-foreground leading-none"
                     style={stagger(200)}
                   >
                     Unlock
@@ -196,7 +196,7 @@ const EmailPopup = () => {
                     17% Off
                   </span>
                   <span
-                    className="block font-display text-lg sm:text-xl italic font-light text-primary/80 leading-snug mt-1"
+                    className="block font-display text-lg sm:text-xl italic font-light text-primary leading-snug mt-1"
                     style={stagger(400)}
                   >
                     your first order
@@ -204,7 +204,7 @@ const EmailPopup = () => {
                 </h2>
 
                 <p
-                  className="text-sm text-muted-foreground/80 leading-relaxed mt-5 max-w-[300px]"
+                  className="text-sm text-muted-foreground leading-relaxed mt-5 max-w-[300px]"
                   style={stagger(500)}
                 >
                   Join our list and receive your welcome discount — handcrafted just like our nails.
@@ -222,7 +222,7 @@ const EmailPopup = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full h-12 bg-transparent border-0 border-b border-foreground/15 px-0 text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-foreground/40 transition-colors duration-300 font-light tracking-wide"
+                      className="w-full h-12 bg-transparent border-0 border-b border-foreground/25 px-0 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary transition-colors duration-300 font-light tracking-wide"
                     />
                   </div>
                   <button
@@ -246,7 +246,7 @@ const EmailPopup = () => {
                 </form>
 
                 <p
-                  className="text-[11px] text-muted-foreground/40 mt-5"
+                  className="text-[11px] text-muted-foreground/60 mt-5"
                   style={stagger(700)}
                 >
                   No spam · Unsubscribe anytime
@@ -256,7 +256,7 @@ const EmailPopup = () => {
               /* ═══ SUCCESS STATE ═══ */
               <>
                 <p
-                  className="text-[10px] sm:text-[11px] font-medium tracking-[0.3em] uppercase text-foreground/40"
+                  className="text-[10px] sm:text-[11px] font-medium tracking-[0.3em] uppercase text-foreground/60"
                   style={stagger(100)}
                 >
                   Thank You
@@ -270,7 +270,7 @@ const EmailPopup = () => {
                     You're In
                   </span>
                   <span
-                    className="block font-display text-lg italic font-light text-primary/80 leading-snug mt-1"
+                    className="block font-display text-lg italic font-light text-primary leading-snug mt-1"
                     style={stagger(300)}
                   >
                     your code is ready
@@ -309,7 +309,7 @@ const EmailPopup = () => {
                 </div>
 
                 <p
-                  className="text-[11px] text-muted-foreground/40 mt-5"
+                  className="text-[11px] text-muted-foreground/60 mt-5"
                   style={stagger(600)}
                 >
                   Code saved to your account

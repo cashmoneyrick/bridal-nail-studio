@@ -87,7 +87,7 @@ const Navigation = () => {
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
             <Link to="/" className="flex-shrink-0" onClick={handleLogoClick}>
-              <h1 className={`font-display text-3xl sm:text-4xl lg:text-[2.5rem] font-semibold tracking-tight transition-colors duration-300 lg:hover:text-primary ${isLogoClicked ? 'text-primary' : ''}`}>
+              <h1 className={`font-display text-2xl sm:text-3xl lg:text-[2.5rem] font-semibold tracking-tight transition-colors duration-300 lg:hover:text-primary ${isLogoClicked ? 'text-primary' : ''}`}>
                 YourPrettySets
               </h1>
             </Link>
@@ -151,32 +151,32 @@ const Navigation = () => {
             </div>
 
             {/* Mobile Icons + Menu Button */}
-            <div className="flex lg:hidden items-center space-x-1">
+            <div className="flex lg:hidden items-center space-x-0.5">
               <Button
                 variant="ghost"
                 size="icon"
-                className={`rounded-full h-9 w-9 ${iconBtnClass}`}
+                className={`rounded-full h-8 w-8 ${iconBtnClass}`}
                 onClick={() => setIsSearchOpen(true)}
                 aria-label="Search products"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-4 w-4" />
               </Button>
               <Link to="/favorites" className="relative">
-                <Button variant="ghost" size="icon" className={`rounded-full h-9 w-9 ${iconBtnClass}`}>
-                  <Heart className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className={`rounded-full h-8 w-8 ${iconBtnClass}`}>
+                  <Heart className="h-4 w-4" />
                 </Button>
                 {favoritesCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
                     {favoritesCount > 9 ? '9+' : favoritesCount}
                   </span>
                 )}
               </Link>
               <Link to="/cart" className="relative">
-                <Button variant="ghost" size="icon" className={`rounded-full h-9 w-9 ${iconBtnClass}`}>
-                  <ShoppingBag className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className={`rounded-full h-8 w-8 ${iconBtnClass}`}>
+                  <ShoppingBag className="h-4 w-4" />
                 </Button>
                 {totalCartItems > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
                     {totalCartItems > 9 ? '9+' : totalCartItems}
                   </span>
                 )}
@@ -185,13 +185,13 @@ const Navigation = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`rounded-full h-9 w-9 ${iconBtnClass}`}
+                className={`rounded-full h-8 w-8 ${iconBtnClass}`}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-5 w-5" />
                 )}
               </Button>
             </div>
@@ -199,31 +199,36 @@ const Navigation = () => {
         </nav>
       </header>
 
-      {/* Mobile Menu - Outside header for proper blur */}
+      {/* Mobile Menu - Fashion campaign typography overlay */}
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 top-16 sm:top-20 z-40 bg-background/80 backdrop-blur-2xl backdrop-saturate-150 animate-slide-down"
+          className="lg:hidden fixed inset-0 top-16 sm:top-20 z-40 bg-neutral-800/50 backdrop-blur-sm animate-slide-down"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <div className="px-4 py-6 space-y-4" onClick={(e) => e.stopPropagation()}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="block py-3 px-4 rounded-xl text-lg font-medium text-foreground bg-background/50 backdrop-blur-sm hover:bg-background/70 hover:pl-5 transition-all duration-200 border-b border-border/30"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
+          <div className="flex flex-col items-center justify-center h-full pb-20 gap-0" onClick={(e) => e.stopPropagation()}>
+            {navLinks.map((link, index) => (
+              <div key={link.name} className="flex flex-col items-center">
+                {index > 0 && <div className="w-6 h-px bg-white/15 my-1" />}
+                <Link
+                  to={link.href}
+                  className="block py-2.5 px-6 font-display text-4xl font-medium tracking-wide text-white/90 text-center transition-all duration-300 hover:text-white hover:tracking-widest"
+                  style={{ textShadow: '0 1px 6px rgba(0,0,0,0.35), 0 0 16px rgba(0,0,0,0.2)' }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              </div>
             ))}
-            <div className="pt-4 px-1">
-              <Link to={user && initialized ? "/account" : "/auth"} onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">
-                  <User className="h-5 w-5 mr-3" />
-                  {user && initialized ? getDisplayName() : 'Sign In'}
-                </Button>
-              </Link>
-            </div>
+            <div className="w-10 h-px bg-white/20 mt-6 mb-4" />
+            <Link
+              to={user && initialized ? "/account" : "/auth"}
+              className="flex items-center gap-2.5 font-display text-xl text-white/60 hover:text-white/90 transition-colors duration-300"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.25)' }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <User className="h-5 w-5" />
+              {user && initialized ? getDisplayName() : 'Sign In'}
+            </Link>
           </div>
         </div>
       )}

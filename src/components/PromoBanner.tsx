@@ -1,114 +1,114 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import { useState, useEffect, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const messages = [
-  "New: Spring Collection — garden-inspired sets, handmade to order",
-  "Your first sizing kit is FREE with any nail set purchase",
-  "Custom designs start at $45",
+  {
+    headline: "Spring Collection",
+    detail: "garden-inspired sets, handmade to order",
+  },
+  {
+    headline: "Free Sizing Kit",
+    detail: "included with every nail set purchase",
+  },
+  {
+    headline: "Custom Designs",
+    detail: "your vision, handcrafted — starting at $45",
+  },
 ];
 
-const MarqueeSlide = ({
-  message,
-  isActive,
-  onComplete
-}: {
-  message: string;
-  isActive: boolean;
-  onComplete: () => void;
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const [overflow, setOverflow] = useState(0);
-
-  // Measure overflow on mount and resize
-  useEffect(() => {
-    const measure = () => {
-      if (containerRef.current && textRef.current) {
-        const containerWidth = containerRef.current.offsetWidth;
-        const textWidth = textRef.current.scrollWidth;
-        setOverflow(Math.max(0, textWidth - containerWidth + 32)); // +32 for padding
-      }
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [message]);
-
-  // Handle timing when slide becomes active
-  useEffect(() => {
-    if (!isActive) return;
-
-    const duration = overflow > 0
-      ? 1000 + (overflow / 50) * 1000 + 1000  // 1s pause + scroll + 1s pause
-      : 4000;  // No overflow: 4s delay
-
-    const timer = setTimeout(onComplete, duration);
-    return () => clearTimeout(timer);
-  }, [isActive, overflow, onComplete]);
-
-  const animationDuration = overflow > 0 ? 1 + overflow/50 + 1 : 0;
-  const animationStyle = overflow > 0 && isActive ? {
-    animation: `marquee ${animationDuration}s linear forwards`,
-    ['--scroll-distance' as string]: `-${overflow}px`,
-  } : {};
-
-  return (
-    <div ref={containerRef} className="flex-none w-full py-3 overflow-hidden">
-      <p
-        ref={textRef}
-        style={animationStyle}
-        className="text-sm font-medium tracking-wide leading-relaxed text-center whitespace-nowrap px-4"
-      >
-        {message}
-      </p>
-    </div>
-  );
-};
+const DISPLAY_DURATION = 5000; // 5s per message
 
 const PromoBanner = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [index, setIndex] = useState(0);
+
+  const advance = useCallback(() => {
+    setIndex((prev) => (prev + 1) % messages.length);
+  }, []);
 
   useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
-    emblaApi.on('select', onSelect);
-    return () => { emblaApi.off('select', onSelect); };
-  }, [emblaApi]);
+    const timer = setInterval(advance, DISPLAY_DURATION);
+    return () => clearInterval(timer);
+  }, [advance]);
 
-  const handleSlideComplete = useCallback(() => {
-    emblaApi?.scrollNext();
-  }, [emblaApi]);
+  const current = messages[index];
 
   return (
-    <div className="bg-gradient-to-r from-primary/85 via-primary to-primary/85 text-primary-foreground shadow-sm overflow-hidden">
-      <style>{`
-        @keyframes marquee {
-          0%, 10% { transform: translateX(0); }
-          90%, 100% { transform: translateX(var(--scroll-distance)); }
-        }
-      `}</style>
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {messages.map((message, index) => (
-            <MarqueeSlide
+    <div
+      className="relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, hsl(130 15% 12%) 0%, hsl(25 12% 16%) 50%, hsl(130 12% 14%) 100%)",
+      }}
+    >
+      {/* Subtle noise texture overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Warm glow accent */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 100% at 50% 50%, hsla(35 40% 50% / 0.06) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative py-5 sm:py-6 px-6">
+        <div className="flex flex-col items-center justify-center min-h-[56px] sm:min-h-[64px]">
+          <AnimatePresence mode="wait">
+            <motion.div
               key={index}
-              message={message}
-              isActive={index === selectedIndex}
-              onComplete={handleSlideComplete}
-            />
-          ))}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              className="flex flex-col items-center text-center"
+            >
+              <h3
+                className="font-display italic font-medium tracking-wide leading-tight"
+                style={{
+                  color: "hsl(38 45% 65%)",
+                  fontSize: "clamp(1.25rem, 3.5vw, 1.6rem)",
+                }}
+              >
+                {current.headline}
+              </h3>
+              <p
+                className="mt-1 tracking-wider uppercase"
+                style={{
+                  color: "hsl(35 25% 55%)",
+                  fontSize: "clamp(0.65rem, 1.8vw, 0.8rem)",
+                  letterSpacing: "0.14em",
+                }}
+              >
+                {current.detail}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Progress dots */}
+          <div className="flex items-center gap-2 mt-3">
+            {messages.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                aria-label={`Go to announcement ${i + 1}`}
+                className="relative h-[3px] rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: i === index ? "20px" : "4px",
+                  backgroundColor:
+                    i === index
+                      ? "hsl(38 45% 65%)"
+                      : "hsla(35 25% 55% / 0.3)",
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      {/* Dot indicators */}
-      <div className="flex items-center justify-center gap-1.5 pb-1.5">
-        {messages.map((_, i) => (
-          <div key={i} className={`rounded-full transition-all duration-300 ${
-            i === selectedIndex
-              ? "w-4 h-[3px] bg-primary-foreground"
-              : "w-[3px] h-[3px] bg-primary-foreground/35"
-          }`} />
-        ))}
       </div>
     </div>
   );

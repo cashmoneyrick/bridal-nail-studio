@@ -305,7 +305,7 @@ const FaqChatbot = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-[6px]"
+            className="fixed inset-0 z-40 bg-foreground/20"
             onClick={() => setIsWheelOpen(false)}
             aria-hidden="true"
           />

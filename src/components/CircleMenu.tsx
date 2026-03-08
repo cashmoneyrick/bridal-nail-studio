@@ -24,28 +24,22 @@ interface CircleMenuProps {
 
 /* ─── Constants ──────────────────────────────────────────────── */
 
-const ITEM_SIZE = 44;
-const TRIGGER_SIZE = 52;
+const ITEM_SIZE = 52;
+const ITEM_SIZE_LG = 46;
+const TRIGGER_SIZE = 58;
 const TRIGGER_SIZE_LG = 56;
-const RADIUS = 85;
-const RADIUS_LG = 95;
+const ITEM_GAP = 16;
+const ITEM_GAP_LG = 14;
 const OPEN_STAGGER = 0.06;
 const CLOSE_STAGGER = 0.04;
 
 /* ─── Geometry ───────────────────────────────────────────────── */
 
-/** Quarter-arc from 180° (left) to 90° (up) */
-const pointOnArc = (index: number, totalItems: number, radius: number) => {
-  const startAngle = 180;
-  const endAngle = 90;
-  const step = totalItems > 1 ? (startAngle - endAngle) / (totalItems - 1) : 0;
-  const angleDeg = startAngle - index * step;
-  const angleRad = (angleDeg * Math.PI) / 180;
-  return {
-    x: Math.cos(angleRad) * radius,
-    y: -Math.sin(angleRad) * radius,
-  };
-};
+/** Vertical stack: items rise upward from the trigger */
+const stackOffset = (index: number, triggerSize: number, itemSize: number, gap: number) => ({
+  x: -(triggerSize - itemSize) / 2,
+  y: -(itemSize + gap) * (index + 1),
+});
 
 /* ─── Component ──────────────────────────────────────────────── */
 
@@ -59,7 +53,7 @@ const CircleMenu = ({
   const triggerControls = useAnimationControls();
   const itemsControls = useAnimationControls();
 
-  // Responsive radius
+  // Responsive sizing
   const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     const check = () => setIsDesktop(window.innerWidth >= 1024);
@@ -68,7 +62,9 @@ const CircleMenu = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const radius = isDesktop ? RADIUS_LG : RADIUS;
+  const triggerSize = isDesktop ? TRIGGER_SIZE_LG : TRIGGER_SIZE;
+  const itemSize = isDesktop ? ITEM_SIZE_LG : ITEM_SIZE;
+  const itemGap = isDesktop ? ITEM_GAP_LG : ITEM_GAP;
 
   // Close with shake animation
   const handleClose = useCallback(async () => {
@@ -103,18 +99,35 @@ const CircleMenu = ({
   );
 
   return (
-    <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      className="fixed bottom-20 right-5 lg:bottom-6 lg:right-6 z-50"
-    >
+    <div className="fixed bottom-20 right-5 lg:bottom-6 lg:right-6 z-50">
+      {/* ─── Backdrop Glow ───────────────────────────────────── */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="glow"
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: 280,
+              height: 280,
+              right: -40,
+              bottom: -40,
+              background:
+                "radial-gradient(circle, hsla(125,9%,56%,0.08) 0%, transparent 70%)",
+              filter: "blur(20px)",
+            }}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* ─── Menu Items ─────────────────────────────────────── */}
       <AnimatePresence>
         {isOpen &&
           items.map((item, i) => {
-            const { x, y } = pointOnArc(i, items.length, radius);
+            const { x, y } = stackOffset(i, triggerSize, itemSize, itemGap);
 
             return (
               <motion.div
@@ -144,46 +157,59 @@ const CircleMenu = ({
                     delay: (items.length - 1 - i) * CLOSE_STAGGER,
                   },
                 }}
-                className="absolute bottom-0 right-0 group flex items-center gap-2"
+                className="absolute bottom-0 right-0 group flex items-center gap-2.5"
               >
-                {/* Tooltip label */}
+                {/* Editorial label */}
                 <motion.span
-                  initial={{ opacity: 0, x: 5 }}
+                  initial={{ opacity: 0, x: 8 }}
                   animate={{
                     opacity: 1,
                     x: 0,
-                    transition: { delay: i * OPEN_STAGGER + 0.15 },
+                    transition: {
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 20,
+                      delay: i * OPEN_STAGGER + 0.15,
+                    },
                   }}
-                  exit={{ opacity: 0 }}
-                  className="pointer-events-none whitespace-nowrap font-studio-body
-                    text-[10px] lg:text-[11px] font-medium tracking-wide uppercase
-                    bg-white/95 text-foreground/70 px-2.5 py-1 rounded-full
-                    shadow-sm border border-border/20
+                  exit={{ opacity: 0, x: 4, transition: { duration: 0.1 } }}
+                  className="pointer-events-none whitespace-nowrap font-body
+                    text-xs lg:text-xs font-medium tracking-wide text-foreground/70 px-3.5 py-1.5 lg:px-3 lg:py-1 rounded-full
+                    shadow-sm border border-border/15
                     lg:opacity-0 lg:group-hover:opacity-100 lg:transition-opacity lg:duration-200"
+                  style={{
+                    background: "hsla(0,0%,100%,0.8)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                  }}
                 >
                   {item.label}
                 </motion.span>
 
-                {/* Icon button */}
+                {/* Frosted glass icon button */}
                 <motion.button
                   whileHover={{
-                    scale: 1.12,
-                    transition: { duration: 0.1, delay: 0 },
+                    scale: 1.08,
+                    y: -2,
+                    transition: { type: "spring", stiffness: 400, damping: 15 },
                   }}
-                  whileTap={{ scale: 0.9 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() => handleItemClick(item.id)}
-                  className="relative flex items-center justify-center rounded-full border border-border/20"
+                  className="relative flex items-center justify-center rounded-full"
                   style={{
-                    width: ITEM_SIZE,
-                    height: ITEM_SIZE,
-                    background: "#FDFAF6",
+                    width: itemSize,
+                    height: itemSize,
+                    background: "hsla(30,6%,97%,0.8)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    border: "1px solid hsla(30,6%,86%,0.3)",
                     boxShadow:
-                      "0 2px 12px -2px rgba(90,82,74,0.15), 0 1px 3px rgba(90,82,74,0.06)",
+                      "0 2px 16px -2px rgba(90,82,74,0.12), 0 1px 4px rgba(90,82,74,0.06)",
                   }}
                   aria-label={item.label}
                 >
                   <item.icon
-                    className="w-[18px] h-[18px]"
+                    className="w-5 h-5 lg:w-[18px] lg:h-[18px]"
                     strokeWidth={1.6}
                     style={{ color: "hsl(125 9% 50%)" }}
                   />
@@ -201,8 +227,8 @@ const CircleMenu = ({
         onClick={handleToggle}
         className="relative rounded-full flex items-center justify-center"
         style={{
-          width: isDesktop ? TRIGGER_SIZE_LG : TRIGGER_SIZE,
-          height: isDesktop ? TRIGGER_SIZE_LG : TRIGGER_SIZE,
+          width: triggerSize,
+          height: triggerSize,
           background: isOpen ? "hsl(125 9% 56%)" : "#F5F0EB",
           boxShadow:
             "0 4px 20px -2px rgba(90,82,74,0.2), 0 1px 4px rgba(90,82,74,0.08)",
@@ -216,7 +242,7 @@ const CircleMenu = ({
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
         >
           <Plus
-            className="w-[22px] h-[22px] lg:w-6 lg:h-6"
+            className="w-6 h-6 lg:w-6 lg:h-6"
             strokeWidth={2}
             style={{
               color: isOpen ? "#FDFAF6" : "hsl(125 9% 50%)",
@@ -236,7 +262,7 @@ const CircleMenu = ({
           />
         )}
       </motion.button>
-    </motion.div>
+    </div>
   );
 };
 

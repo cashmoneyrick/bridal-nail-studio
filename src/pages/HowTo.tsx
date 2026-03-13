@@ -1,69 +1,67 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
-import { Ruler, Hand, Wrench, Droplets, Heart, ChevronRight } from "lucide-react";
+import { Ruler, Hand, Wrench, Droplets, Heart, ArrowRight, Sparkles, PaintBucket, Scissors, RotateCcw } from "lucide-react";
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-const categories = [
+import cherryBlossom from "@/assets/cherry-blossom.jpeg";
+import roseQuartzDreams from "@/assets/rose-quartz-dreams.jpeg";
+import midnightLuxe from "@/assets/midnight-luxe.jpeg";
+import frenchElegance from "@/assets/french-elegance.jpeg";
+import heroDesktop from "@/assets/hero-desktop.jpeg";
+
+const guides = [
   {
     title: "I Don't Know My Size",
-    description: "Find your perfect fit before ordering",
+    preview: "Our free sizing kit takes the guesswork out of ordering. Measure once, get a perfect fit every time — no salon visit needed.",
     path: "/how-to/sizing",
-    gridArea: "sizing",
-    isPrimary: true,
     icon: Ruler,
-    iconBg: "from-secondary/50 to-secondary/15",
-    accentBorder: "border-t-2 border-secondary/50",
+    image: cherryBlossom,
   },
   {
     title: "Applying for the First Time",
-    description: "Step-by-step for a flawless, long-lasting manicure",
+    preview: "Ten minutes to a flawless manicure. We walk you through prep, placement, and pressing — step by step with pro tips along the way.",
     path: "/how-to/application",
-    gridArea: "applying",
     icon: Hand,
-    iconBg: "from-primary/25 to-primary/5",
-    accentBorder: "border-t-2 border-primary/30",
+    image: roseQuartzDreams,
   },
   {
     title: "Troubleshooting",
-    description: "Quick fixes for the most common problems",
+    preview: "Lifting edges, bubbles, or a nail that popped off? Quick fixes for the five most common issues — no need to start over.",
     path: "/how-to/troubleshooting",
-    gridArea: "troubleshooting",
     icon: Wrench,
-    iconBg: "from-accent/40 to-accent/10",
-    accentBorder: "border-t-2 border-accent/40",
+    image: midnightLuxe,
   },
   {
     title: "Removing Your Set",
-    description: "Remove safely — no damage to your natural nails",
+    preview: "Three gentle removal methods that protect your natural nails. Oil, water, or acetone — pick the one that works for your routine.",
     path: "/how-to/removal",
-    gridArea: "removal",
     icon: Droplets,
-    iconBg: "from-secondary/40 to-primary/8",
-    accentBorder: "border-t-2 border-secondary/40",
+    image: frenchElegance,
   },
   {
     title: "Prepping for My Wedding",
-    description: "Wedding-day timeline and emergency checklist",
+    preview: "A complete wedding-day nail timeline — from your trial set 3 months out to your emergency touch-up kit on the big day.",
     path: "/how-to/bridal",
-    gridArea: "bridal",
     icon: Heart,
-    iconBg: "from-primary/20 to-secondary/15",
-    accentBorder: "border-t-2 border-primary/25",
+    image: heroDesktop,
+    isBridal: true,
   },
 ];
 
-const journeySteps = categories.filter(c => c.gridArea !== 'bridal');
-const specialCard = categories.find(c => c.gridArea === 'bridal')!;
-
 const faqCategories = [
   {
+    id: "application",
     label: "Application & Wear",
+    icon: Hand,
     items: [
       {
         question: "How long do press-on nails last?",
@@ -88,7 +86,9 @@ const faqCategories = [
     ],
   },
   {
+    id: "sizing",
     label: "Sizing & Fit",
+    icon: Ruler,
     items: [
       {
         question: "How do I find my size?",
@@ -105,7 +105,9 @@ const faqCategories = [
     ],
   },
   {
+    id: "custom",
     label: "Custom Orders",
+    icon: PaintBucket,
     items: [
       {
         question: "How does a custom order work?",
@@ -122,7 +124,9 @@ const faqCategories = [
     ],
   },
   {
+    id: "care",
     label: "Care & Reuse",
+    icon: RotateCcw,
     items: [
       {
         question: "Can I reuse my press-on nails?",
@@ -137,154 +141,83 @@ const faqCategories = [
 ];
 
 const HowTo = () => {
-  const faqHeaderRef = useScrollReveal();
-  const faqContentRef = useScrollReveal();
+  const faqRef = useScrollReveal();
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-12 md:pt-40 md:pb-16">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-5">
-            What do you need help with today?
+      {/* ─── Hero Section ─── */}
+      <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden">
+        {/* Ambient blur blooms */}
+        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-secondary/20 blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-primary/[0.12] blur-[80px] pointer-events-none" />
+
+        <div className="container mx-auto px-6 text-center relative z-10">
+          {/* Rule-flanked eyebrow */}
+          <div className="animate-stagger-1 flex items-center justify-center gap-5 mb-8">
+            <div className="w-12 h-px bg-border/60" />
+            <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50">
+              How To Guides
+            </p>
+            <div className="w-12 h-px bg-border/60" />
+          </div>
+
+          {/* Editorial heading */}
+          <h1 className="animate-stagger-2 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-5">
+            <span className="italic font-light text-foreground/60">Your</span>{" "}
+            Guide to Perfect Nails
           </h1>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-xl mx-auto">
-            Select a topic and we'll guide you through it.
+
+          {/* Accent line */}
+          <div className="animate-stagger-3 flex justify-center mb-6">
+            <div className="w-12 h-px bg-primary/40" />
+          </div>
+
+          {/* Subtitle */}
+          <p className="animate-stagger-3 text-muted-foreground text-lg md:text-xl max-w-xl mx-auto mb-8">
+            Select a topic and we'll guide you through it
           </p>
+
+          {/* Editorial badge */}
+          <div className="animate-stagger-4 flex items-center justify-center gap-3">
+            <div className="w-8 h-px bg-border/40" />
+            <p className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground/40">
+              Step-by-Step — Beginner Friendly
+            </p>
+            <div className="w-8 h-px bg-border/40" />
+          </div>
         </div>
       </section>
 
-      {/* Category Grid */}
-      <section className="pb-24 md:pb-32">
+      {/* ─── Editorial Scroll Guide Sections ─── */}
+      <section className="pt-12 md:pt-16 pb-24 md:pb-32">
         <div className="container mx-auto px-6">
+          <div className="max-w-5xl mx-auto space-y-16 md:space-y-24">
+            {guides.map((guide, index) => {
+              const Icon = guide.icon;
+              const isReversed = index % 2 === 1;
 
-          {/* Mobile: Journey framing */}
-          <div className="lg:hidden">
-            {/* Numbered journey steps */}
-            {journeySteps.map((category, index) => {
-              const Icon = category.icon;
-              const isLast = index === journeySteps.length - 1;
               return (
-                <div key={category.path}>
-                  <Link to={category.path} className="group block">
-                    <div className="bg-secondary/10 border border-border/50 rounded-2xl p-5 flex items-center gap-4 transition-all duration-300 hover:shadow-md hover:border-border">
-                      {/* Step number + icon stacked */}
-                      <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                        <span className="text-[11px] font-medium text-muted-foreground/70 uppercase tracking-widest leading-none">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${category.iconBg} flex items-center justify-center border border-border/20`}>
-                          <Icon className="w-5 h-5 text-primary" />
-                        </div>
-                      </div>
-                      {/* Text */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-display text-base text-foreground group-hover:text-primary transition-colors leading-snug mb-1">
-                          {category.title}
-                        </h3>
-                        <p className="text-xs text-muted-foreground leading-snug">{category.description}</p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                  </Link>
-                  {!isLast && (
-                    <div className="flex justify-start pl-[30px] py-0.5">
-                      <div className="border-l-2 border-dashed border-border/40 h-4" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Special occasion divider */}
-            <div className="flex items-center gap-3 py-1">
-              <div className="h-px flex-1 bg-border/40" />
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Special occasion</span>
-              <div className="h-px flex-1 bg-border/40" />
-            </div>
-
-            {/* Bridal special card */}
-            {(() => {
-              const Icon = specialCard.icon;
-              return (
-                <Link to={specialCard.path} className="group block">
-                  <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 flex items-center gap-4 transition-all duration-300 hover:shadow-md hover:border-primary/40">
-                    <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${specialCard.iconBg} flex items-center justify-center flex-shrink-0 border border-primary/15`}>
-                      <Icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-display text-base text-foreground group-hover:text-primary transition-colors leading-snug mb-1">
-                        {specialCard.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-snug">{specialCard.description}</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
-              );
-            })()}
-          </div>
-
-          {/* Desktop: Bento Grid */}
-          <div
-            className="hidden lg:grid gap-5"
-            style={{
-              gridTemplateColumns: '1fr 1fr',
-              gridTemplateRows: 'auto auto auto',
-              gridTemplateAreas: `
-                "sizing applying"
-                "sizing troubleshooting"
-                "removal bridal"
-              `,
-            }}
-          >
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Link
-                  key={category.path}
-                  to={category.path}
-                  className="group block"
-                  style={{ gridArea: category.gridArea }}
-                >
-                  <div className={`h-full bg-secondary/10 border border-border/50 ${category.accentBorder} rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border flex flex-col`}>
-                    {/* Icon Area */}
-                    <div
-                      className={`flex-1 bg-gradient-to-br ${category.iconBg} flex items-center justify-center ${category.isPrimary ? 'min-h-[260px]' : 'min-h-[130px]'}`}
-                    >
-                      <Icon
-                        className={`text-primary/60 transition-transform duration-300 group-hover:scale-110 ${category.isPrimary ? 'w-20 h-20' : 'w-14 h-14'}`}
-                      />
-                    </div>
-                    {/* Text Area */}
-                    <div className={`${category.isPrimary ? 'p-7' : 'p-5'} flex items-start justify-between gap-3`}>
-                      <div>
-                        <h3 className={`font-display text-foreground group-hover:text-primary transition-colors mb-1.5 ${category.isPrimary ? 'text-2xl' : 'text-lg'}`}>
-                          {category.title}
-                        </h3>
-                        <p className={`text-muted-foreground leading-relaxed ${category.isPrimary ? 'text-sm' : 'text-xs'}`}>
-                          {category.description}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground/40 flex-shrink-0 mt-1 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                  </div>
-                </Link>
+                <GuideSection
+                  key={guide.path}
+                  guide={guide}
+                  Icon={Icon}
+                  isReversed={isReversed}
+                  index={index}
+                />
               );
             })}
           </div>
-
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* ─── FAQ Section — Tabbed ─── */}
       <section className="py-20 sm:py-28 lg:py-32 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Editorial section header */}
-          <div ref={faqHeaderRef} className="reveal mb-12 sm:mb-16 max-w-3xl mx-auto">
+          <div ref={faqRef} className="reveal mb-12 sm:mb-16 max-w-3xl mx-auto">
             <div className="flex items-center gap-5 mb-8">
               <div className="flex-1 h-px bg-border/40" />
               <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 shrink-0">
@@ -301,39 +234,134 @@ const HowTo = () => {
             </p>
           </div>
 
-          {/* Accordion content */}
-          <div ref={faqContentRef} className="reveal max-w-2xl mx-auto">
-            {faqCategories.map((category, catIndex) => (
-              <div key={category.label} className={catIndex > 0 ? "mt-10" : ""}>
-                <div className="flex items-center gap-4 mb-4">
-                  <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-muted-foreground/50 shrink-0">
-                    {category.label}
-                  </p>
-                  <div className="flex-1 h-px bg-border/30" />
-                </div>
-                <Accordion type="single" collapsible className="space-y-2.5">
-                  {category.items.map((faq, index) => (
-                    <AccordionItem
-                      key={`${category.label}-${index}`}
-                      value={`${category.label}-${index}`}
-                      className="bg-card rounded-2xl px-6 border border-border/40 transition-all duration-300 data-[state=open]:border-primary/20 data-[state=open]:bg-card/80 data-[state=open]:shadow-sm"
+          {/* Tabbed FAQ */}
+          <div className="max-w-2xl mx-auto">
+            <Tabs defaultValue="application">
+              <TabsList className="w-full h-auto flex flex-wrap gap-1 bg-muted/30 rounded-xl p-1.5 mb-8">
+                {faqCategories.map((cat) => {
+                  const CatIcon = cat.icon;
+                  return (
+                    <TabsTrigger
+                      key={cat.id}
+                      value={cat.id}
+                      className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary/60 whitespace-nowrap"
                     >
-                      <AccordionTrigger className="font-display text-base text-foreground hover:no-underline py-5 text-left">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground pb-5 text-sm leading-relaxed">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </div>
-            ))}
+                      <CatIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span className="hidden sm:inline">{cat.label}</span>
+                      <span className="sm:hidden">{cat.label.split(' ')[0]}</span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+
+              {faqCategories.map((cat) => (
+                <TabsContent key={cat.id} value={cat.id}>
+                  <Accordion type="single" collapsible className="space-y-2.5">
+                    {cat.items.map((faq, faqIndex) => (
+                      <AccordionItem
+                        key={`${cat.id}-${faqIndex}`}
+                        value={`${cat.id}-${faqIndex}`}
+                        className="bg-card rounded-2xl px-6 border border-border/40 transition-all duration-300 data-[state=open]:border-l-primary/40 data-[state=open]:border-l-2 data-[state=open]:bg-card/80 data-[state=open]:shadow-sm"
+                      >
+                        <AccordionTrigger className="font-display text-base text-foreground hover:no-underline py-5 text-left">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground pb-5 text-sm leading-relaxed">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </TabsContent>
+              ))}
+            </Tabs>
           </div>
 
         </div>
       </section>
 
+    </div>
+  );
+};
+
+/* ─── Guide Section Component ─── */
+
+interface GuideSectionProps {
+  guide: typeof guides[number];
+  Icon: React.ElementType;
+  isReversed: boolean;
+  index: number;
+}
+
+const GuideSection = ({ guide, Icon, isReversed, index }: GuideSectionProps) => {
+  const sectionRef = useScrollReveal();
+
+  return (
+    <div ref={sectionRef} className="reveal">
+      {/* Bridal gets a subtle "Special Occasion" divider */}
+      {guide.isBridal && (
+        <div className="flex items-center gap-3 mb-8">
+          <div className="h-px flex-1 bg-border/40" />
+          <span className="text-[10px] text-muted-foreground/60 uppercase tracking-widest font-medium">
+            Special Occasion
+          </span>
+          <div className="h-px flex-1 bg-border/40" />
+        </div>
+      )}
+
+      <Link to={guide.path} className="group block">
+        <div
+          className={`flex flex-col lg:flex-row gap-8 lg:gap-12 items-center ${
+            isReversed ? 'lg:flex-row-reverse' : ''
+          } ${guide.isBridal ? 'bg-primary/[0.03] border border-primary/10 rounded-2xl p-6 lg:p-8' : ''}`}
+        >
+          {/* Image */}
+          <div className="w-full lg:w-1/2 flex-shrink-0">
+            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted">
+              <img
+                src={guide.image}
+                alt={guide.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+            </div>
+          </div>
+
+          {/* Text */}
+          <div className="w-full lg:w-1/2">
+            {/* Icon + step label */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Icon className="w-5 h-5 text-primary/70" />
+              </div>
+              {guide.isBridal ? (
+                <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-primary/50">
+                  Wedding Day
+                </span>
+              ) : (
+                <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-muted-foreground/50">
+                  Guide {String(index + 1).padStart(2, '0')}
+                </span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h3 className="font-display text-2xl sm:text-3xl text-foreground group-hover:text-primary transition-colors mb-3">
+              {guide.title}
+            </h3>
+
+            {/* Preview */}
+            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
+              {guide.preview}
+            </p>
+
+            {/* CTA */}
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
+              Read Guide
+              <ArrowRight className="w-4 h-4" />
+            </span>
+          </div>
+        </div>
+      </Link>
     </div>
   );
 };

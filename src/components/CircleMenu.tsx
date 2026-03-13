@@ -12,6 +12,7 @@ export interface CircleMenuItem {
     strokeWidth?: number;
     style?: React.CSSProperties;
   }>;
+  badge?: number;
 }
 
 interface CircleMenuProps {
@@ -213,6 +214,13 @@ const CircleMenu = ({
                     strokeWidth={1.6}
                     style={{ color: "hsl(125 9% 50%)" }}
                   />
+                  {item.badge != null && item.badge > 0 && (
+                    <span
+                      className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center"
+                    >
+                      {item.badge > 9 ? "9+" : item.badge}
+                    </span>
+                  )}
                 </motion.button>
               </motion.div>
             );

@@ -1,5 +1,5 @@
 /**
- * ShapeSection — horizontal showcase carousel for 8 nail shapes.
+ * ShapeSection — horizontal showcase carousel for 7 nail shapes.
  * Active shape is enlarged in the center, neighbors are smaller.
  * Uses Embla Carousel for swipe behavior.
  */
@@ -9,10 +9,9 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCustomStudioStore } from '@/stores/customStudioStore';
 import { ShapeType, SHAPE_LABELS, SHAPE_PRICES } from '@/lib/pricing';
-import { getPreviewNailPath } from './NailPaths';
 import SectionWrapper from './SectionWrapper';
 
-const SHAPES: ShapeType[] = ['almond', 'oval', 'round', 'square', 'squoval', 'coffin', 'stiletto', 'lipstick'];
+const SHAPES: ShapeType[] = ['almond', 'oval', 'round', 'square', 'squoval', 'coffin', 'stiletto'];
 
 const SHAPE_DESCRIPTIONS: Record<ShapeType, string> = {
   almond: 'Tapered with a soft, rounded peak — universally flattering',
@@ -22,7 +21,6 @@ const SHAPE_DESCRIPTIONS: Record<ShapeType, string> = {
   squoval: 'Square with rounded corners — the best of both worlds',
   coffin: 'Tapered to a flat tip — dramatic and runway-ready',
   stiletto: 'Sharp pointed tip — fierce and statement-making',
-  lipstick: 'Asymmetric diagonal tip — edgy and unique',
 };
 
 export default function ShapeSection() {
@@ -61,10 +59,10 @@ export default function ShapeSection() {
         {/* Arrow buttons */}
         <motion.button
           onClick={scrollPrev}
-          whileHover={{ scale: 1.1, background: '#6B635B' }}
+          whileHover={{ scale: 1.1, background: '#D4B0B3' }}
           whileTap={{ scale: 0.95 }}
           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: '#5A524A', color: '#F5F0EB' }}
+          style={{ background: '#DBBFC2', color: '#3D2B1F' }}
           aria-label="Previous shape"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -73,10 +71,10 @@ export default function ShapeSection() {
         </motion.button>
         <motion.button
           onClick={scrollNext}
-          whileHover={{ scale: 1.1, background: '#6B635B' }}
+          whileHover={{ scale: 1.1, background: '#D4B0B3' }}
           whileTap={{ scale: 0.95 }}
           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: '#5A524A', color: '#F5F0EB' }}
+          style={{ background: '#DBBFC2', color: '#3D2B1F' }}
           aria-label="Next shape"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -89,7 +87,6 @@ export default function ShapeSection() {
             {SHAPES.map((s, index) => {
               const isActive = index === selectedIndex;
               const price = SHAPE_PRICES[s];
-              const previewPath = getPreviewNailPath(s, 36, 54);
 
               return (
                 <div
@@ -106,42 +103,28 @@ export default function ShapeSection() {
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                     className="flex flex-col items-center gap-3 py-4 px-3 rounded-2xl"
                     style={{
-                      background: isActive ? 'rgba(90,82,74,0.7)' : 'rgba(90,82,74,0.25)',
-                      border: isActive ? '2px solid #C26871' : '2px solid transparent',
-                      boxShadow: isActive ? 'inset 0 0 20px rgba(194,104,113,0.08)' : 'none',
+                      background: isActive ? 'rgba(219,191,194,0.7)' : 'rgba(219,191,194,0.25)',
+                      border: isActive ? '2px solid #6B4C3B' : '2px solid transparent',
+                      boxShadow: isActive ? 'inset 0 0 20px rgba(107,76,59,0.08)' : 'none',
                     }}
                   >
-                    {/* Nail silhouette preview */}
-                    <svg
-                      viewBox="-24 -62 48 68"
-                      className={`${isActive ? 'w-16 h-20 sm:w-20 sm:h-24' : 'w-12 h-16 sm:w-14 sm:h-18'} transition-all`}
-                    >
-                      <defs>
-                        <linearGradient id={`preview-grad-${s}`} x1="0.2" y1="0" x2="0.8" y2="1">
-                          <stop offset="0%" stopColor="#F5F0EB" stopOpacity={0.9} />
-                          <stop offset="100%" stopColor="#d4c4b8" stopOpacity={0.9} />
-                        </linearGradient>
-                        <linearGradient id={`preview-shine-${s}`} x1="0.2" y1="0" x2="0.8" y2="1">
-                          <stop offset="0%" stopColor="white" stopOpacity={0.3} />
-                          <stop offset="50%" stopColor="white" stopOpacity={0.05} />
-                          <stop offset="100%" stopColor="white" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <path d={previewPath} fill={`url(#preview-grad-${s})`} />
-                      <path d={previewPath} fill={`url(#preview-shine-${s})`} />
-                      <path d={previewPath} fill="none" stroke="#d4bfb0" strokeWidth={0.5} strokeOpacity={0.4} />
-                    </svg>
+                    <img
+                      src={`/shapes/${s}.svg`}
+                      alt={SHAPE_LABELS[s]}
+                      className={`${isActive ? 'w-20 h-28 sm:w-24 sm:h-32' : 'w-14 h-20 sm:w-16 sm:h-24'} transition-all object-contain`}
+                      draggable={false}
+                    />
 
                     {/* Label + price */}
                     <div className="text-center">
                       <p
                         className="text-sm sm:text-base font-medium"
-                        style={{ color: isActive ? '#F5F0EB' : '#B8AFA6' }}
+                        style={{ color: isActive ? '#3D2B1F' : '#7A5A48' }}
                       >
                         {SHAPE_LABELS[s]}
                       </p>
                       {price > 0 && (
-                        <p className="text-xs mt-0.5" style={{ color: '#C26871' }}>
+                        <p className="text-xs mt-0.5" style={{ color: '#6B4C3B' }}>
                           +${price}
                         </p>
                       )}
@@ -164,7 +147,7 @@ export default function ShapeSection() {
               i === selectedIndex ? 'w-6' : 'w-1.5'
             }`}
             style={{
-              background: i === selectedIndex ? '#C26871' : '#5A524A',
+              background: i === selectedIndex ? '#6B4C3B' : '#DBBFC2',
             }}
             aria-label={`Select ${SHAPE_LABELS[s]}`}
           />
@@ -184,20 +167,20 @@ export default function ShapeSection() {
           <p
             className="text-xl sm:text-2xl font-light tracking-wide"
             style={{
-              color: '#F5F0EB',
+              color: '#3D2B1F',
               fontFamily: "'Playfair Display', serif",
             }}
           >
             {SHAPE_LABELS[shape]}
             {SHAPE_PRICES[shape] > 0 && (
-              <span className="text-sm ml-2" style={{ color: '#C26871' }}>
+              <span className="text-sm ml-2" style={{ color: '#6B4C3B' }}>
                 +${SHAPE_PRICES[shape]}
               </span>
             )}
           </p>
           <p
             className="text-sm text-center mt-1.5 max-w-[280px]"
-            style={{ color: '#8A827A' }}
+            style={{ color: '#9A7E6D' }}
           >
             {SHAPE_DESCRIPTIONS[shape]}
           </p>

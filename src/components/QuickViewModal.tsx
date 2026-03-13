@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Product } from "@/lib/products";
+import { Link, useNavigate } from "react-router-dom";
+import { Product, type PrimaryColor } from "@/lib/products";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { useFavoritesStore } from "@/stores/favoritesStore";
+import { useCustomStudioStore } from "@/stores/customStudioStore";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
   Heart,
   ShoppingBag,
   Truck,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -153,6 +155,18 @@ interface QuickViewModalProps {
   onClose: () => void;
 }
 
+const COLOR_TO_HEX: Record<PrimaryColor, string> = {
+  Pink: '#F8C8D4',
+  Red: '#C41E3A',
+  Nude: '#E8D4C4',
+  Black: '#1A1A1A',
+  White: '#FFFFFF',
+  Gold: '#D4A574',
+  Blue: '#1A1A2E',
+  Purple: '#B4A7D6',
+  Multi: '#F8E8E0',
+};
+
 const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedShape, setSelectedShape] = useState('Almond');
@@ -160,6 +174,7 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
 
   const { addItem, hasSizingKitInCart } = useCartStore();
   const { toggleFavorite, isFavorite } = useFavoritesStore();
+  const navigate = useNavigate();
 
   // Reset state when product changes
   useEffect(() => {
@@ -436,8 +451,8 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
               </Button>
             </div>
 
-            {/* View Full Details link */}
-            <div className="text-center">
+            {/* View Full Details + Design Your Own */}
+            <div className="text-center space-y-2">
               <Link
                 to={`/product/${product.handle}`}
                 onClick={onClose}
@@ -445,6 +460,20 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
               >
                 View Full Details
               </Link>
+              <button
+                onClick={() => {
+                  const { reset, setDefaultNailConfig } = useCustomStudioStore.getState();
+                  reset();
+                  const hex = COLOR_TO_HEX[product.primaryColor] || '#F8E8E0';
+                  setDefaultNailConfig({ color: hex });
+                  onClose();
+                  navigate('/create');
+                }}
+                className="flex items-center gap-1.5 mx-auto text-xs text-primary/70 hover:text-primary transition-colors"
+              >
+                <Sparkles className="h-3 w-3" />
+                Design your own version
+              </button>
             </div>
           </div>
         </div>

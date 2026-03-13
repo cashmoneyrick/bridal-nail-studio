@@ -165,7 +165,7 @@ const ProductGrid = () => {
         <div className="lg:hidden">
           <div className="relative">
             {/* Left fade gradient */}
-            <div className="absolute left-0 top-0 bottom-12 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-0 w-12 md:w-52 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
 
             {/* Carousel Container */}
             <div className="overflow-hidden" ref={emblaRef}>
@@ -231,7 +231,7 @@ const ProductGrid = () => {
             </div>
 
             {/* Right fade gradient */}
-            <div className="absolute right-0 top-0 bottom-12 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 md:w-52 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
             {/* Arrow Navigation */}
             <button

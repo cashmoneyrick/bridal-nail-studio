@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, Ruler, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroMobileImage from "@/assets/hero-mobile.jpeg";
@@ -7,9 +7,11 @@ import heroDesktopImage from "@/assets/hero-desktop.jpeg";
 const HeroSection = () => {
   const isMobile = useIsMobile();
   const scrollToShop = () => {
-    document.getElementById('collections')?.scrollIntoView({
-      behavior: 'smooth'
-    });
+    const el = document.getElementById('promo');
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 60;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
   };
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with botanical color wash + parallax */}
@@ -59,16 +61,7 @@ const HeroSection = () => {
             />
           </svg>
 
-          {/* Spring Announcement — stagger 1 */}
-          <div className="animate-stagger-1 relative inline-flex items-center px-5 py-2 rounded-full overflow-hidden">
-            <div className="absolute inset-0 bg-primary/10 backdrop-blur-sm" />
-            <div className="absolute inset-0 border border-primary/20 rounded-full" />
-            <span className="relative text-sm font-semibold tracking-widest uppercase text-primary/90">
-              Spring Collection 2026
-            </span>
-          </div>
-
-          {/* Main Headline — stagger 2 */}
+          {/* Main Headline — stagger 2 (eyebrow badge hidden for now) */}
           <h1 className="animate-stagger-2 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-tight text-balance">
             Fresh Blooms
             <span className="block italic text-primary">At Your Fingertips</span>
@@ -77,9 +70,8 @@ const HeroSection = () => {
           {/* Subheadline — stagger 3 */}
           <div className="animate-stagger-3 max-w-2xl mx-auto">
             <p className="text-base sm:text-lg lg:text-xl text-foreground/85 font-light leading-relaxed">
-              Welcome the season with our{" "}
-              <span className="font-medium text-foreground/95">handcrafted</span> spring press-on nails.
-              Florals, pastels, and botanical details—designed to make every moment{" "}
+              <span className="font-medium text-foreground/95">Handcrafted</span> spring press-on nails
+              — florals, pastels, and botanical details designed to make every moment{" "}
               <span className="italic text-primary/80 font-medium">bloom</span>.
             </p>
           </div>
@@ -106,6 +98,26 @@ const HeroSection = () => {
                 <span className="absolute bottom-0 left-0 w-0 h-px bg-foreground/40 group-hover:w-full transition-all duration-300" />
               </span>
             </Link>
+          </div>
+
+          {/* Trust signals — stagger 5 */}
+          <div className="animate-stagger-5 pt-6">
+            <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-foreground/5 backdrop-blur-md border border-foreground/[0.08]">
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-sm text-foreground/70">
+                <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary/60 shrink-0" />
+                Handmade
+              </span>
+              <span className="w-px h-3.5 bg-foreground/10 shrink-0" aria-hidden="true" />
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-sm text-foreground/70">
+                <Ruler className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary/60 shrink-0" />
+                Sizing Kit
+              </span>
+              <span className="w-px h-3.5 bg-foreground/10 shrink-0" aria-hidden="true" />
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-sm text-foreground/70">
+                <Heart className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary/60 shrink-0" />
+                2-Week Wear
+              </span>
+            </div>
           </div>
         </div>
       </div>

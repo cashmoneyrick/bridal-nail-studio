@@ -39,13 +39,22 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
+  savedItems: CartItem[];
   isLoading: boolean;
   isDrawerOpen: boolean;
-  
+
   // Actions
   addItem: (item: CartItem) => void;
   updateQuantity: (variantId: string, quantity: number) => void;
   removeItem: (variantId: string) => void;
+  updateItem: (oldVariantId: string, updates: {
+    variantId: string;
+    variantTitle: string;
+    selectedOptions: CartItem['selectedOptions'];
+  }) => void;
+  saveForLater: (variantId: string) => void;
+  moveToCart: (variantId: string) => void;
+  removeSavedItem: (variantId: string) => void;
   clearCart: () => void;
   setLoading: (loading: boolean) => void;
   getTotalItems: () => number;
@@ -59,6 +68,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      savedItems: [],
       isLoading: false,
       isDrawerOpen: false,
 
@@ -121,6 +131,98 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
+      updateItem: (oldVariantId, updates) => {
+        const { items } = get();
+        const itemToUpdate = items.find(i => i.variantId === oldVariantId);
+        if (!itemToUpdate) return;
+
+        // Check if another item already has the new variantId
+        const existingTarget = items.find(
+          i => i.variantId === updates.variantId && i.variantId !== oldVariantId
+        );
+
+        if (existingTarget) {
+          // Merge: add quantity to existing, remove old
+          set({
+            items: items
+              .map(i =>
+                i.variantId === updates.variantId
+                  ? { ...i, quantity: i.quantity + itemToUpdate.quantity }
+                  : i
+              )
+              .filter(i => i.variantId !== oldVariantId)
+          });
+        } else {
+          // Update in-place
+          set({
+            items: items.map(i =>
+              i.variantId === oldVariantId
+                ? { ...i, ...updates }
+                : i
+            )
+          });
+        }
+      },
+
+      saveForLater: (variantId) => {
+        const { items } = get();
+        const item = items.find(i => i.variantId === variantId);
+        if (!item) return;
+
+        const hadSizingKit = item.needsSizingKit;
+
+        // Move to saved with quantity 1
+        set({
+          savedItems: [...get().savedItems, { ...item, quantity: 1 }],
+          items: items.filter(i => i.variantId !== variantId)
+        });
+
+        // Reassign sizing kit if needed
+        if (hadSizingKit && get().items.length > 0) {
+          const remainingItems = get().items;
+          const itemsNeedingSizing = remainingItems.filter(i => i.sizingOption === 'kit');
+          if (itemsNeedingSizing.length > 0 && !remainingItems.some(i => i.needsSizingKit)) {
+            set({
+              items: remainingItems.map(i =>
+                i.variantId === itemsNeedingSizing[0].variantId
+                  ? { ...i, needsSizingKit: true }
+                  : i
+              )
+            });
+          }
+        }
+      },
+
+      moveToCart: (variantId) => {
+        const { savedItems, items } = get();
+        const item = savedItems.find(i => i.variantId === variantId);
+        if (!item) return;
+
+        // Check if same variant already in cart
+        const existing = items.find(i => i.variantId === variantId);
+        if (existing) {
+          set({
+            items: items.map(i =>
+              i.variantId === variantId
+                ? { ...i, quantity: i.quantity + 1 }
+                : i
+            ),
+            savedItems: savedItems.filter(i => i.variantId !== variantId)
+          });
+        } else {
+          set({
+            items: [...items, { ...item, quantity: 1 }],
+            savedItems: savedItems.filter(i => i.variantId !== variantId)
+          });
+        }
+      },
+
+      removeSavedItem: (variantId) => {
+        set({
+          savedItems: get().savedItems.filter(i => i.variantId !== variantId)
+        });
+      },
+
       clearCart: () => {
         set({ items: [] });
       },
@@ -152,6 +254,7 @@ export const useCartStore = create<CartStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         items: state.items,
+        savedItems: state.savedItems,
         isLoading: state.isLoading,
       }),
     }

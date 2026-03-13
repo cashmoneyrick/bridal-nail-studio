@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { X, Send, Mail, Trash2, Sparkles, Store, Paintbrush, MessageCircle } from "lucide-react";
+import { X, Send, Mail, Trash2, Sparkles, Search, Heart, ShoppingBag, Paintbrush, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,9 @@ import { toast } from "@/hooks/use-toast";
 import { logError } from "@/lib/logger";
 import CircleMenu from "@/components/CircleMenu";
 import type { CircleMenuItem } from "@/components/CircleMenu";
+import { useMenuStore } from "@/stores/menuStore";
+import { useCartStore } from "@/stores/cartStore";
+import { useFavoritesStore } from "@/stores/favoritesStore";
 
 /* ─── Types ──────────────────────────────────────────────────── */
 
@@ -36,12 +39,14 @@ const DEFAULT_MESSAGE: Message = {
 
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`;
 
-/* ─── Circle Menu Items ──────────────────────────────────────── */
+/* ─── Circle Menu Items (static base — badges injected at render) ── */
 
-const CIRCLE_ITEMS: CircleMenuItem[] = [
-  { id: "shop", label: "Shop", icon: Store },
-  { id: "create", label: "Create", icon: Paintbrush },
+const CIRCLE_ITEMS_BASE: Omit<CircleMenuItem, "badge">[] = [
+  { id: "search", label: "Search", icon: Search },
+  { id: "favorites", label: "Favorites", icon: Heart },
+  { id: "cart", label: "Cart", icon: ShoppingBag },
   { id: "chat", label: "Chat", icon: MessageCircle },
+  { id: "create", label: "Create", icon: Paintbrush },
 ];
 
 /* ─── Helpers ────────────────────────────────────────────────── */
@@ -185,7 +190,6 @@ const AutoTextarea = ({
 /* ─── Main Component ─────────────────────────────────────────── */
 
 const FaqChatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [isWheelOpen, setIsWheelOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(loadMessages);
   const [input, setInput] = useState("");
@@ -196,6 +200,18 @@ const FaqChatbot = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null!);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const isMobileNavOpen = useMenuStore(state => state.isMobileNavOpen);
+  const setSearchOpen = useMenuStore(state => state.setSearchOpen);
+  const isOpen = useMenuStore(state => state.isChatOpen);
+  const setIsOpen = useMenuStore(state => state.setChatOpen);
+  const totalCartItems = useCartStore(state => state.getTotalItems());
+  const favoritesCount = useFavoritesStore(state => state.items.length);
+
+  // Inject live badge counts into menu items
+  const circleItems: CircleMenuItem[] = CIRCLE_ITEMS_BASE.map((item) => ({
+    ...item,
+    badge: item.id === "cart" ? totalCartItems : item.id === "favorites" ? favoritesCount : undefined,
+  }));
 
   // Persist messages
   useEffect(() => {
@@ -213,6 +229,13 @@ const FaqChatbot = () => {
       setTimeout(() => inputRef.current?.focus(), 200);
     }
   }, [isOpen]);
+
+  // Close FAB wheel when mobile nav opens
+  useEffect(() => {
+    if (isMobileNavOpen && isWheelOpen) {
+      setIsWheelOpen(false);
+    }
+  }, [isMobileNavOpen, isWheelOpen]);
 
   // Escape key
   useEffect(() => {
@@ -240,14 +263,20 @@ const FaqChatbot = () => {
       case "chat":
         setTimeout(() => handleOpen(), 150);
         break;
-      case "shop":
-        navigate("/shop");
+      case "search":
+        setTimeout(() => setSearchOpen(true), 150);
+        break;
+      case "favorites":
+        navigate("/favorites");
+        break;
+      case "cart":
+        navigate("/cart");
         break;
       case "create":
         navigate("/create");
         break;
     }
-  }, [navigate, handleOpen]);
+  }, [navigate, handleOpen, setSearchOpen]);
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
@@ -314,9 +343,9 @@ const FaqChatbot = () => {
 
       {/* ─── Circle Menu Navigation ────────────────────────────── */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !isMobileNavOpen && (
           <CircleMenu
-            items={CIRCLE_ITEMS}
+            items={circleItems}
             isOpen={isWheelOpen}
             onToggle={() => setIsWheelOpen((prev) => !prev)}
             onAction={handleCircleAction}

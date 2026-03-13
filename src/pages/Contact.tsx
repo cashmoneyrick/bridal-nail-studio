@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -6,15 +6,22 @@ import {
   Mail,
   Send,
   Instagram,
-  Star,
-  Clock,
-  Quote,
-  ExternalLink,
-  Heart,
+  Paintbrush,
   MessageCircle,
+  BookOpen,
   ArrowRight,
+  ChevronDown,
+  Camera,
+  X,
+  Ruler,
+  Hand,
+  RotateCcw,
+  Clock,
+  Sparkles,
+  Package,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,7 +42,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useMenuStore } from "@/stores/menuStore";
 import Navigation from "@/components/Navigation";
+
+/* ─── Schema ─── */
 
 const contactSchema = z.object({
   name: z
@@ -54,81 +64,324 @@ const contactSchema = z.object({
     .trim()
     .min(10, "Message must be at least 10 characters")
     .max(1000, "Message must be less than 1000 characters"),
+  orderNumber: z.string().trim().max(50).optional(),
+  issueType: z.string().optional(),
+  companyName: z.string().trim().max(200).optional(),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
-const inquiryTypes = [
-  { value: "bridal", label: "Bridal Set Inquiry" },
+/* ─── Constants ─── */
+
+const INQUIRY_TYPES = [
   { value: "custom", label: "Custom Order Request" },
-  { value: "collaboration", label: "Collaboration Proposal" },
   { value: "general", label: "General Question" },
+  { value: "order-help", label: "Help with My Order" },
+  { value: "collaboration", label: "Collaboration Proposal" },
 ];
 
-const testimonial = {
-  quote:
-    "My bridal nails were absolutely perfect. Everyone at my wedding asked where I got them! The attention to detail was incredible.",
-  author: "Jessica T.",
-  event: "October 2024 Bride",
-  rating: 5,
-};
+const ORDER_ISSUE_TYPES = [
+  { value: "sizing", label: "Sizing doesn't fit" },
+  { value: "damaged", label: "Damaged in shipping" },
+  { value: "wrong-order", label: "Wrong order received" },
+  { value: "application", label: "Application help" },
+  { value: "other", label: "Other" },
+];
+
+const QUICK_ACTIONS = [
+  {
+    id: "design",
+    icon: Paintbrush,
+    title: "Design a Custom Set",
+    description: "Build your dream nails step by step",
+    tint: "bg-secondary/15 text-secondary-foreground",
+  },
+  {
+    id: "chat",
+    icon: MessageCircle,
+    title: "Chat with Us",
+    description: "Get instant answers from our AI assistant",
+    tint: "bg-primary/15 text-primary",
+  },
+  {
+    id: "faq",
+    icon: BookOpen,
+    title: "Browse Our FAQ",
+    description: "Sizing, application, care & more",
+    tint: "bg-accent/15 text-accent-foreground",
+  },
+  {
+    id: "message",
+    icon: Mail,
+    title: "Send Us a Message",
+    description: "We reply within 24 hours",
+    tint: "bg-primary/10 text-primary",
+  },
+];
+
+const FAQ_SUGGESTIONS = [
+  {
+    question: "How do I find my nail size?",
+    icon: Ruler,
+    href: "/how-to/sizing",
+  },
+  {
+    question: "How do I apply press-on nails?",
+    icon: Hand,
+    href: "/how-to/application",
+  },
+  {
+    question: "What's your return policy?",
+    icon: RotateCcw,
+    answer: "We accept returns within 14 days of delivery for unused, unopened sets. Custom orders are final sale.",
+  },
+  {
+    question: "How long do sets last?",
+    icon: Clock,
+    answer: "About 1 week with adhesive tabs, or up to 2 weeks with nail glue. Proper application helps them last longer.",
+  },
+];
+
+/* ─── Instagram Data (preserved) ─── */
 
 const instagramPostsRow1 = [
   {
-    image:
-      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=500&fit=crop",
-    alt: "Elegant bridal nail set with pearls",
+    image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=500&fit=crop",
+    alt: "Elegant nail set with pearls",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=500&h=500&fit=crop",
     alt: "Custom French tip press-on nails",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=500&h=500&fit=crop",
-    alt: "Wedding day manicure closeup",
+    image: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=500&h=500&fit=crop",
+    alt: "Manicure closeup",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=500&h=500&fit=crop",
     alt: "Luxury nail art design",
   },
 ];
 
 const instagramPostsRow2 = [
   {
-    image:
-      "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=500&h=625&fit=crop",
+    image: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=500&h=625&fit=crop",
     alt: "Luxury nail art design",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=625&fit=crop",
-    alt: "Elegant bridal nail set",
+    image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=625&fit=crop",
+    alt: "Elegant nail set",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=500&h=625&fit=crop",
+    image: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=500&h=625&fit=crop",
     alt: "Custom French tip nails",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=500&h=625&fit=crop",
-    alt: "Wedding day manicure",
+    image: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=500&h=625&fit=crop",
+    alt: "Manicure closeup",
   },
 ];
 
-const quickLinks = [
-  { label: "How do I find my size?", href: "/how-to/sizing" },
-  { label: "How to apply press-ons", href: "/how-to/application" },
-  { label: "Bridal set timeline", href: "/how-to/bridal" },
-  { label: "Removal tips", href: "/how-to/removal" },
-];
+/* ─── Sub-components ─── */
+
+const QuickActionCard = ({
+  icon: Icon,
+  title,
+  description,
+  tint,
+  onClick,
+}: {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  tint: string;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className="group text-left p-5 sm:p-6 rounded-2xl border border-border/30 hover:border-primary/25 bg-gradient-to-br from-card via-card to-secondary/5 transition-all duration-500 hover:shadow-[0_8px_30px_-12px_rgba(107,76,59,0.12)] hover:-translate-y-0.5 relative overflow-hidden"
+  >
+    {/* Subtle top accent */}
+    <div className="absolute top-0 left-5 right-5 sm:left-6 sm:right-6 h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent group-hover:via-primary/25 transition-all duration-500" />
+
+    {/* Icon + Title row */}
+    <div className="flex items-center gap-3 mb-3">
+      <div className={`w-10 h-10 rounded-xl ${tint} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-500`}>
+        <Icon className="h-[18px] w-[18px]" />
+      </div>
+      <h3 className="font-display text-base sm:text-lg font-medium text-foreground group-hover:text-primary transition-colors tracking-[-0.01em]">
+        {title}
+      </h3>
+    </div>
+
+    {/* Description + Arrow row */}
+    <div className="flex items-end justify-between gap-3">
+      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{description}</p>
+      <ArrowRight className="h-4 w-4 shrink-0 text-primary/0 group-hover:text-primary/50 transition-all duration-500 translate-x-0 group-hover:translate-x-0.5" />
+    </div>
+  </button>
+);
+
+const ImageUploadField = ({
+  images,
+  previews,
+  onAdd,
+  onRemove,
+}: {
+  images: File[];
+  previews: string[];
+  onAdd: (files: FileList) => void;
+  onRemove: (index: number) => void;
+}) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const isFull = images.length >= 3;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+        Inspiration Images
+      </p>
+
+      {/* Upload area */}
+      <button
+        type="button"
+        onClick={() => !isFull && fileInputRef.current?.click()}
+        className={`w-full py-8 rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center gap-2 ${
+          isFull
+            ? "border-border/20 bg-muted/10 cursor-not-allowed opacity-50"
+            : "border-border/40 hover:border-primary/40 hover:bg-primary/5 cursor-pointer"
+        }`}
+      >
+        <Camera className="h-6 w-6 text-muted-foreground/50" />
+        <span className="text-sm text-muted-foreground">
+          {isFull ? "Maximum 3 images reached" : `Add inspiration images (${images.length}/3)`}
+        </span>
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => e.target.files && onAdd(e.target.files)}
+      />
+
+      {/* Thumbnails */}
+      <AnimatePresence>
+        {previews.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex flex-wrap gap-3"
+          >
+            {previews.map((src, i) => (
+              <motion.div
+                key={src}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="relative w-20 h-20 rounded-xl overflow-hidden border border-border/30"
+              >
+                <img src={src} alt={`Inspiration ${i + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => onRemove(i)}
+                  className="absolute top-1 right-1 p-1 rounded-full bg-background/90 backdrop-blur-sm hover:bg-background transition-colors"
+                >
+                  <X className="h-3 w-3 text-foreground/60" />
+                </button>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const FaqSuggestionCards = () => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 12 }}
+      transition={{ duration: 0.3 }}
+      className="mt-8"
+    >
+      <p className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
+        <Sparkles className="h-3.5 w-3.5 text-primary/60" />
+        These might help right away
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {FAQ_SUGGESTIONS.map((faq, i) => {
+          const Icon = faq.icon;
+          const isExpanded = expandedIndex === i;
+
+          if (faq.href) {
+            return (
+              <Link
+                key={i}
+                to={faq.href}
+                className="group flex items-center gap-3 p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon className="h-4 w-4 text-primary/70" />
+                </div>
+                <span className="text-sm text-foreground flex-1">{faq.question}</span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
+              </Link>
+            );
+          }
+
+          return (
+            <button
+              key={i}
+              onClick={() => setExpandedIndex(isExpanded ? null : i)}
+              className="text-left p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon className="h-4 w-4 text-primary/70" />
+                </div>
+                <span className="text-sm text-foreground flex-1">{faq.question}</span>
+                <ChevronDown
+                  className={`h-4 w-4 text-muted-foreground/40 shrink-0 transition-transform duration-300 ${
+                    isExpanded ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+              <AnimatePresence>
+                {isExpanded && faq.answer && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="text-xs text-muted-foreground leading-relaxed mt-3 ml-12"
+                  >
+                    {faq.answer}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </button>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+};
+
+/* ─── Main Component ─── */
 
 const Contact = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const setChatOpen = useMenuStore((state) => state.setChatOpen);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -137,18 +390,82 @@ const Contact = () => {
       email: "",
       inquiryType: "",
       message: "",
+      orderNumber: "",
+      issueType: "",
+      companyName: "",
     },
   });
 
+  const watchedInquiryType = form.watch("inquiryType");
+
+  // Clear conditional fields when inquiry type changes
+  useEffect(() => {
+    form.setValue("orderNumber", "");
+    form.setValue("issueType", "");
+    form.setValue("companyName", "");
+    setSelectedImages([]);
+    setImagePreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
+  }, [watchedInquiryType, form]);
+
+  // Cleanup blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Scroll reveal refs
-  const sectionHeaderRef = useScrollReveal();
-  const leftColRef = useScrollReveal();
-  const contactCardsRef = useScrollReveal();
-  const formRef = useScrollReveal();
+  const actionCardsRef = useScrollReveal();
+  const formSectionRef = useScrollReveal();
   const instaSectionRef = useScrollReveal();
   const instaMarqueeRef = useScrollReveal();
-  const faqRef = useScrollReveal();
-  const faqContentRef = useScrollReveal();
+
+  const handleImageAdd = (files: FileList) => {
+    const remaining = 3 - selectedImages.length;
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
+
+    for (let i = 0; i < Math.min(files.length, remaining); i++) {
+      const file = files[i];
+      if (!file.type.startsWith("image/")) continue;
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "File too large", description: `${file.name} exceeds 5MB limit.` });
+        continue;
+      }
+      newFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    }
+
+    setSelectedImages((prev) => [...prev, ...newFiles]);
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleImageRemove = (index: number) => {
+    URL.revokeObjectURL(imagePreviews[index]);
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleQuickAction = (id: string) => {
+    switch (id) {
+      case "design":
+        navigate("/create");
+        break;
+      case "chat":
+        setChatOpen(true);
+        break;
+      case "faq":
+        navigate("/how-to");
+        break;
+      case "message":
+        document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth" });
+        break;
+    }
+  };
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
@@ -157,335 +474,112 @@ const Contact = () => {
 
     toast({
       title: "Message Sent",
-      description:
-        "Thank you for reaching out! We'll get back to you within 24 hours.",
+      description: "Thank you for reaching out! We'll get back to you within 24 hours.",
     });
 
     form.reset();
+    setSelectedImages([]);
+    setImagePreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* ─── Hero Section ─── */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Multi-layer atmospheric background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/15 via-background to-primary/10" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse 70% 50% at 20% 80%, hsl(var(--secondary) / 0.20), transparent),
-              radial-gradient(ellipse 50% 60% at 80% 30%, hsl(var(--accent) / 0.15), transparent)
-            `,
-          }}
-        />
+      {/* ─── Hero ─── */}
+      <section className="relative pt-32 pb-8 sm:pt-40 sm:pb-12 overflow-hidden">
+        {/* Ambient background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 right-[15%] w-72 h-72 bg-primary/8 rounded-full blur-[100px]" />
+          <div className="absolute bottom-10 left-[10%] w-60 h-60 bg-secondary/10 rounded-full blur-[80px]" />
+        </div>
 
-        {/* Floating blur orbs */}
-        <div className="absolute top-20 right-[15%] w-72 h-72 rounded-full bg-secondary/10 blur-3xl animate-float" />
-        <div
-          className="absolute bottom-32 left-[10%] w-96 h-96 rounded-full bg-primary/[0.08] blur-3xl animate-float"
-          style={{ animationDelay: "1.5s" }}
-        />
-
-        {/* Decorative thin side line — desktop only */}
-        <div className="absolute left-8 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-primary/15 to-transparent hidden lg:block" />
-
-        {/* Content grid */}
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-32 lg:py-0">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-0 items-center lg:min-h-screen">
-            {/* Left column: Typography */}
-            <div className="lg:col-span-7 lg:pr-16">
-              {/* Eyebrow pill */}
-              <div className="animate-stagger-1">
-                <span className="inline-block px-5 py-2 border border-primary/20 rounded-full text-[10px] font-semibold tracking-[0.35em] uppercase text-primary/80">
-                  Get in Touch
-                </span>
-              </div>
-
-              {/* Oversized display heading */}
-              <h1 className="animate-stagger-2 font-display mt-8 sm:mt-10">
-                <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium leading-[0.95] text-foreground">
-                  Let's Create
-                </span>
-                <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl italic font-light text-primary/70 leading-[0.95] -mt-1">
-                  Something Beautiful
-                </span>
-              </h1>
-
-              {/* Subheadline with decorative rule */}
-              <div className="animate-stagger-3 mt-8 sm:mt-10">
-                <div className="w-12 h-px bg-primary/30 mb-6" />
-                <p className="text-base sm:text-lg lg:text-xl text-muted-foreground font-light leading-relaxed max-w-md">
-                  Whether you're dreaming up a custom set or planning your
-                  bridal nails, we'd love to hear your vision.
-                </p>
-              </div>
-
-              {/* Scroll indicator — desktop only */}
-              <div className="animate-stagger-4 mt-10 hidden lg:flex items-center gap-3 text-muted-foreground/50 text-sm">
-                <div className="w-6 h-10 border-2 border-foreground/15 rounded-full flex justify-center pt-2">
-                  <div className="w-1 h-2 bg-foreground/30 rounded-full animate-bounce" />
-                </div>
-                <span className="text-[10px] tracking-[0.2em] uppercase">
-                  Scroll to connect
-                </span>
-              </div>
-            </div>
-
-            {/* Right column: Statement image */}
-            <div className="lg:col-span-5 animate-stagger-4">
-              <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[85vh] rounded-2xl lg:rounded-none lg:rounded-l-3xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&h=1200&fit=crop"
-                  alt="Elegant press-on nail artistry"
-                  className="w-full h-full object-cover"
-                />
-                {/* Soft overlay for brand consistency */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-primary/10" />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-transparent lg:from-background/30" />
-
-                {/* Floating response-time badge */}
-                <div className="absolute bottom-8 left-8 bg-background/80 backdrop-blur-sm rounded-full px-5 py-2.5 border border-border/50 animate-float">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">
-                      Replies within{" "}
-                      <span className="text-primary">24 hours</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="animate-stagger-1">
+            <span className="inline-block px-5 py-2 border border-primary/20 rounded-full text-[10px] font-semibold tracking-[0.35em] uppercase text-primary/80">
+              Get in Touch
+            </span>
+          </div>
+          <h1 className="animate-stagger-2 font-display mt-8">
+            <span className="block text-4xl sm:text-5xl md:text-6xl font-medium leading-[0.95] text-foreground">
+              How Can We
+            </span>
+            <span className="block text-4xl sm:text-5xl md:text-6xl italic font-light text-primary/70 leading-[0.95] -mt-1">
+              Help You?
+            </span>
+          </h1>
+          <div className="animate-stagger-3 mt-6">
+            <p className="text-base sm:text-lg text-muted-foreground font-light max-w-lg mx-auto">
+              Custom sets, questions, collaborations — we'd love to hear from you.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ─── Form + Context Section ─── */}
-      <section className="relative py-20 sm:py-28 lg:py-32 overflow-hidden">
-        {/* Subtle background shift */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
-
-        {/* Large decorative ampersand — desktop only */}
-        <div className="absolute top-1/2 -translate-y-1/2 -right-20 text-[20rem] font-display font-light text-primary/[0.03] leading-none select-none pointer-events-none hidden lg:block">
-          &
+      {/* ─── Quick Action Cards ─── */}
+      <section className="relative py-6 sm:py-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div
+            ref={actionCardsRef}
+            className="reveal-children grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto"
+          >
+            {QUICK_ACTIONS.map((action) => (
+              <QuickActionCard
+                key={action.id}
+                icon={action.icon}
+                title={action.title}
+                description={action.description}
+                tint={action.tint}
+                onClick={() => handleQuickAction(action.id)}
+              />
+            ))}
+          </div>
         </div>
+      </section>
+
+      {/* ─── Smart Contact Form ─── */}
+      <section id="contact-form" className="relative py-16 sm:py-24 overflow-hidden">
+        {/* Subtle background */}
+        <div className="absolute inset-0 bg-primary/[0.04]" />
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Editorial section header */}
-          <div ref={sectionHeaderRef} className="reveal mb-16 sm:mb-20">
-            <div className="flex items-center gap-5 mb-8">
+          {/* Section header */}
+          <div ref={formSectionRef} className="reveal text-center mb-10 sm:mb-14">
+            <div className="flex items-center gap-5 mb-6 max-w-2xl mx-auto">
               <div className="flex-1 h-px bg-border/40" />
               <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 shrink-0">
-                Start a Conversation
+                Send a Message
               </p>
               <div className="flex-1 h-px bg-border/40" />
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-12">
-              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-medium leading-[1.05] shrink-0">
-                <span className="italic font-light text-foreground/60">
-                  Tell Us
-                </span>{" "}
-                Your Vision
-              </h2>
-              <p className="text-muted-foreground text-sm sm:text-base sm:text-right sm:max-w-[220px] sm:pb-1 leading-relaxed">
-                Every great set starts with a conversation
-              </p>
-            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-medium text-foreground">
+              Tell Us What You{" "}
+              <span className="italic font-light text-primary/70">Need</span>
+            </h2>
           </div>
 
-          {/* Two-column grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 max-w-6xl mx-auto items-start">
-            {/* Left Column: Testimonial + Contact Info */}
-            <div
-              ref={leftColRef}
-              className="reveal lg:col-span-5 space-y-8 lg:sticky lg:top-32"
-            >
-              {/* Testimonial card */}
-              <div className="relative p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-secondary/30 via-secondary/10 to-transparent border border-border/30">
-                <Quote className="absolute top-8 right-8 h-12 w-12 text-primary/10" />
-                <div className="relative z-10">
-                  <div className="flex gap-1 mb-5">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="h-4 w-4 fill-primary/70 text-primary/70"
-                      />
-                    ))}
-                  </div>
-                  <blockquote className="font-display text-xl sm:text-2xl text-foreground italic leading-relaxed mb-8">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="h-px bg-border/30 mb-6" />
-                  <div className="flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-full bg-primary/15 flex items-center justify-center">
-                      <span className="font-display text-primary text-base font-medium">
-                        {testimonial.author.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground text-sm">
-                        {testimonial.author}
-                      </p>
-                      <p className="text-xs text-muted-foreground tracking-wide">
-                        {testimonial.event}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact channel cards */}
-              <div
-                ref={contactCardsRef}
-                className="reveal-children space-y-4"
-              >
-                <a
-                  href="mailto:hello@yourprettysets.com"
-                  className="group flex items-center gap-4 p-5 rounded-2xl border border-border/30 hover:border-primary/30 bg-card/50 hover:bg-card transition-all duration-300"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-                    <Mail className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      hello@yourprettysets.com
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Email us anytime
-                    </p>
-                  </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
-                </a>
-
-                <a
-                  href="https://instagram.com/yourprettysets"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-4 p-5 rounded-2xl border border-border/30 hover:border-primary/30 bg-card/50 hover:bg-card transition-all duration-300"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-                    <Instagram className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      @yourprettysets
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      DM us on Instagram
-                    </p>
-                  </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
-                </a>
-              </div>
-            </div>
-
-            {/* Right Column: The Form */}
-            <div ref={formRef} className="reveal-scale lg:col-span-7">
-              <div className="p-8 sm:p-10 lg:p-12 rounded-3xl bg-card border border-border/30 shadow-sm">
-                {/* Form header */}
-                <div className="mb-10">
-                  <h3 className="font-display text-2xl sm:text-3xl text-foreground mb-2">
-                    Send a Message
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    Tell us about your dream set and we'll make it happen.
-                  </p>
-                </div>
-
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
-                  >
-                    {/* Name & Email side-by-side on sm+ */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground text-sm font-medium tracking-wide">
-                              Name
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Your name"
-                                className="bg-background/50 border-border/40 focus:border-primary focus:ring-primary/20 transition-all duration-300 h-12 rounded-xl"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-foreground text-sm font-medium tracking-wide">
-                              Email
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="email"
-                                placeholder="your@email.com"
-                                className="bg-background/50 border-border/40 focus:border-primary focus:ring-primary/20 transition-all duration-300 h-12 rounded-xl"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
+          {/* Form card */}
+          <div className="max-w-2xl mx-auto">
+            <div className="p-6 sm:p-8 lg:p-10 rounded-3xl bg-white border border-border/50 shadow-lg shadow-black/[0.04]">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                  {/* Name + Email row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <FormField
                       control={form.control}
-                      name="inquiryType"
+                      name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-foreground text-sm font-medium tracking-wide">
-                            Inquiry Type
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-background/50 border-border/40 focus:border-primary focus:ring-primary/20 transition-all duration-300 h-12 rounded-xl">
-                                <SelectValue placeholder="Select inquiry type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {inquiryTypes.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
-                                  {type.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="message"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-foreground text-sm font-medium tracking-wide">
-                            Message
+                          <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                            Name
                           </FormLabel>
                           <FormControl>
-                            <Textarea
-                              placeholder="Tell us about your vision..."
-                              rows={5}
-                              className="bg-background/50 border-border/40 focus:border-primary focus:ring-primary/20 transition-all duration-300 resize-none rounded-xl"
+                            <Input
+                              placeholder="Your name"
+                              className="h-12 rounded-xl border-border/40 bg-background focus:border-primary/50"
                               {...field}
                             />
                           </FormControl>
@@ -493,41 +587,218 @@ const Contact = () => {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                            Email
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="your@email.com"
+                              className="h-12 rounded-xl border-border/40 bg-background focus:border-primary/50"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                    <div className="pt-2 space-y-4">
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 group"
+                  {/* Inquiry Type */}
+                  <FormField
+                    control={form.control}
+                    name="inquiryType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                          What can we help with?
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 rounded-xl border-border/40 bg-background">
+                              <SelectValue placeholder="Choose an inquiry type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {INQUIRY_TYPES.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* ── Conditional Fields ── */}
+
+                  {/* Custom Order: Image upload + Custom Studio link */}
+                  {watchedInquiryType === "custom" && (
+                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+                      <ImageUploadField
+                        images={selectedImages}
+                        previews={imagePreviews}
+                        onAdd={handleImageAdd}
+                        onRemove={handleImageRemove}
+                      />
+                      <Link
+                        to="/create"
+                        className="flex items-center gap-2 text-sm text-primary/70 hover:text-primary transition-colors"
                       >
-                        {isSubmitting ? (
-                          "Sending..."
-                        ) : (
-                          <span className="flex items-center justify-center gap-2">
-                            Send Message
-                            <Send className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                          </span>
-                        )}
-                      </Button>
-
-                      <p className="text-center text-xs text-muted-foreground/60 tracking-wide">
-                        We typically respond within 24 hours
-                      </p>
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Already started a design? Finish it in our Custom Studio
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
                     </div>
-                  </form>
-                </Form>
-              </div>
+                  )}
+
+                  {/* Order Help: Order number + Issue type */}
+                  {watchedInquiryType === "order-help" && (
+                    <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+                      <FormField
+                        control={form.control}
+                        name="orderNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                              Order Number <span className="normal-case tracking-normal font-normal">(optional)</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g. YPS-1234"
+                                className="h-12 rounded-xl border-border/40 bg-background focus:border-primary/50"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="issueType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                              What's the issue?
+                            </FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="h-12 rounded-xl border-border/40 bg-background">
+                                  <SelectValue placeholder="Select an issue type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {ORDER_ISSUE_TYPES.map((type) => (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    {type.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  {/* Collaboration: Company name */}
+                  {watchedInquiryType === "collaboration" && (
+                    <div className="animate-in fade-in-0 slide-in-from-top-2 duration-200">
+                      <FormField
+                        control={form.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                              Company / Brand Name
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Your company or brand"
+                                className="h-12 rounded-xl border-border/40 bg-background focus:border-primary/50"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  {/* Message */}
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium tracking-wider uppercase text-muted-foreground">
+                          Message
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder={
+                              watchedInquiryType === "custom"
+                                ? "Tell us about your dream nail design..."
+                                : watchedInquiryType === "order-help"
+                                  ? "Describe the issue with your order..."
+                                  : watchedInquiryType === "collaboration"
+                                    ? "Tell us about your collaboration idea..."
+                                    : "How can we help?"
+                            }
+                            className="min-h-[120px] rounded-xl border-border/40 bg-background resize-none focus:border-primary/50"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Submit */}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full h-12 rounded-full text-sm font-medium tracking-wide shadow-md shadow-primary/20 gap-2"
+                    size="lg"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" />
+                        Send Message
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
+
+            {/* FAQ Suggestions (below form card, when General is selected) */}
+            <AnimatePresence>
+              {watchedInquiryType === "general" && <FaqSuggestionCards />}
+            </AnimatePresence>
           </div>
         </div>
       </section>
 
-      {/* ─── Instagram / Social Proof ─── */}
+      {/* ─── Instagram Feed (preserved) ─── */}
       <section className="relative py-20 sm:py-28 lg:py-32 overflow-hidden">
-        {/* Background tint */}
         <div className="absolute inset-0 bg-muted/20" />
 
-        {/* Section header */}
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div ref={instaSectionRef} className="reveal text-center mb-12 sm:mb-16">
             <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 mb-6">
@@ -535,10 +806,7 @@ const Contact = () => {
             </p>
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium text-foreground leading-tight mb-4">
               Follow the
-              <span className="italic font-light text-primary/70">
-                {" "}
-                journey
-              </span>
+              <span className="italic font-light text-primary/70"> journey</span>
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto">
               Real nails, real moments. Get inspired by our latest creations.
@@ -546,7 +814,6 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* Full-bleed marquee rows */}
         <div ref={instaMarqueeRef} className="reveal-scale relative z-10 space-y-4">
           {/* Row 1: scrolls left */}
           <div className="animate-marquee-left">
@@ -609,7 +876,6 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* Follow CTA */}
         <div className="relative z-10 text-center mt-10 sm:mt-14">
           <a
             href="https://instagram.com/yourprettysets"
@@ -624,115 +890,6 @@ const Contact = () => {
           </a>
         </div>
       </section>
-
-      {/* ─── FAQ & Trust Section ─── */}
-      <section className="relative py-20 sm:py-28 lg:py-32 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={faqRef} className="reveal">
-            {/* Section header */}
-            <div className="mb-16 sm:mb-20">
-              <div className="flex items-center gap-5 mb-8">
-                <div className="flex-1 h-px bg-border/40" />
-                <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 shrink-0">
-                  Before You Go
-                </p>
-                <div className="flex-1 h-px bg-border/40" />
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-12">
-                <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-medium leading-[1.05] shrink-0">
-                  <span className="italic font-light text-foreground/60">
-                    Quick
-                  </span>{" "}
-                  Answers
-                </h2>
-                <p className="text-muted-foreground text-sm sm:text-base sm:text-right sm:max-w-[220px] sm:pb-1 leading-relaxed">
-                  Everything you need to know, all in one place
-                </p>
-              </div>
-            </div>
-
-            {/* Three-column content */}
-            <div
-              ref={faqContentRef}
-              className="reveal-children grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-5xl mx-auto"
-            >
-              {/* Trust signals */}
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Clock className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-display text-lg text-foreground mb-1">
-                      24-Hour Reply
-                    </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Every message gets a thoughtful response within one
-                      business day.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Heart className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-display text-lg text-foreground mb-1">
-                      Handmade with Care
-                    </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Every set is crafted by hand, just for you. No mass
-                      production, ever.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Central CTA card */}
-              <div className="relative">
-                <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-secondary/30 via-secondary/15 to-accent/10 border border-border/30 text-center">
-                  <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-6">
-                    <MessageCircle className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="font-display text-xl sm:text-2xl text-foreground mb-3">
-                    Need Quick Answers?
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
-                    Our FAQ covers sizing, shipping, custom orders, and more.
-                  </p>
-                  <Link to="/how-to">
-                    <Button className="rounded-full px-8 font-medium">
-                      Visit Our FAQ
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Quick links */}
-              <div>
-                <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 mb-6">
-                  Popular Topics
-                </p>
-                <div className="space-y-1">
-                  {quickLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      to={link.href}
-                      className="group flex items-center justify-between py-3.5 border-b border-border/30 hover:border-primary/30 transition-colors"
-                    >
-                      <span className="text-sm text-foreground group-hover:text-primary transition-colors">
-                        {link.label}
-                      </span>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-1 transition-all duration-300" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 };

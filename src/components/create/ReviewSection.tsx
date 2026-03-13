@@ -33,15 +33,15 @@ function LineItem({ label, value, price, swatch }: LineItemProps) {
         {swatch && (
           <div
             className="w-4 h-4 rounded-full flex-shrink-0"
-            style={{ background: swatch, border: '1px solid rgba(255,255,255,0.1)' }}
+            style={{ background: swatch, border: '1px solid rgba(107,76,59,0.12)' }}
           />
         )}
         <div>
-          <span className="text-xs" style={{ color: '#8A827A' }}>
+          <span className="text-xs" style={{ color: '#9A7E6D' }}>
             {label}
           </span>
           {value && (
-            <span className="text-sm ml-2" style={{ color: '#F5F0EB' }}>
+            <span className="text-sm ml-2" style={{ color: '#3D2B1F' }}>
               {value}
             </span>
           )}
@@ -49,7 +49,7 @@ function LineItem({ label, value, price, swatch }: LineItemProps) {
       </div>
       <span
         className="text-xs font-medium"
-        style={{ color: price > 0 ? '#C26871' : '#8A827A' }}
+        style={{ color: price > 0 ? '#6B4C3B' : '#9A7E6D' }}
       >
         {price > 0 ? `+$${price}` : 'Included'}
       </span>
@@ -89,11 +89,11 @@ export default function ReviewSection() {
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 15 }}
             className="w-16 h-16 rounded-full flex items-center justify-center text-2xl"
-            style={{ background: 'rgba(194,104,113,0.15)', color: '#C26871' }}
+            style={{ background: 'rgba(107,76,59,0.15)', color: '#6B4C3B' }}
           >
             ✓
           </motion.div>
-          <p className="text-sm" style={{ color: '#B8AFA6' }}>
+          <p className="text-sm" style={{ color: '#7A5A48' }}>
             Your custom set has been saved. We'll be in touch!
           </p>
           <button
@@ -102,7 +102,7 @@ export default function ReviewSection() {
               setSubmitted(false);
             }}
             className="px-6 py-2 rounded-full text-sm"
-            style={{ background: '#5A524A', color: '#F5F0EB' }}
+            style={{ background: '#DBBFC2', color: '#3D2B1F' }}
           >
             Design Another Set
           </button>
@@ -118,9 +118,9 @@ export default function ReviewSection() {
         <div
           className="rounded-xl overflow-hidden"
           style={{
-            background: 'rgba(74,66,59,0.6)',
+            background: 'rgba(245,228,230,0.6)',
             borderTop: '2px solid transparent',
-            borderImage: 'linear-gradient(90deg, transparent 10%, #C26871 50%, transparent 90%) 1',
+            borderImage: 'linear-gradient(90deg, transparent 10%, #6B4C3B 50%, transparent 90%) 1',
           }}
         >
           {/* Card header */}
@@ -128,7 +128,7 @@ export default function ReviewSection() {
             <p
               className="text-sm"
               style={{
-                color: '#B8AFA6',
+                color: '#7A5A48',
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: 'italic',
                 letterSpacing: '0.05em',
@@ -137,14 +137,14 @@ export default function ReviewSection() {
               Order Summary
             </p>
             <div className="flex items-center gap-2 mt-1">
-              <div className="w-8 h-px" style={{ background: 'rgba(194,104,113,0.25)' }} />
-              <span className="text-[7px]" style={{ color: 'rgba(194,104,113,0.4)' }}>◇</span>
-              <div className="w-8 h-px" style={{ background: 'rgba(194,104,113,0.25)' }} />
+              <div className="w-8 h-px" style={{ background: 'rgba(107,76,59,0.25)' }} />
+              <span className="text-[7px]" style={{ color: 'rgba(107,76,59,0.4)' }}>◇</span>
+              <div className="w-8 h-px" style={{ background: 'rgba(107,76,59,0.25)' }} />
             </div>
           </div>
 
           {/* Line items */}
-          <div className="px-4 pb-2 divide-y" style={{ borderColor: 'rgba(90,82,74,0.4)' }}>
+          <div className="px-4 pb-2 divide-y" style={{ borderColor: 'rgba(219,191,194,0.4)' }}>
             <LineItem label="Base Set" value="" price={BASE_CUSTOM_SET_PRICE} />
             <LineItem label="Shape" value={SHAPE_LABELS[shape]} price={SHAPE_PRICES[shape]} />
             <LineItem label="Length" value={LENGTH_LABELS[length]} price={LENGTH_PRICES[length]} />
@@ -189,15 +189,15 @@ export default function ReviewSection() {
           {/* Total row */}
           <div
             className="flex items-center justify-between px-4 py-3 mx-3 mb-3 rounded-lg"
-            style={{ background: 'rgba(194,104,113,0.08)' }}
+            style={{ background: 'rgba(107,76,59,0.08)' }}
           >
-            <span className="text-sm font-medium" style={{ color: '#F5F0EB' }}>
+            <span className="text-sm font-medium" style={{ color: '#3D2B1F' }}>
               Estimated Total
             </span>
             <span
               className="text-xl font-semibold"
               style={{
-                color: '#C26871',
+                color: '#6B4C3B',
                 fontFamily: "'Playfair Display', serif",
               }}
             >
@@ -211,7 +211,7 @@ export default function ReviewSection() {
           <label
             className="text-xs block mb-1.5"
             style={{
-              color: '#B8AFA6',
+              color: '#7A5A48',
               fontFamily: "'Playfair Display', serif",
               fontStyle: 'italic',
             }}
@@ -223,10 +223,10 @@ export default function ReviewSection() {
             onChange={(e) => setSpecialInstructions(e.target.value)}
             placeholder="Any specific requests for your nail artist..."
             rows={2}
-            className="w-full rounded-lg px-3 py-2 text-sm resize-none outline-none placeholder:opacity-40 transition-colors focus:border-[rgba(194,104,113,0.5)]"
+            className="w-full rounded-lg px-3 py-2 text-sm resize-none outline-none placeholder:opacity-40 transition-colors focus:border-[rgba(107,76,59,0.5)]"
             style={{
-              background: '#5A524A',
-              color: '#F5F0EB',
+              background: '#DBBFC2',
+              color: '#3D2B1F',
               border: '1px solid #4A423B',
             }}
           />
@@ -236,13 +236,13 @@ export default function ReviewSection() {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <motion.button
             whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.02, boxShadow: '0 6px 28px rgba(194,104,113,0.4)' }}
+            whileHover={{ scale: 1.02, boxShadow: '0 6px 28px rgba(107,76,59,0.4)' }}
             onClick={handleAddToCart}
             className="flex-1 py-3 rounded-full text-sm font-medium"
             style={{
-              background: 'linear-gradient(135deg, #C26871, #b55a63)',
+              background: 'linear-gradient(135deg, #6B4C3B, #5A3D2E)',
               color: '#FFF',
-              boxShadow: '0 4px 20px rgba(194,104,113,0.3)',
+              boxShadow: '0 4px 20px rgba(107,76,59,0.3)',
             }}
           >
             Add to Cart — ${total}
@@ -254,8 +254,8 @@ export default function ReviewSection() {
             className="flex-1 py-3 rounded-full text-sm font-medium"
             style={{
               background: 'transparent',
-              color: '#C26871',
-              border: '1px solid rgba(194,104,113,0.4)',
+              color: '#6B4C3B',
+              border: '1px solid rgba(107,76,59,0.4)',
             }}
           >
             Request Custom Quote

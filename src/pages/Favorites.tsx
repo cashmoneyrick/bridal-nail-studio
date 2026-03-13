@@ -1,11 +1,14 @@
 import { useState, useRef } from "react";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
-import { Heart, Eye, X, ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart, Eye, X, ShoppingBag, Check, Sparkles, Truck } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useFavoritesStore } from "@/stores/favoritesStore";
+import { useCartStore, CartItem } from "@/stores/cartStore";
+import { useCustomStudioStore } from "@/stores/customStudioStore";
 import { toast } from "sonner";
-import { getProducts, type Product } from "@/lib/products";
+import { getProducts, type Product, type PrimaryColor } from "@/lib/products";
+import { PRESET_COLORS } from "@/lib/pricing";
 import {
   Select,
   SelectContent,
@@ -23,6 +26,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import QuickViewModal from "@/components/QuickViewModal";
 
 const SORT_OPTIONS = [
@@ -32,13 +45,36 @@ const SORT_OPTIONS = [
   { value: "name-asc", label: "Name: A → Z" },
 ];
 
+const NAIL_SHAPES = ['Almond', 'Coffin', 'Stiletto', 'Square', 'Oval'];
+const NAIL_LENGTHS = ['Short', 'Medium', 'Long', 'Extra Long'];
+
+const FREE_SHIPPING_THRESHOLD = 50;
+
+// Map product primaryColor to closest preset hex for the custom studio
+const COLOR_TO_HEX: Record<PrimaryColor, string> = {
+  Pink: '#F8C8D4',
+  Red: '#C41E3A',
+  Nude: '#E8D4C4',
+  Black: '#1A1A1A',
+  White: '#FFFFFF',
+  Gold: '#D4A574',
+  Blue: '#1A1A2E',
+  Purple: '#B4A7D6',
+  Multi: '#F8E8E0',
+};
+
 const Favorites = () => {
   const { items: favorites, addFavorite, removeFavorite, clearFavorites } = useFavoritesStore();
+  const { addItem, hasSizingKitInCart } = useCartStore();
   const [sortBy, setSortBy] = useState("recent");
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const [showBatchAddDialog, setShowBatchAddDialog] = useState(false);
+  const [batchShape, setBatchShape] = useState('Almond');
+  const [batchLength, setBatchLength] = useState('Medium');
   const removingProductRef = useRef<Product | null>(null);
+  const navigate = useNavigate();
 
   // Sort favorites
   const sortedFavorites = [...favorites].sort((a, b) => {
@@ -65,6 +101,11 @@ const Favorites = () => {
     const rest = all.filter(p => !badged.some(b => b.id === p.id));
     return [...badged, ...rest].slice(0, 4);
   })();
+
+  // Summary bar calculations
+  const favoritesTotal = favorites.reduce((sum, p) => sum + p.price, 0);
+  const hasFreeSipping = favoritesTotal >= FREE_SHIPPING_THRESHOLD;
+  const amountToFreeShipping = FREE_SHIPPING_THRESHOLD - favoritesTotal;
 
   const handleRemove = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
@@ -100,10 +141,83 @@ const Favorites = () => {
     setQuickViewProduct(product);
   };
 
+  const handleAddToCart = (product: Product, shape: string, length: string) => {
+    const variant = product.variants[0];
+    if (!variant) return;
+
+    const needsSizingKit = !hasSizingKitInCart();
+    const variantId = `${product.id}-${shape.toLowerCase()}-${length.toLowerCase()}-kit`;
+
+    const cartItem: CartItem = {
+      product,
+      variantId,
+      variantTitle: `${shape} / ${length}`,
+      price: {
+        amount: variant.price.toString(),
+        currencyCode: variant.currencyCode,
+      },
+      quantity: 1,
+      selectedOptions: [
+        { name: 'Shape', value: shape },
+        { name: 'Length', value: length },
+      ],
+      needsSizingKit,
+      sizingOption: 'kit',
+    };
+
+    addItem(cartItem);
+  };
+
+  const handleDesignYourOwn = (product: Product) => {
+    const { reset, setDefaultNailConfig } = useCustomStudioStore.getState();
+    reset();
+    const hex = COLOR_TO_HEX[product.primaryColor] || '#F8E8E0';
+    setDefaultNailConfig({ color: hex });
+    navigate('/create');
+  };
+
+  const handleBatchAddAll = () => {
+    let firstItem = true;
+    for (const product of favorites) {
+      const variant = product.variants[0];
+      if (!variant) continue;
+
+      const needsSizingKit = firstItem && !hasSizingKitInCart();
+      const variantId = `${product.id}-${batchShape.toLowerCase()}-${batchLength.toLowerCase()}-kit`;
+
+      const cartItem: CartItem = {
+        product,
+        variantId,
+        variantTitle: `${batchShape} / ${batchLength}`,
+        price: {
+          amount: variant.price.toString(),
+          currencyCode: variant.currencyCode,
+        },
+        quantity: 1,
+        selectedOptions: [
+          { name: 'Shape', value: batchShape },
+          { name: 'Length', value: batchLength },
+        ],
+        needsSizingKit,
+        sizingOption: 'kit',
+      };
+
+      addItem(cartItem);
+      firstItem = false;
+    }
+
+    setShowBatchAddDialog(false);
+    toast.success(`${favorites.length} sets added to bag`, { position: "top-center" });
+  };
+
   // Shared card used for both favorites grid and empty-state suggestions
   const FavoriteCard = ({ product, isFavorited = true }: { product: Product; isFavorited?: boolean }) => {
     const image = product.images?.[0];
     const isRemoving = removingId === product.id;
+    const [selectedShape, setSelectedShape] = useState('Almond');
+    const [selectedLength, setSelectedLength] = useState('Medium');
+    const [justAdded, setJustAdded] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
 
     const handleHeartClick = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -114,6 +228,14 @@ const Favorites = () => {
         addFavorite(product);
         toast.success("Added to favorites", { position: "top-center" });
       }
+    };
+
+    const handleQuickAdd = () => {
+      handleAddToCart(product, selectedShape, selectedLength);
+      setJustAdded(true);
+      setPopoverOpen(false);
+      toast.success(`${product.title} added to bag`, { position: "top-center" });
+      setTimeout(() => setJustAdded(false), 2000);
     };
 
     return (
@@ -151,16 +273,31 @@ const Favorites = () => {
               )}
 
               {/* Quick View overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-end justify-center pb-4 gap-2">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="rounded-full shadow-xl bg-background hover:bg-background border-0 px-6 py-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+                  className="rounded-full shadow-xl bg-background hover:bg-background border-0 px-5 py-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
                   onClick={(e) => handleQuickView(product, e)}
                 >
-                  <Eye className="h-4 w-4 mr-2" />
+                  <Eye className="h-4 w-4 mr-1.5" />
                   Quick View
                 </Button>
+                {isFavorited && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="rounded-full shadow-xl bg-background hover:bg-background border-0 px-4 py-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDesignYourOwn(product);
+                    }}
+                  >
+                    <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                    Customize
+                  </Button>
+                )}
               </div>
             </div>
           </Link>
@@ -190,6 +327,94 @@ const Favorites = () => {
           <p className="text-primary/90 font-display text-lg tracking-wide">
             ${product.price.toFixed(2)}
           </p>
+
+          {/* Feature 1: Quick Add to Bag */}
+          {isFavorited && (
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  className={`w-full mt-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                    justAdded
+                      ? "bg-primary/10 text-primary border border-primary/30"
+                      : "border border-border/50 text-foreground/70 hover:border-primary/40 hover:text-primary hover:bg-primary/5"
+                  }`}
+                >
+                  {justAdded ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" />
+                      Added
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      Add to Bag
+                    </>
+                  )}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-72 p-4 rounded-xl shadow-xl border border-border/30"
+                align="center"
+                side="top"
+                sideOffset={8}
+              >
+                <div className="space-y-4">
+                  {/* Shape selector */}
+                  <div>
+                    <p className="text-xs font-medium tracking-wider uppercase text-muted-foreground mb-2">
+                      Shape
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {NAIL_SHAPES.map((shape) => (
+                        <button
+                          key={shape}
+                          onClick={() => setSelectedShape(shape)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                            selectedShape === shape
+                              ? 'bg-primary text-primary-foreground shadow-sm'
+                              : 'bg-muted/40 text-muted-foreground hover:bg-muted/60'
+                          }`}
+                        >
+                          {shape}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Length selector */}
+                  <div>
+                    <p className="text-xs font-medium tracking-wider uppercase text-muted-foreground mb-2">
+                      Length
+                    </p>
+                    <div className="flex bg-muted/30 rounded-lg p-0.5">
+                      {NAIL_LENGTHS.map((length) => (
+                        <button
+                          key={length}
+                          onClick={() => setSelectedLength(length)}
+                          className={`flex-1 px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+                            selectedLength === length
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {length}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Add button */}
+                  <Button
+                    onClick={handleQuickAdd}
+                    className="w-full rounded-full h-10 text-sm font-medium shadow-sm gap-2"
+                  >
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Add — ${product.price.toFixed(2)}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </div>
     );
@@ -319,7 +544,7 @@ const Favorites = () => {
           </div>
         ) : (
           /* ═══ FAVORITES GRID ═══ */
-          <div className="pt-8 pb-24 animate-fade-in">
+          <div className={`pt-8 animate-fade-in ${favorites.length >= 2 ? 'pb-40' : 'pb-24'}`}>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {sortedFavorites.map((product) => (
                 <FavoriteCard key={product.id} product={product} isFavorited />
@@ -328,6 +553,124 @@ const Favorites = () => {
           </div>
         )}
       </div>
+
+      {/* ═══ Feature 3: Summary Bar ═══ */}
+      {favorites.length >= 2 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border/30 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5">
+            <div className="flex items-center justify-between gap-4">
+              {/* Left: count, total, shipping nudge */}
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">
+                  {favorites.length} sets saved
+                  <span className="text-muted-foreground font-light ml-1.5">—</span>
+                  <span className="text-primary font-display ml-1.5">${favoritesTotal.toFixed(2)}</span>
+                </p>
+                {hasFreeSipping ? (
+                  <p className="text-xs text-primary/80 flex items-center gap-1 mt-0.5">
+                    <Truck className="h-3 w-3" />
+                    Free shipping on this order
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Add ${amountToFreeShipping.toFixed(2)} more for free shipping
+                  </p>
+                )}
+              </div>
+
+              {/* Right: Add All button */}
+              <Button
+                onClick={() => setShowBatchAddDialog(true)}
+                className="rounded-full px-6 h-10 text-sm font-medium shadow-sm gap-2 shrink-0"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                <span className="hidden sm:inline">Add All to Bag</span>
+                <span className="sm:hidden">Add All</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Batch Add Dialog */}
+      <Dialog open={showBatchAddDialog} onOpenChange={setShowBatchAddDialog}>
+        <DialogContent className="max-w-sm p-6 rounded-2xl border border-border/20">
+          <DialogTitle className="font-display text-xl text-foreground">
+            Add all {favorites.length} sets to bag
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground -mt-1">
+            Pick one shape and length for all sets.
+          </p>
+
+          <div className="space-y-5 mt-3">
+            {/* Shape selector */}
+            <div>
+              <p className="text-xs font-medium tracking-wider uppercase text-muted-foreground mb-2.5">
+                Shape
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {NAIL_SHAPES.map((shape) => (
+                  <button
+                    key={shape}
+                    onClick={() => setBatchShape(shape)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      batchShape === shape
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'bg-muted/40 text-muted-foreground hover:bg-muted/60'
+                    }`}
+                  >
+                    {shape}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Length selector */}
+            <div>
+              <p className="text-xs font-medium tracking-wider uppercase text-muted-foreground mb-2.5">
+                Length
+              </p>
+              <div className="flex bg-muted/30 rounded-lg p-1">
+                {NAIL_LENGTHS.map((length) => (
+                  <button
+                    key={length}
+                    onClick={() => setBatchLength(length)}
+                    className={`flex-1 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                      batchLength === length
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {length}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary + add button */}
+            <div className="pt-1 space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{favorites.length} sets</span>
+                <span className="font-display text-lg text-foreground">${favoritesTotal.toFixed(2)}</span>
+              </div>
+              {hasFreeSipping && (
+                <p className="text-xs text-primary/80 flex items-center gap-1">
+                  <Truck className="h-3 w-3" />
+                  Free shipping included
+                </p>
+              )}
+              <Button
+                onClick={handleBatchAddAll}
+                className="w-full rounded-full h-11 text-sm font-medium shadow-md gap-2"
+                size="lg"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Add All to Bag — ${favoritesTotal.toFixed(2)}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Clear All Confirmation Dialog */}
       <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>

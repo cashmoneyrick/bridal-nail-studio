@@ -1,109 +1,70 @@
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import NailClubSignup from "@/components/NailClubSignup";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import {
-  Sparkles,
-  Gift,
-  Heart,
-  Package,
-  Check,
-  Star,
-  Mail,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Gift, Tag, Palette, ArrowRight } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { sampleProducts } from "@/lib/products";
 
 /* ─── Data ────────────────────────────────────────────────────────── */
 
+const benefitBadges = [
+  "Early Access",
+  "10% Off",
+  "Birthday Gift",
+  "Exclusive Drops",
+];
+
 const perks = [
   {
-    number: "01",
     title: "Early Access",
     description:
       "New collections land in your inbox before anyone else. Shop first, never miss a drop.",
+    icon: Sparkles,
+    accent: "bg-primary/10",
   },
   {
-    number: "02",
     title: "Member Pricing",
     description:
       "10–20% off every set, every time. Because loyalty deserves to be rewarded.",
+    icon: Tag,
+    accent: "bg-secondary/15",
   },
   {
-    number: "03",
     title: "Birthday Surprise",
     description:
       "A special gift arrives during your birthday month — our way of celebrating you.",
+    icon: Gift,
+    accent: "bg-accent/15",
   },
   {
-    number: "04",
     title: "Exclusive Drops",
     description:
       "Members-only designs you won't find anywhere else. Limited runs, made for you.",
+    icon: Palette,
+    accent: "bg-primary/8",
   },
 ];
 
-const journeySteps = [
+const memberQuotes = [
   {
-    step: "01",
-    title: "Sign Up Free",
-    description:
-      "Join the Nail Club with just your email. No credit card, no strings attached.",
-    Icon: Mail,
+    quote: "I always get the new drops before they sell out.",
+    name: "Taylor R.",
   },
   {
-    step: "02",
-    title: "Unlock Your Perks",
-    description:
-      "Start enjoying member pricing, early access, and exclusive drops right away.",
-    Icon: Gift,
+    quote: "The birthday surprise was the sweetest touch.",
+    name: "Priya K.",
   },
   {
-    step: "03",
-    title: "Get the VIP Treatment",
-    description:
-      "Birthday surprises, first dibs on every collection, and designs made just for you.",
-    Icon: Sparkles,
-  },
-];
-
-const freeTierFeatures = [
-  "10% off orders $50+",
-  "Early access to new releases",
-  "Members-only newsletter",
-];
-
-const premiumTierFeatures = [
-  "20% off everything",
-  "Free shipping on all orders",
-  "Monthly nail drop",
-  "Birthday surprise",
-  "Priority support",
-];
-
-const testimonials = [
-  {
-    quote:
-      "The early access drops mean I always get the sets I want before they sell out. It feels like having a personal stylist.",
-    name: "Sarah M.",
-    detail: "Member since 2025",
-  },
-  {
-    quote:
-      "The birthday surprise was such a thoughtful touch — it's the little things that make you feel like a VIP.",
-    name: "Jessica L.",
-    detail: "Nail Obsessed Waitlist",
-  },
-  {
-    quote:
-      "Being in the Nail Club feels exclusive without being elitist. The designs are always exactly my vibe.",
-    name: "Aisha K.",
-    detail: "Member since 2024",
+    quote: "My friends always ask where I get my nails.",
+    name: "Maya S.",
   },
 ];
 
@@ -111,17 +72,12 @@ const faqs = [
   {
     question: "What is the Nail Drop Club?",
     answer:
-      "The Nail Drop Club is our membership program with two tiers. Nail Lover (free) gives you 10% off orders $50+ and early access to new releases. Nail Obsessed ($19.99/month) adds 20% off everything, free shipping, monthly nail drops, birthday surprises, and priority support.",
+      "The Nail Drop Club is our free membership program. Members enjoy 10% off orders $50+, early access to new releases, and our members-only newsletter packed with exclusive tips and sneak peeks.",
   },
   {
-    question: "What do I get with the free Nail Lover tier?",
+    question: "What do I get as a member?",
     answer:
-      "Nail Lover members enjoy 10% off all orders $50 or more, early access to new releases via email, and our members-only newsletter packed with exclusive tips and sneak peeks.",
-  },
-  {
-    question: "When does Nail Obsessed launch?",
-    answer:
-      "Nail Obsessed is launching soon! Sign up for the free Nail Lover tier or join our email list to be the first to know when the premium tier goes live.",
+      "Early access to new collections, 10% off all orders $50 or more, birthday month surprises, and exclusive members-only designs you won't find anywhere else.",
   },
   {
     question: "Do my discounts stack with sale prices?",
@@ -133,21 +89,30 @@ const faqs = [
 /* ─── Component ───────────────────────────────────────────────────── */
 
 const NailClub = () => {
+  const heroRef = useRef<HTMLElement>(null);
+  const [showFloatingBtn, setShowFloatingBtn] = useState(false);
+  const socialProofRef = useScrollReveal();
   const perksRef = useScrollReveal();
-  const perksListRef = useScrollReveal();
-  const journeyRef = useScrollReveal();
-  const journeyStepsRef = useScrollReveal();
-  const journeyStepsMobileRef = useScrollReveal();
-  const pricingRef = useScrollReveal();
-  const pricingCardsRef = useScrollReveal();
-  const testimonialsRef = useScrollReveal();
-  const testimonialsCardsRef = useScrollReveal();
+  const perksCardsRef = useScrollReveal();
+  const showcaseRef = useScrollReveal();
+  const showcaseGridRef = useScrollReveal();
   const faqRef = useScrollReveal();
-  const ctaRef = useScrollReveal();
 
-  const scrollToSignup = () => {
-    document.getElementById("signup")?.scrollIntoView({ behavior: "smooth" });
-  };
+  // Floating button visibility — show when hero is out of view
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowFloatingBtn(!entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -157,6 +122,7 @@ const NailClub = () => {
           HERO
       ═══════════════════════════════════════════════════════════ */}
       <section
+        ref={heroRef}
         id="signup"
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
       >
@@ -221,7 +187,20 @@ const NailClub = () => {
             {/* Signup form */}
             <div className="animate-stagger-4 mt-10 sm:mt-12 max-w-md mx-auto">
               <NailClubSignup />
-              <p className="text-center text-sm text-muted-foreground/60 mt-6 tracking-wide">
+
+              {/* Benefit badges */}
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
+                {benefitBadges.map((badge) => (
+                  <span
+                    key={badge}
+                    className="border border-primary/20 rounded-full text-xs text-muted-foreground/70 px-3 py-1"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+
+              <p className="text-center text-sm text-muted-foreground/60 mt-4 tracking-wide">
                 Join 2,000+ nail lovers
               </p>
             </div>
@@ -230,33 +209,71 @@ const NailClub = () => {
 
         {/* Bottom gradient fade */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-
-        {/* Scroll indicator */}
-        <button
-          onClick={() =>
-            document
-              .getElementById("perks")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce"
-          aria-label="Scroll down"
-        >
-          <div className="w-6 h-10 border-2 border-foreground/15 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-foreground/30 rounded-full" />
-          </div>
-        </button>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          PERKS — Editorial numbered list
+          SOCIAL PROOF — Editorial Quote Strip
       ═══════════════════════════════════════════════════════════ */}
-      <section id="perks" className="py-20 sm:py-28 lg:py-32 bg-background">
+      <section className="py-16 sm:py-20 bg-background relative overflow-hidden">
+        {/* Subtle accent line top */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+
+        <div
+          ref={socialProofRef}
+          className="reveal container mx-auto px-4 sm:px-6 lg:px-8"
+        >
+          {/* Flanked eyebrow */}
+          <div className="flex items-center justify-center gap-5 mb-10 sm:mb-12">
+            <div className="w-12 h-px bg-border/40" />
+            <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50">
+              From Our Members
+            </p>
+            <div className="w-12 h-px bg-border/40" />
+          </div>
+
+          {/* Quotes */}
+          <div className="flex flex-col md:flex-row items-stretch justify-center gap-10 md:gap-0 max-w-4xl mx-auto">
+            {memberQuotes.map((item, index) => (
+              <div key={index} className="flex items-center">
+                {/* Vertical divider (desktop) */}
+                {index > 0 && (
+                  <div className="hidden md:block w-px self-stretch mx-10 bg-gradient-to-b from-transparent via-border/40 to-transparent" />
+                )}
+                {/* Horizontal divider (mobile) */}
+                {index > 0 && (
+                  <div className="md:hidden w-16 h-px bg-border/30 absolute left-1/2 -translate-x-1/2 -mt-5" />
+                )}
+                <div className="text-center md:text-left max-w-[260px] mx-auto md:mx-0">
+                  {/* Decorative open quote */}
+                  <span
+                    className="block font-display text-3xl leading-none text-primary/20 mb-2 select-none"
+                    aria-hidden="true"
+                  >
+                    &ldquo;
+                  </span>
+                  <p className="font-display italic text-base sm:text-lg text-foreground/80 leading-relaxed mb-3">
+                    {item.quote}
+                  </p>
+                  <p className="text-xs font-medium tracking-wider uppercase text-muted-foreground/40">
+                    {item.name}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          PERKS — Icon-forward 2×2 card grid
+      ═══════════════════════════════════════════════════════════ */}
+      <section className="py-16 sm:py-20 bg-background">
         <div
           ref={perksRef}
           className="reveal container mx-auto px-4 sm:px-6 lg:px-8"
         >
           {/* Section header */}
-          <div className="mb-16 sm:mb-20">
+          <div className="mb-12 sm:mb-16">
             <div className="flex items-center gap-5 mb-8">
               <div className="flex-1 h-px bg-border/40" />
               <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 shrink-0">
@@ -264,133 +281,70 @@ const NailClub = () => {
               </p>
               <div className="flex-1 h-px bg-border/40" />
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-12">
-              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-medium leading-[1.05] shrink-0">
-                <span className="italic font-light text-foreground/60">
-                  Why
-                </span>{" "}
-                Join the Club
-              </h2>
-              <p className="text-muted-foreground text-sm sm:text-base sm:text-right sm:max-w-[240px] sm:pb-1 leading-relaxed">
-                Rewards that make every set feel special
-              </p>
-            </div>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium text-foreground text-center">
+              <span className="italic font-light text-foreground/60">Why</span>{" "}
+              Join the Club
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base text-center mt-4 max-w-md mx-auto">
+              Rewards that make every set feel special
+            </p>
           </div>
 
-          {/* Perks list */}
+          {/* 2×2 card grid */}
           <div
-            ref={perksListRef}
-            className="reveal-children max-w-3xl mx-auto"
+            ref={perksCardsRef}
+            className="reveal-children grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 max-w-3xl mx-auto"
           >
-            {perks.map((perk, index) => (
-              <div
-                key={perk.number}
-                className={`flex items-start gap-6 sm:gap-10 ${
-                  index < perks.length - 1
-                    ? "mb-12 sm:mb-16 pb-12 sm:pb-16 border-b border-border/30"
-                    : ""
-                }`}
-              >
-                {/* Large decorative number */}
-                <span className="font-display text-5xl sm:text-6xl md:text-7xl font-light text-primary/15 leading-none shrink-0 select-none">
-                  {perk.number}
-                </span>
+            {perks.map((perk, index) => {
+              const Icon = perk.icon;
+              return (
+                <div
+                  key={perk.title}
+                  className="group relative rounded-2xl p-6 sm:p-7 transition-all duration-500 hover:-translate-y-0.5 border border-border/30 hover:border-primary/25 bg-gradient-to-br from-card via-card to-secondary/5 hover:shadow-[0_8px_30px_-12px_rgba(107,76,59,0.12)]"
+                >
+                  {/* Subtle top accent line */}
+                  <div className="absolute top-0 left-6 right-6 sm:left-7 sm:right-7 h-px bg-gradient-to-r from-transparent via-primary/15 to-transparent group-hover:via-primary/30 transition-all duration-500" />
 
-                {/* Text content */}
-                <div className="pt-1 sm:pt-2">
-                  <h3 className="font-display text-xl sm:text-2xl md:text-3xl font-medium text-foreground mb-3 leading-tight">
+                  {/* Number + Icon row */}
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="font-display text-2xl sm:text-3xl font-light text-primary/15 leading-none select-none">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div className="w-10 h-10 rounded-xl bg-primary/[0.06] group-hover:bg-primary/[0.10] flex items-center justify-center transition-colors duration-500">
+                      <Icon className="w-[18px] h-[18px] text-primary/50 group-hover:text-primary/70 transition-colors duration-500" />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="font-display text-lg sm:text-xl font-medium text-foreground mb-2.5 tracking-[-0.01em]">
                     {perk.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-md">
+
+                  {/* Description */}
+                  <p className="text-muted-foreground text-sm leading-relaxed">
                     {perk.description}
                   </p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
-      </section>
 
-      {/* ═══════════════════════════════════════════════════════════
-          HOW IT WORKS — Journey timeline
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 lg:py-32 bg-muted/20 overflow-hidden">
-        <div
-          ref={journeyRef}
-          className="reveal container mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          {/* Section header — centered */}
-          <div className="text-center mb-16 sm:mb-20">
-            <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 mb-6">
-              Your Journey
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium text-foreground leading-tight">
-              Three steps to
-              <span className="italic font-light text-primary/70">
-                {" "}
-                beautiful
+          {/* Premium tier teaser */}
+          <div className="mt-10 sm:mt-12 max-w-3xl mx-auto">
+            <div className="relative rounded-2xl border border-dashed border-primary/20 bg-gradient-to-r from-primary/[0.03] via-transparent to-primary/[0.03] px-6 sm:px-8 py-5 sm:py-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              {/* Left: "Coming Soon" badge */}
+              <span className="shrink-0 inline-block px-3 py-1 rounded-full border border-primary/20 text-[10px] font-semibold tracking-[0.25em] uppercase text-primary/60">
+                Coming Soon
               </span>
-            </h2>
-          </div>
 
-          {/* Desktop: Horizontal 3-column with connecting line */}
-          <div className="hidden md:block">
-            <div className="relative max-w-4xl mx-auto">
-              {/* Connecting line */}
-              <div className="absolute top-6 left-[16.67%] right-[16.67%] h-px bg-border/40" />
-
-              <div
-                ref={journeyStepsRef}
-                className="reveal-children grid grid-cols-3 gap-8"
-              >
-                {journeySteps.map((step) => (
-                  <div key={step.step} className="text-center">
-                    {/* Circle marker */}
-                    <div className="w-12 h-12 rounded-full bg-background border-2 border-primary/30 flex items-center justify-center mx-auto mb-6 relative z-10">
-                      <step.Icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-muted-foreground/40 mb-3">
-                      Step {step.step}
-                    </p>
-                    <h3 className="font-display text-xl font-medium text-foreground mb-3">
-                      {step.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed max-w-[240px] mx-auto">
-                      {step.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile: Vertical timeline */}
-          <div className="md:hidden">
-            <div className="relative pl-12">
-              {/* Vertical connecting line */}
-              <div className="absolute left-[15px] top-0 bottom-0 w-px bg-border/40" />
-
-              <div
-                ref={journeyStepsMobileRef}
-                className="reveal-children space-y-10"
-              >
-                {journeySteps.map((step) => (
-                  <div key={step.step} className="relative">
-                    {/* Circle marker on the line */}
-                    <div className="absolute -left-12 top-0 w-[30px] h-[30px] rounded-full bg-background border-2 border-primary/30 flex items-center justify-center">
-                      <step.Icon className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                    <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-muted-foreground/40 mb-2">
-                      Step {step.step}
-                    </p>
-                    <h3 className="font-display text-lg font-medium text-foreground mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                ))}
+              {/* Center: Tier name + perks */}
+              <div className="text-center sm:text-left flex-1 min-w-0">
+                <p className="font-display text-lg sm:text-xl font-medium text-foreground/80 tracking-[-0.01em]">
+                  Nail Obsessed
+                </p>
+                <p className="text-sm text-muted-foreground/50 mt-0.5">
+                  20% off · Free shipping · Monthly drops
+                </p>
               </div>
             </div>
           </div>
@@ -398,188 +352,74 @@ const NailClub = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          PRICING TIERS
+          MEMBER FAVORITES SHOWCASE
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 lg:py-32 bg-background">
+      <section className="py-16 sm:py-20 bg-background">
         <div
-          ref={pricingRef}
+          ref={showcaseRef}
           className="reveal container mx-auto px-4 sm:px-6 lg:px-8"
         >
           {/* Section header */}
-          <div className="mb-16 sm:mb-20">
+          <div className="mb-12 sm:mb-16">
             <div className="flex items-center gap-5 mb-8">
               <div className="flex-1 h-px bg-border/40" />
               <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 shrink-0">
-                Membership Tiers
+                Members First
               </p>
               <div className="flex-1 h-px bg-border/40" />
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-12">
-              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-medium leading-[1.05] shrink-0">
-                <span className="italic font-light text-foreground/60">
-                  Find
-                </span>{" "}
-                Your Tier
-              </h2>
-              <p className="text-muted-foreground text-sm sm:text-base sm:text-right sm:max-w-[240px] sm:pb-1 leading-relaxed">
-                Start free, upgrade when you're ready
-              </p>
-            </div>
-          </div>
-
-          {/* Pricing cards */}
-          <div
-            ref={pricingCardsRef}
-            className="reveal-children grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto items-start"
-          >
-            {/* Free Tier — clean, understated */}
-            <div className="bg-card rounded-3xl p-8 sm:p-10 border border-border/50">
-              <div className="flex items-center gap-3 mb-6">
-                <Heart className="w-5 h-5 text-primary/60" />
-                <h3 className="font-display text-xl text-foreground">
-                  Nail Lover
-                </h3>
-              </div>
-
-              <div className="mb-8">
-                <span className="font-display text-4xl sm:text-5xl text-foreground">
-                  Free
-                </span>
-                <span className="text-muted-foreground text-sm ml-2">
-                  forever
-                </span>
-              </div>
-
-              <div className="h-px bg-border/40 mb-8" />
-
-              <ul className="space-y-4 mb-10">
-                {freeTierFeatures.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-4 h-4 text-primary/60 mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground text-sm">
-                      {feature}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link to="/auth">
-                <Button
-                  className="w-full rounded-full"
-                  size="lg"
-                  variant="outline"
-                >
-                  Sign Up Free
-                </Button>
-              </Link>
-            </div>
-
-            {/* Premium Tier — elevated, aspirational */}
-            <div className="relative">
-              {/* Outer glow */}
-              <div className="absolute -inset-1 bg-gradient-to-br from-primary/20 via-secondary/15 to-accent/20 rounded-[2rem] blur-sm animate-glow-pulse" />
-
-              <div className="relative bg-card rounded-3xl p-8 sm:p-10 border border-primary/25 shadow-lg">
-                {/* Launching Soon badge */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-5 py-1.5 bg-primary text-primary-foreground text-[10px] font-semibold tracking-[0.15em] uppercase rounded-full inline-flex items-center gap-1.5 whitespace-nowrap">
-                    <Star className="w-3 h-3" />
-                    Launching Soon
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3 mb-6 mt-2">
-                  <Package className="w-5 h-5 text-primary" />
-                  <h3 className="font-display text-xl text-foreground">
-                    Nail Obsessed
-                  </h3>
-                </div>
-
-                <div className="mb-8">
-                  <span className="font-display text-4xl sm:text-5xl text-foreground">
-                    $19.99
-                  </span>
-                  <span className="text-muted-foreground text-sm ml-2">
-                    /month
-                  </span>
-                </div>
-
-                <div className="h-px bg-primary/15 mb-8" />
-
-                <ul className="space-y-4 mb-10">
-                  {premiumTierFeatures.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-foreground text-sm">
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  className="w-full rounded-full"
-                  size="lg"
-                  onClick={scrollToSignup}
-                >
-                  Join Waitlist
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          TESTIMONIALS
-      ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 lg:py-32 bg-muted/20">
-        <div
-          ref={testimonialsRef}
-          className="reveal container mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          {/* Section header — centered */}
-          <div className="text-center mb-16 sm:mb-20">
-            <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground/50 mb-6">
-              From Our Members
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium text-foreground">
-              In their{" "}
-              <span className="italic font-light text-primary/70">words</span>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium text-foreground text-center">
+              <span className="italic font-light text-foreground/60">What</span>{" "}
+              You Get First
             </h2>
+            <p className="text-muted-foreground text-sm sm:text-base text-center mt-4 max-w-md mx-auto">
+              These sets dropped to members before anyone else
+            </p>
           </div>
 
-          {/* Testimonials grid */}
+          {/* Product grid — desktop: 4-col, tablet: 2x2, mobile: horizontal scroll */}
           <div
-            ref={testimonialsCardsRef}
-            className="reveal-children grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto"
+            ref={showcaseGridRef}
+            className="reveal-children flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-visible sm:snap-none sm:pb-0 max-w-5xl mx-auto -mx-4 px-4 sm:mx-auto sm:px-0"
           >
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
-                className={`relative ${i === 1 ? "md:mt-8" : ""}`}
+            {sampleProducts.map((product) => (
+              <Link
+                key={product.id}
+                to={`/shop/${product.handle}`}
+                className="group flex-shrink-0 w-[220px] sm:w-auto snap-start"
               >
-                {/* Oversized decorative quotation mark */}
-                <span className="font-display text-7xl sm:text-8xl text-primary/10 leading-none select-none absolute -top-4 -left-2 pointer-events-none">
-                  &ldquo;
-                </span>
-
-                <div className="bg-card rounded-2xl p-8 border border-border/40 relative">
-                  <p className="font-display text-base sm:text-lg text-foreground/90 italic leading-relaxed mb-6">
-                    {t.quote}
-                  </p>
-                  <div className="h-px bg-border/30 mb-4" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      {t.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground/60">
-                      {t.detail}
-                    </p>
-                  </div>
+                {/* Image container */}
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted mb-3">
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {/* Early Access badge */}
+                  <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full">
+                    Early Access
+                  </span>
                 </div>
-              </div>
+                {/* Text */}
+                <h3 className="font-display text-base font-medium text-foreground group-hover:text-primary transition-colors">
+                  {product.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  ${product.price.toFixed(2)}
+                </p>
+              </Link>
             ))}
+          </div>
+
+          {/* Browse CTA */}
+          <div className="text-center mt-8">
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all"
+            >
+              Browse the full collection
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -587,7 +427,7 @@ const NailClub = () => {
       {/* ═══════════════════════════════════════════════════════════
           FAQ
       ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 lg:py-32 bg-background">
+      <section className="py-16 sm:py-20 bg-background">
         <div
           ref={faqRef}
           className="reveal container mx-auto px-4 sm:px-6 lg:px-8"
@@ -616,7 +456,7 @@ const NailClub = () => {
                   value={`item-${index}`}
                   className="bg-card rounded-2xl px-6 border border-border/40 transition-colors duration-300 data-[state=open]:border-primary/20 data-[state=open]:bg-card/80"
                 >
-                  <AccordionTrigger className="font-display text-base text-foreground hover:no-underline py-5">
+                  <AccordionTrigger className="font-display text-base text-foreground hover:no-underline py-5 text-left">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground pb-5 text-sm leading-relaxed">
@@ -630,59 +470,19 @@ const NailClub = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          FINAL CTA — Dark band
+          FLOATING "JOIN FREE" BUTTON
       ═══════════════════════════════════════════════════════════ */}
-      <section className="relative py-24 sm:py-32 overflow-hidden">
-        {/* Dark atmospheric background */}
-        <div className="absolute inset-0 bg-foreground" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse 60% 80% at 30% 50%, hsl(var(--primary) / 0.15), transparent),
-              radial-gradient(ellipse 50% 60% at 70% 60%, hsl(var(--secondary) / 0.10), transparent)
-            `,
-          }}
-        />
-
-        {/* Decorative floating blur */}
-        <div className="absolute top-10 right-[15%] w-64 h-64 rounded-full bg-primary/8 blur-3xl animate-float" />
-
-        <div
-          ref={ctaRef}
-          className="reveal relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center"
-        >
-          <div className="w-8 h-px bg-background/20 mx-auto mb-8" />
-
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-background leading-tight mb-6">
-            Ready to join
-            <span className="block italic font-light text-primary/80">
-              something beautiful?
-            </span>
-          </h2>
-
-          <p className="text-background/60 text-base sm:text-lg max-w-md mx-auto mb-10 leading-relaxed">
-            Sign up today and start enjoying exclusive perks, early access, and
-            designs made just for members.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-10 h-12 text-base font-medium min-w-[200px]"
-              size="lg"
-              onClick={scrollToSignup}
-            >
-              Join the Club
-            </Button>
-            <Link
-              to="/shop"
-              className="text-background/50 hover:text-background/80 text-sm font-medium transition-colors underline underline-offset-4 decoration-background/20 hover:decoration-background/40"
-            >
-              or browse the shop
-            </Link>
-          </div>
-        </div>
-      </section>
+      <Button
+        onClick={() =>
+          document.getElementById("signup")?.scrollIntoView({ behavior: "smooth" })
+        }
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 rounded-full shadow-lg transition-opacity duration-300 ${
+          showFloatingBtn ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        size="lg"
+      >
+        Join Free
+      </Button>
 
     </div>
   );

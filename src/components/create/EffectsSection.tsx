@@ -18,11 +18,11 @@ import SectionWrapper from './SectionWrapper';
 function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-px" style={{ background: 'rgba(194,104,113,0.15)' }} />
+      <div className="flex-1 h-px" style={{ background: 'rgba(107,76,59,0.15)' }} />
       <span
         className="text-xs"
         style={{
-          color: '#B8AFA6',
+          color: '#7A5A48',
           fontFamily: "'Playfair Display', serif",
           fontStyle: 'italic',
           letterSpacing: '0.05em',
@@ -30,7 +30,7 @@ function SectionDivider({ label }: { label: string }) {
       >
         {label}
       </span>
-      <div className="flex-1 h-px" style={{ background: 'rgba(194,104,113,0.15)' }} />
+      <div className="flex-1 h-px" style={{ background: 'rgba(107,76,59,0.15)' }} />
     </div>
   );
 }
@@ -45,7 +45,7 @@ function EffectToggles() {
   return (
     <div>
       <SectionDivider label="Effects" />
-      <p className="text-[10px] text-center mt-1.5 mb-3" style={{ color: '#8A827A' }}>
+      <p className="text-[10px] text-center mt-1.5 mb-3" style={{ color: '#9A7E6D' }}>
         Select multiple
       </p>
       <div className="flex flex-wrap gap-2 justify-center">
@@ -60,16 +60,16 @@ function EffectToggles() {
               whileTap={{ scale: 0.95 }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm"
               style={{
-                background: isActive ? 'rgba(194,104,113,0.12)' : '#5A524A',
-                border: `2px solid ${isActive ? '#C26871' : 'transparent'}`,
-                color: isActive ? '#F5F0EB' : '#B8AFA6',
-                boxShadow: isActive ? '0 0 12px rgba(194,104,113,0.2)' : 'none',
+                background: isActive ? 'rgba(107,76,59,0.12)' : '#DBBFC2',
+                border: `2px solid ${isActive ? '#6B4C3B' : 'transparent'}`,
+                color: isActive ? '#3D2B1F' : '#7A5A48',
+                boxShadow: isActive ? '0 0 12px rgba(107,76,59,0.2)' : 'none',
               }}
             >
               <span>{EFFECT_LABELS[effect]}</span>
               <span
                 className="text-xs"
-                style={{ color: isActive ? '#C26871' : '#8A827A' }}
+                style={{ color: isActive ? '#6B4C3B' : '#9A7E6D' }}
               >
                 +${price}
               </span>
@@ -115,20 +115,20 @@ function TierSelector<T extends string>({
               whileTap={{ scale: 0.95 }}
               className="flex flex-col items-center gap-0.5 py-2.5 px-2 rounded-xl text-center"
               style={{
-                background: isActive ? 'rgba(194,104,113,0.08)' : '#5A524A',
-                border: `2px solid ${isActive ? '#C26871' : 'transparent'}`,
-                boxShadow: isActive ? '0 0 12px rgba(194,104,113,0.2)' : 'none',
+                background: isActive ? 'rgba(107,76,59,0.08)' : '#DBBFC2',
+                border: `2px solid ${isActive ? '#6B4C3B' : 'transparent'}`,
+                boxShadow: isActive ? '0 0 12px rgba(107,76,59,0.2)' : 'none',
               }}
             >
               <span
                 className="text-xs sm:text-sm font-medium"
-                style={{ color: isActive ? '#F5F0EB' : '#B8AFA6' }}
+                style={{ color: isActive ? '#3D2B1F' : '#7A5A48' }}
               >
                 {labels[tier]}
               </span>
               <span
                 className="text-[10px] sm:text-xs"
-                style={{ color: price > 0 ? '#C26871' : '#8A827A' }}
+                style={{ color: price > 0 ? '#6B4C3B' : '#9A7E6D' }}
               >
                 {price > 0 ? `+$${price}` : 'Free'}
               </span>
@@ -206,7 +206,7 @@ export default function EffectsSection() {
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.2 }}
               className="text-sm font-medium"
-              style={{ color: extrasTotal > 0 ? '#C26871' : '#8A827A' }}
+              style={{ color: extrasTotal > 0 ? '#6B4C3B' : '#9A7E6D' }}
             >
               {extrasTotal > 0 ? `Extras: +$${extrasTotal}` : 'No extras selected'}
             </motion.p>

@@ -9,13 +9,11 @@ import { Link } from "react-router-dom";
 import { logError } from "@/lib/logger";
 
 const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
-const nameSchema = z.string().max(50, "Name is too long").optional();
 
 type SignupStatus = "idle" | "loading" | "success" | "already_subscribed" | "error" | "rate_limited";
 
 const NailClubSignup = () => {
   const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [status, setStatus] = useState<SignupStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,16 +41,6 @@ const NailClubSignup = () => {
       return;
     }
 
-    // Validate first name if provided
-    if (firstName) {
-      const nameResult = nameSchema.safeParse(firstName.trim());
-      if (!nameResult.success) {
-        setErrorMessage(nameResult.error.errors[0].message);
-        setStatus("error");
-        return;
-      }
-    }
-
     setStatus("loading");
     setCooldown(true);
 
@@ -64,7 +52,7 @@ const NailClubSignup = () => {
       const { data, error } = await supabase.functions.invoke('subscribe-newsletter', {
         body: {
           email: email.trim().toLowerCase(),
-          first_name: firstName.trim() || null,
+          first_name: null,
           source: "nail_club_page",
         },
       });
@@ -167,6 +155,12 @@ const NailClubSignup = () => {
           <p className="text-muted-foreground text-sm">
             Early access, exclusive designs, and members-only savings.
           </p>
+
+          {/* Incentive callout */}
+          <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-primary/80 font-medium">
+            <Gift className="w-3.5 h-3.5" />
+            <span>$20 off your first order + 15% off ongoing</span>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -197,21 +191,6 @@ const NailClubSignup = () => {
               }}
               required
               maxLength={255}
-              className="bg-background/50"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-foreground">
-              First Name <span className="text-muted-foreground text-xs">(optional)</span>
-            </Label>
-            <Input
-              id="firstName"
-              type="text"
-              placeholder="Jane"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              maxLength={50}
               className="bg-background/50"
             />
           </div>

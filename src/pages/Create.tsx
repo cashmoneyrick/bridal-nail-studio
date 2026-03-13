@@ -18,7 +18,6 @@ import ColorSection from '@/components/create/ColorSection';
 import FinishSection from '@/components/create/FinishSection';
 import EffectsSection from '@/components/create/EffectsSection';
 import ReviewSection from '@/components/create/ReviewSection';
-import PriceBar from '@/components/create/PriceBar';
 
 const TOTAL_SECTIONS = 6;
 
@@ -53,10 +52,77 @@ const Create = () => {
     contentRef.current?.scrollTo({ top: 0 });
   }, [activeSection]);
 
+  // ── Auto-advance for discrete selection steps ──────────────────────────
+  // Snapshot values when arriving at a section so we only advance on *changes*
+  const arrivedValues = useRef({
+    shape, length, finish: defaultNailConfig.finish,
+  });
+
+  useEffect(() => {
+    arrivedValues.current = {
+      shape, length, finish: defaultNailConfig.finish,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection]);
+
+  // Auto-advance: Shape (0), Length (1), Finish (3)
+  useEffect(() => {
+    const autoSections = [0, 1, 3] as const;
+    if (!autoSections.includes(activeSection as 0 | 1 | 3)) return;
+
+    const currentValues = { 0: shape, 1: length, 3: defaultNailConfig.finish } as Record<number, string>;
+    const arrivedVals = { 0: arrivedValues.current.shape, 1: arrivedValues.current.length, 3: arrivedValues.current.finish } as Record<number, string>;
+
+    if (currentValues[activeSection] === arrivedVals[activeSection]) return;
+
+    const timer = setTimeout(handleContinue, 600);
+    return () => clearTimeout(timer);
+  }, [activeSection, shape, length, defaultNailConfig.finish, handleContinue]);
+
   const ActiveSection = SECTIONS[activeSection];
+  const isLastSection = activeSection >= TOTAL_SECTIONS - 1;
+
+  // Show manual continue button only for Color (2), Effects (4), Review (5)
+  const showContinueButton = activeSection === 2 || activeSection >= 4;
+  const ctaLabel = isLastSection
+    ? 'Add to Cart'
+    : activeSection === TOTAL_SECTIONS - 2
+      ? 'Review Design'
+      : 'Next';
+
+  const ContinueButton = () =>
+    showContinueButton ? (
+      <div className="flex justify-center py-6 pb-10">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={handleContinue}
+          className="flex items-center gap-2 rounded-full text-sm font-semibold"
+          style={{
+            padding: '14px 28px',
+            background: '#6B4C3B',
+            color: '#FFF',
+            boxShadow: '0 2px 12px rgba(107,76,59,0.25)',
+          }}
+        >
+          {isLastSection && (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+          )}
+          {ctaLabel}
+          {!isLastSection && (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          )}
+        </motion.button>
+      </div>
+    ) : null;
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: '#3D352E' }}>
+    <div className="h-screen flex flex-col" style={{ background: '#FDF2F3' }}>
       {/* Fixed header */}
       <CreateHeader
         totalSections={TOTAL_SECTIONS}
@@ -64,8 +130,8 @@ const Create = () => {
         onBack={activeSection > 0 ? handleBack : undefined}
       />
 
-      {/* Main content — below header, above price bar */}
-      <div className="flex-1 min-h-0 pt-14 sm:pt-16 pb-20 sm:pb-24">
+      {/* Main content — below header */}
+      <div className="flex-1 min-h-0 pt-14 sm:pt-16">
         {isMobile ? (
           /* Mobile: single column */
           <div className="h-full flex flex-col">
@@ -79,6 +145,7 @@ const Create = () => {
                 className="flex-1 flex flex-col"
               >
                 <ActiveSection />
+                <ContinueButton />
               </motion.div>
             </div>
           </div>
@@ -88,13 +155,13 @@ const Create = () => {
             {/* Left — sticky hand preview + design summary */}
             <div
               className="w-[40%] flex flex-col items-center justify-center relative"
-              style={{ background: '#2E2620' }}
+              style={{ background: '#E8D0D2' }}
             >
               {/* Radial rose glow behind hands */}
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'radial-gradient(ellipse at center, rgba(194,104,113,0.05) 0%, transparent 70%)',
+                  background: 'radial-gradient(ellipse at center, rgba(107,76,59,0.05) 0%, transparent 70%)',
                 }}
               />
 
@@ -102,7 +169,7 @@ const Create = () => {
               <p
                 className="relative text-xs uppercase mb-4"
                 style={{
-                  color: '#8A827A',
+                  color: '#9A7E6D',
                   fontFamily: "'Playfair Display', serif",
                   fontStyle: 'italic',
                   letterSpacing: '0.25em',
@@ -124,7 +191,7 @@ const Create = () => {
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.3 }}
                   className="relative text-xs mt-4"
-                  style={{ color: '#8A827A', letterSpacing: '0.05em' }}
+                  style={{ color: '#9A7E6D', letterSpacing: '0.05em' }}
                 >
                   {SHAPE_LABELS[shape]} · {LENGTH_LABELS[length]} · {FINISH_LABELS[defaultNailConfig.finish]}
                 </motion.p>
@@ -141,18 +208,12 @@ const Create = () => {
                 className="flex-1 flex flex-col"
               >
                 <ActiveSection />
+                <ContinueButton />
               </motion.div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Fixed price bar */}
-      <PriceBar
-        onContinue={handleContinue}
-        activeSection={activeSection}
-        totalSections={TOTAL_SECTIONS}
-      />
     </div>
   );
 };

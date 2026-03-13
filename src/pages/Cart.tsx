@@ -2,13 +2,15 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ShoppingBag, Minus, Plus, Trash2, Tag, X, Check, Package, ChevronDown, ChevronUp, Truck, ShieldCheck, RefreshCcw, Sparkles, ArrowRight } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, Tag, X, Check, Package, ChevronDown, ChevronUp, Truck, ShieldCheck, RefreshCcw, Sparkles, ArrowRight, Calendar, Bookmark, Pencil } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useDiscountCodesStore } from "@/stores/discountCodesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { sampleProducts } from "@/lib/products";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
+import CartItemEditModal from "@/components/CartItemEditModal";
+import EmptyCartState from "@/components/EmptyCartState";
 import { useState } from "react";
 import {
   Collapsible,
@@ -17,6 +19,32 @@ import {
 } from "@/components/ui/collapsible";
 
 const FREE_SHIPPING_THRESHOLD = 50;
+
+// Estimated delivery date calculation
+const getEstimatedDeliveryRange = (): { earliest: string; latest: string } => {
+  const addBusinessDays = (startDate: Date, days: number): Date => {
+    const result = new Date(startDate);
+    let added = 0;
+    while (added < days) {
+      result.setDate(result.getDate() + 1);
+      const dayOfWeek = result.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        added++;
+      }
+    }
+    return result;
+  };
+
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const today = new Date();
+  const earliest = addBusinessDays(today, 8);  // 5 crafting + 3 shipping
+  const latest = addBusinessDays(today, 12);   // 7 crafting + 5 shipping
+
+  return { earliest: formatDate(earliest), latest: formatDate(latest) };
+};
 
 // Discount calculation functions
 const getMemberDiscount = (subtotal: number, isAuthenticated: boolean): number => {
@@ -44,7 +72,7 @@ const getDiscountLabel = (code: string): string => {
 };
 
 const Cart = () => {
-  const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
+  const { items, savedItems, updateQuantity, removeItem, saveForLater, moveToCart, removeSavedItem, getTotalPrice } = useCartStore();
   const { appliedCode, clearAppliedCode } = useDiscountCodesStore();
   const { user } = useAuthStore();
 
@@ -53,6 +81,7 @@ const Cart = () => {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [editingItem, setEditingItem] = useState<import("@/stores/cartStore").CartItem | null>(null);
 
   const toggleExpanded = (variantId: string) => {
     setExpandedItems(prev =>
@@ -142,24 +171,7 @@ const Cart = () => {
         )}
 
         {items.length === 0 ? (
-          /* Empty Cart State */
-          <div className="flex flex-col items-center justify-center py-24 sm:py-32">
-            <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-6">
-              <ShoppingBag className="h-9 w-9 text-muted-foreground/60" />
-            </div>
-            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-foreground mb-2 tracking-tight">
-              Your collection awaits
-            </h2>
-            <p className="text-muted-foreground mb-8 text-center max-w-sm">
-              Discover handcrafted press-on nail sets made just for you
-            </p>
-            <Button asChild size="lg" className="rounded-full px-8">
-              <Link to="/shop">
-                Shop Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          <EmptyCartState />
         ) : (
           /* Cart Content */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
@@ -197,6 +209,13 @@ const Cart = () => {
                         {item.selectedOptions.length > 0 && (
                           <p className="text-sm text-muted-foreground mt-0.5">
                             {item.selectedOptions.map(opt => opt.value).join(' · ')}
+                            <button
+                              onClick={() => setEditingItem(item)}
+                              className="ml-2 text-xs text-muted-foreground hover:text-primary underline underline-offset-4 transition-colors inline-flex items-center gap-1"
+                            >
+                              <Pencil className="h-3 w-3" />
+                              Edit
+                            </button>
                           </p>
                         )}
                         {/* Sizing badges */}
@@ -310,18 +329,33 @@ const Cart = () => {
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => removeItem(item.variantId)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => {
+                            saveForLater(item.variantId);
+                            toast.success("Saved for later");
+                          }}
+                          title="Save for later"
+                        >
+                          <Bookmark className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => removeItem(item.variantId)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
+
             </div>
 
             {/* Right Column - Order Summary */}
@@ -345,6 +379,20 @@ const Cart = () => {
                   <span className="text-muted-foreground">Shipping</span>
                   <span className={hasFreeShipping ? "text-primary font-medium" : "text-muted-foreground"}>
                     {hasFreeShipping ? 'Free' : 'Calculated at checkout'}
+                  </span>
+                </div>
+
+                {/* Estimated Delivery */}
+                <div className="flex justify-between text-sm mb-3">
+                  <span className="text-muted-foreground flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    Est. Delivery
+                  </span>
+                  <span className="text-foreground font-medium">
+                    {(() => {
+                      const { earliest, latest } = getEstimatedDeliveryRange();
+                      return `${earliest} – ${latest}`;
+                    })()}
                   </span>
                 </div>
 
@@ -430,6 +478,83 @@ const Cart = () => {
           </div>
         )}
 
+        {/* Saved for Later Section — shown regardless of cart state */}
+        {savedItems.length > 0 && (
+          <section className="mt-10 sm:mt-14">
+            <h3 className="font-display text-lg sm:text-xl font-semibold text-foreground mb-4">
+              Saved for Later
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({savedItems.length} {savedItems.length === 1 ? 'item' : 'items'})
+              </span>
+            </h3>
+            <div className="space-y-3">
+              {savedItems.map((item) => (
+                <div
+                  key={item.variantId}
+                  className="bg-muted/20 rounded-xl p-4 flex gap-4"
+                >
+                  <Link
+                    to={`/product/${item.product.handle}`}
+                    className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-muted hover:opacity-90 transition-opacity"
+                  >
+                    {item.product.images[0] && (
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </Link>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <Link
+                          to={`/product/${item.product.handle}`}
+                          className="font-medium text-sm text-foreground hover:text-primary transition-colors truncate block"
+                        >
+                          {item.product.title}
+                        </Link>
+                        {item.selectedOptions.length > 0 && (
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {item.selectedOptions.map(opt => opt.value).join(' · ')}
+                          </p>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-foreground whitespace-nowrap">
+                        ${parseFloat(item.price.amount).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 rounded-full text-xs px-4"
+                        onClick={() => {
+                          moveToCart(item.variantId);
+                          toast.success("Moved to bag");
+                        }}
+                      >
+                        Move to Bag
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => {
+                          removeSavedItem(item.variantId);
+                          toast.success("Removed");
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Complete Your Look — Recommendations */}
         {items.length > 0 && recommendations.length > 0 && (
           <section className="mt-14 sm:mt-20 mb-8">
@@ -471,6 +596,13 @@ const Cart = () => {
           </section>
         )}
       </main>
+
+      {/* Edit Item Modal */}
+      <CartItemEditModal
+        item={editingItem}
+        isOpen={!!editingItem}
+        onClose={() => setEditingItem(null)}
+      />
     </div>
   );
 };

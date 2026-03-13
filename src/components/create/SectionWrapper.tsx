@@ -24,8 +24,8 @@ export default function SectionWrapper({ title, subtitle, children, className, s
     <section
       className={`relative flex flex-col items-center px-6 ${scrollable ? 'py-3' : 'py-6'} sm:px-10 sm:py-8 ${scrollable ? '' : 'flex-1'} ${className || ''}`}
       style={{
-        background: '#4D453E',
-        borderTop: '1px solid rgba(194,104,113,0.08)',
+        background: '#F5E4E6',
+        borderTop: '1px solid rgba(107,76,59,0.08)',
       }}
     >
       {/* Grain texture overlay */}
@@ -51,17 +51,17 @@ export default function SectionWrapper({ title, subtitle, children, className, s
           <h2
             className="text-2xl sm:text-3xl md:text-4xl font-light"
             style={{
-              color: '#F5F0EB',
+              color: '#3D2B1F',
               fontFamily: "'Playfair Display', serif",
               fontStyle: 'italic',
               letterSpacing: '0.02em',
-              textShadow: '0 1px 8px rgba(194,104,113,0.15)',
+              textShadow: '0 1px 8px rgba(107,76,59,0.1)',
             }}
           >
             {title}
           </h2>
           {subtitle ? (
-            <p className="mt-2 text-sm sm:text-base" style={{ color: '#B8AFA6' }}>
+            <p className="mt-2 text-sm sm:text-base" style={{ color: '#7A5A48' }}>
               {subtitle}
             </p>
           ) : (
@@ -72,9 +72,9 @@ export default function SectionWrapper({ title, subtitle, children, className, s
               transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
               className="flex items-center justify-center gap-2 mt-3"
             >
-              <div className="w-10 sm:w-14 h-px" style={{ background: 'rgba(194,104,113,0.3)' }} />
-              <span className="text-[8px]" style={{ color: 'rgba(194,104,113,0.5)' }}>◇</span>
-              <div className="w-10 sm:w-14 h-px" style={{ background: 'rgba(194,104,113,0.3)' }} />
+              <div className="w-10 sm:w-14 h-px" style={{ background: 'rgba(107,76,59,0.3)' }} />
+              <span className="text-[8px]" style={{ color: 'rgba(107,76,59,0.5)' }}>◇</span>
+              <div className="w-10 sm:w-14 h-px" style={{ background: 'rgba(107,76,59,0.3)' }} />
             </motion.div>
           )}
         </motion.div>

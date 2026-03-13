@@ -33,7 +33,7 @@ export default function PriceBar({ onContinue, activeSection, totalSections }: P
       <div
         className="h-5 pointer-events-none"
         style={{
-          background: 'linear-gradient(to top, rgba(38,32,27,0.95), transparent)',
+          background: 'linear-gradient(to top, rgba(232,208,210,0.95), transparent)',
         }}
       />
 
@@ -41,9 +41,9 @@ export default function PriceBar({ onContinue, activeSection, totalSections }: P
       <div
         className="relative"
         style={{
-          background: 'rgba(38,32,27,0.97)',
+          background: 'rgba(232,208,210,0.97)',
           backdropFilter: 'blur(20px) saturate(1.3)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderTop: '1px solid rgba(107,76,59,0.08)',
         }}
       >
         <div className="flex items-center gap-3 px-4 py-3 sm:px-8 sm:py-4">
@@ -51,7 +51,7 @@ export default function PriceBar({ onContinue, activeSection, totalSections }: P
           <div className="flex-shrink-0">
             <span
               className="text-xs tabular-nums"
-              style={{ color: '#8A827A' }}
+              style={{ color: '#9A7E6D' }}
             >
               {activeSection + 1} of {totalSections}
             </span>
@@ -67,7 +67,7 @@ export default function PriceBar({ onContinue, activeSection, totalSections }: P
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.2 }}
                 className="text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight"
-                style={{ color: '#F5F0EB' }}
+                style={{ color: '#3D2B1F' }}
               >
                 ${estimatedPrice}
               </motion.span>
@@ -82,9 +82,9 @@ export default function PriceBar({ onContinue, activeSection, totalSections }: P
             className="flex-shrink-0 flex items-center gap-2 rounded-full text-sm font-semibold"
             style={{
               padding: isLastSection ? '12px 24px' : '12px 20px',
-              background: '#C26871',
+              background: '#6B4C3B',
               color: '#FFF',
-              boxShadow: '0 2px 12px rgba(194,104,113,0.25)',
+              boxShadow: '0 2px 12px rgba(107,76,59,0.25)',
             }}
           >
             {isLastSection && (

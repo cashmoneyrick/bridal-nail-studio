@@ -61,7 +61,7 @@ export default function LengthSection() {
                   <g transform={`scale(1, ${scale})`}>
                     <defs>
                       <linearGradient id={`len-grad-${l}`} x1="0.2" y1="0" x2="0.8" y2="1">
-                        <stop offset="0%" stopColor={isActive ? defaultNailConfig.color : '#F5F0EB'} stopOpacity={0.9} />
+                        <stop offset="0%" stopColor={isActive ? defaultNailConfig.color : '#3D2B1F'} stopOpacity={0.9} />
                         <stop offset="100%" stopColor={isActive ? defaultNailConfig.color : '#d4c4b8'} stopOpacity={0.8} />
                       </linearGradient>
                       <linearGradient id={`len-shine-${l}`} x1="0.2" y1="0" x2="0.8" y2="1">
@@ -87,14 +87,14 @@ export default function LengthSection() {
           {/* Track background */}
           <div
             className="absolute inset-x-0 h-1.5 rounded-full"
-            style={{ background: '#5A524A' }}
+            style={{ background: '#DBBFC2' }}
           />
 
           {/* Active track fill */}
           <div
             className="absolute left-0 h-1.5 rounded-full transition-all duration-300"
             style={{
-              background: 'linear-gradient(90deg, rgba(194,104,113,0.4), #C26871)',
+              background: 'linear-gradient(90deg, rgba(107,76,59,0.4), #6B4C3B)',
               width: `${(activeIndex / (LENGTHS.length - 1)) * 100}%`,
             }}
           />
@@ -118,10 +118,10 @@ export default function LengthSection() {
                 <motion.div
                   animate={isActive ? {
                     scale: [1.4, 1.5, 1.4],
-                    background: '#C26871',
+                    background: '#6B4C3B',
                   } : {
                     scale: 1,
-                    background: isPast ? '#C26871' : '#5A524A',
+                    background: isPast ? '#6B4C3B' : '#DBBFC2',
                   }}
                   transition={isActive ? {
                     scale: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
@@ -131,15 +131,15 @@ export default function LengthSection() {
                   }}
                   className="w-4 h-4 rounded-full border-2"
                   style={{
-                    borderColor: isActive ? '#C26871' : 'transparent',
-                    boxShadow: isActive ? '0 0 0 6px rgba(194,104,113,0.15)' : 'none',
+                    borderColor: isActive ? '#6B4C3B' : 'transparent',
+                    boxShadow: isActive ? '0 0 0 6px rgba(107,76,59,0.15)' : 'none',
                   }}
                 />
 
                 {/* Label below */}
                 <span
                   className="text-xs mt-2 font-medium transition-colors"
-                  style={{ color: isActive ? '#F5F0EB' : '#B8AFA6' }}
+                  style={{ color: isActive ? '#3D2B1F' : '#7A5A48' }}
                 >
                   {LENGTH_SHORT_LABELS[l]}
                 </span>
@@ -162,20 +162,20 @@ export default function LengthSection() {
           <p
             className="text-xl sm:text-2xl font-light tracking-wide"
             style={{
-              color: '#F5F0EB',
+              color: '#3D2B1F',
               fontFamily: "'Playfair Display', serif",
             }}
           >
             {LENGTH_LABELS[length]}
           </p>
           {LENGTH_PRICES[length] > 0 && (
-            <p className="text-sm mt-1" style={{ color: '#C26871' }}>
+            <p className="text-sm mt-1" style={{ color: '#6B4C3B' }}>
               +${LENGTH_PRICES[length]}
             </p>
           )}
           <p
             className="text-sm mt-2 max-w-[280px] text-center"
-            style={{ color: '#8A827A' }}
+            style={{ color: '#9A7E6D' }}
           >
             {LENGTH_DESCRIPTIONS[length]}
           </p>

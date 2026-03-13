@@ -1,7 +1,7 @@
 // Custom Studio Pricing Configuration
 // All prices in USD
 
-export type ShapeType = 'almond' | 'square' | 'oval' | 'coffin' | 'stiletto' | 'squoval' | 'round' | 'lipstick';
+export type ShapeType = 'almond' | 'square' | 'oval' | 'coffin' | 'stiletto' | 'squoval' | 'round';
 export type LengthType = 'extra-short' | 'short' | 'medium' | 'long' | 'extra-long';
 export type FinishType = 'glossy' | 'matte' | 'velvet-matte' | 'chrome-finish' | 'holographic' | 'cat-eye' | 'sugar' | 'glass-aurora' | 'glitter-topcoat';
 export type BaseType = 'solid' | 'french-tip-base' | 'ombre' | 'chrome-base' | 'jelly' | 'clear';
@@ -18,7 +18,6 @@ export const SHAPE_PRICES: Record<ShapeType, number> = {
   round: 0,
   coffin: 5,
   stiletto: 8,
-  lipstick: 5,
 };
 
 export const LENGTH_PRICES: Record<LengthType, number> = {
@@ -83,7 +82,6 @@ export const SHAPE_LABELS: Record<ShapeType, string> = {
   round: 'Round',
   coffin: 'Coffin',
   stiletto: 'Stiletto',
-  lipstick: 'Lipstick',
 };
 
 export const LENGTH_LABELS: Record<LengthType, string> = {

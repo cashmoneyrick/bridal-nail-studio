@@ -79,17 +79,17 @@ const BASE_TYPE_VISUALS: Record<BaseType, { background: string; border?: string;
   ombre: { background: 'linear-gradient(to right, #F8E8E0, #C9A0A0)' },
   'chrome-base': { background: 'linear-gradient(135deg, #C0C0C0, #E8E8E8, #808080)' },
   jelly: { background: '#F8C8D4', opacity: 0.5 },
-  clear: { background: 'transparent', border: '1px solid rgba(255,255,255,0.3)' },
+  clear: { background: 'transparent', border: '1px solid rgba(107,76,59,0.2)' },
 };
 
 function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-px" style={{ background: 'rgba(194,104,113,0.15)' }} />
+      <div className="flex-1 h-px" style={{ background: 'rgba(107,76,59,0.15)' }} />
       <span
         className="text-xs"
         style={{
-          color: '#8A827A',
+          color: '#9A7E6D',
           fontFamily: "'Playfair Display', serif",
           fontStyle: 'italic',
           letterSpacing: '0.05em',
@@ -97,7 +97,7 @@ function SectionDivider({ label }: { label: string }) {
       >
         {label}
       </span>
-      <div className="flex-1 h-px" style={{ background: 'rgba(194,104,113,0.15)' }} />
+      <div className="flex-1 h-px" style={{ background: 'rgba(107,76,59,0.15)' }} />
     </div>
   );
 }
@@ -177,15 +177,15 @@ export default function ColorSection() {
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium"
                 style={{
-                  background: isActive ? '#C26871' : '#5A524A',
-                  color: isActive ? '#FFF' : '#B8AFA6',
+                  background: isActive ? '#6B4C3B' : '#DBBFC2',
+                  color: isActive ? '#FFF' : '#7A5A48',
                 }}
               >
                 <div
                   className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{
                     background: visual.background,
-                    border: visual.border || '1px solid rgba(255,255,255,0.1)',
+                    border: visual.border || '1px solid rgba(107,76,59,0.12)',
                     opacity: visual.opacity ?? 1,
                   }}
                 />
@@ -204,9 +204,9 @@ export default function ColorSection() {
                 onClick={() => setEditingSecondary(isSecondary)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors"
                 style={{
-                  background: editingSecondary === isSecondary ? '#5A524A' : 'transparent',
-                  color: '#F5F0EB',
-                  border: '1px solid #5A524A',
+                  background: editingSecondary === isSecondary ? '#DBBFC2' : 'transparent',
+                  color: '#3D2B1F',
+                  border: '1px solid #DBBFC2',
                 }}
               >
                 <div
@@ -231,7 +231,7 @@ export default function ColorSection() {
         <div className="flex items-center justify-center gap-2">
           <div
             className="w-8 h-8 rounded-lg shadow-inner"
-            style={{ background: activeHex, border: '1px solid rgba(255,255,255,0.1)' }}
+            style={{ background: activeHex, border: '1px solid rgba(107,76,59,0.12)' }}
           />
           <HexInput value={activeHex} onChange={(hex) => updateColor(...hexToHsv(hex))} />
         </div>
@@ -250,11 +250,11 @@ export default function ColorSection() {
                 background: hex,
                 border:
                   activeHex === hex
-                    ? '2px solid #C26871'
+                    ? '2px solid #6B4C3B'
                     : '2px solid transparent',
                 boxShadow:
                   activeHex === hex
-                    ? '0 0 0 2px rgba(194,104,113,0.4)'
+                    ? '0 0 0 2px rgba(107,76,59,0.4)'
                     : 'inset 0 1px 3px rgba(0,0,0,0.25)',
               }}
             />
@@ -271,7 +271,7 @@ export default function ColorSection() {
               whileHover={{ y: -1 }}
               onClick={() => selectPalette(palette.colors)}
               className="flex flex-col overflow-hidden rounded-lg"
-              style={{ background: '#5A524A' }}
+              style={{ background: '#DBBFC2' }}
               title={palette.description}
             >
               {/* Gradient band preview */}
@@ -286,12 +286,12 @@ export default function ColorSection() {
                   <div
                     key={i}
                     className="w-5 h-5 rounded-full flex-shrink-0"
-                    style={{ background: c, border: '1px solid rgba(255,255,255,0.1)' }}
+                    style={{ background: c, border: '1px solid rgba(107,76,59,0.12)' }}
                   />
                 ))}
                 <span
                   className="text-xs ml-1"
-                  style={{ color: '#F5F0EB' }}
+                  style={{ color: '#3D2B1F' }}
                 >
                   {palette.name}
                 </span>
@@ -437,9 +437,9 @@ function HexInput({ value, onChange }: { value: string; onChange: (hex: string) 
     <input
       className="w-24 text-center text-sm font-mono py-1 px-2 rounded-md outline-none transition-colors"
       style={{
-        background: '#3D352E',
-        color: '#F5F0EB',
-        border: '1px solid #5A524A',
+        background: '#FDF2F3',
+        color: '#3D2B1F',
+        border: '1px solid #DBBFC2',
       }}
       value={editing ? text : value}
       onChange={(e) => {

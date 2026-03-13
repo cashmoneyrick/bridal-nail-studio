@@ -226,6 +226,16 @@ export const useCustomStudioStore = create<CustomStudioState & CustomStudioActio
         rhinestoneTier: state.rhinestoneTier,
         charmTier: state.charmTier,
       }),
+      version: 1,
+      migrate: (persisted: any, version: number) => {
+        if (version === 0) {
+          // Remove discontinued 'lipstick' shape
+          if (persisted.shape === 'lipstick') {
+            persisted.shape = 'almond';
+          }
+        }
+        return persisted;
+      },
     }
   )
 );

@@ -15,15 +15,15 @@ interface FinishOption {
 }
 
 const FINISH_VISUALS: Record<FinishType, string> = {
-  glossy: 'linear-gradient(135deg, #F5F0EB 0%, #E8DDD5 50%, #F5F0EB 100%)',
-  matte: '#B8AFA6',
-  'velvet-matte': 'linear-gradient(135deg, #A89F97 0%, #B8AFA6 50%, #A89F97 100%)',
+  glossy: 'linear-gradient(135deg, #3D2B1F 0%, #E8DDD5 50%, #3D2B1F 100%)',
+  matte: '#7A5A48',
+  'velvet-matte': 'linear-gradient(135deg, #A89F97 0%, #7A5A48 50%, #A89F97 100%)',
   'chrome-finish': 'linear-gradient(135deg, #C0C0C0 0%, #E8E8E8 30%, #808080 60%, #E8E8E8 100%)',
   holographic: 'linear-gradient(135deg, #FFB3BA 0%, #BAFFC9 25%, #BAE1FF 50%, #E8BAFF 75%, #FFB3BA 100%)',
   'cat-eye': 'linear-gradient(135deg, #2D4A2D 0%, #5A8A5A 40%, #2D4A2D 60%, #1A2E1A 100%)',
   sugar: 'radial-gradient(circle at 30% 30%, #FFF 1px, transparent 1px), radial-gradient(circle at 70% 60%, #FFF 1px, transparent 1px), radial-gradient(circle at 50% 40%, #FFF 0.5px, transparent 0.5px), #D4C4B8',
   'glass-aurora': 'linear-gradient(135deg, #E8F0FF 0%, #FFE8F0 33%, #E8FFE8 66%, #F0E8FF 100%)',
-  'glitter-topcoat': 'radial-gradient(circle at 25% 25%, #FFD700 1.5px, transparent 1.5px), radial-gradient(circle at 75% 75%, #FFD700 1px, transparent 1px), radial-gradient(circle at 50% 50%, #FFD700 0.5px, transparent 0.5px), linear-gradient(135deg, #F5F0EB, #E8DDD5)',
+  'glitter-topcoat': 'radial-gradient(circle at 25% 25%, #FFD700 1.5px, transparent 1.5px), radial-gradient(circle at 75% 75%, #FFD700 1px, transparent 1px), radial-gradient(circle at 50% 50%, #FFD700 0.5px, transparent 0.5px), linear-gradient(135deg, #3D2B1F, #E8DDD5)',
 };
 
 const FINISH_OPTIONS: FinishOption[] = [
@@ -59,10 +59,10 @@ export default function FinishSection() {
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 className="relative flex flex-col items-center justify-center gap-1.5 py-3 sm:py-4 px-2 rounded-xl text-center"
                 style={{
-                  background: isSelected ? 'rgba(194,104,113,0.08)' : '#5A524A',
-                  border: `2px solid ${isSelected ? '#C26871' : 'rgba(90,82,74,0.6)'}`,
+                  background: isSelected ? 'rgba(107,76,59,0.08)' : '#DBBFC2',
+                  border: `2px solid ${isSelected ? '#6B4C3B' : 'rgba(219,191,194,0.6)'}`,
                   boxShadow: isSelected
-                    ? '0 0 20px rgba(194,104,113,0.15), inset 0 0 15px rgba(194,104,113,0.05)'
+                    ? '0 0 20px rgba(107,76,59,0.15), inset 0 0 15px rgba(107,76,59,0.05)'
                     : 'none',
                 }}
               >
@@ -71,7 +71,7 @@ export default function FinishSection() {
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                   style={{
                     background: FINISH_VISUALS[value],
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(107,76,59,0.12)',
                     boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
                   }}
                 />
@@ -79,7 +79,7 @@ export default function FinishSection() {
                 {/* Name */}
                 <span
                   className="text-xs sm:text-sm font-medium leading-tight"
-                  style={{ color: isSelected ? '#F5F0EB' : '#B8AFA6' }}
+                  style={{ color: isSelected ? '#3D2B1F' : '#7A5A48' }}
                 >
                   {FINISH_LABELS[value]}
                 </span>
@@ -87,7 +87,7 @@ export default function FinishSection() {
                 {/* Description — visible on all sizes */}
                 <span
                   className="text-[10px] sm:text-xs leading-tight"
-                  style={{ color: '#8A827A' }}
+                  style={{ color: '#9A7E6D' }}
                 >
                   {description}
                 </span>
@@ -95,7 +95,7 @@ export default function FinishSection() {
                 {/* Price */}
                 <span
                   className="text-[10px] sm:text-xs font-medium"
-                  style={{ color: price > 0 ? '#C26871' : '#8A827A' }}
+                  style={{ color: price > 0 ? '#6B4C3B' : '#9A7E6D' }}
                 >
                   {price > 0 ? `+$${price}` : 'Included'}
                 </span>
@@ -107,7 +107,7 @@ export default function FinishSection() {
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                     className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px]"
-                    style={{ background: '#C26871', color: '#fff' }}
+                    style={{ background: '#6B4C3B', color: '#fff' }}
                   >
                     ✓
                   </motion.div>

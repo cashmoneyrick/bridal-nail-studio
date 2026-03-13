@@ -170,6 +170,7 @@
   .animate-stagger-2,
   .animate-stagger-3,
   .animate-stagger-4,
+  .animate-stagger-5,
   .animate-float {
     animation: none !important;
     opacity: 1;
@@ -196,6 +197,9 @@
 }
 .animate-stagger-4 {
   animation: fade-in-up 0.8s ease-out 600ms both;
+}
+.animate-stagger-5 {
+  animation: fade-in-up 0.8s ease-out 800ms both;
 }
 
 /* Floating badge animation */
@@ -343,18 +347,18 @@
    ============================================ */
 
 .custom-studio {
-  --primary: 354 42% 58%;
+  --primary: 18 30% 33%;
   --primary-foreground: 0 0% 100%;
-  --background: 38 44% 96%;
-  --foreground: 12 9% 22%;
-  --card: 40 100% 99%;
-  --card-foreground: 12 9% 22%;
-  --border: 30 18% 82%;
-  --input: 30 18% 82%;
-  --muted: 36 38% 92%;
-  --muted-foreground: 24 12% 48%;
-  --ring: 354 42% 58%;
-  --accent: 41 49% 59%;
+  --background: 350 60% 97%;
+  --foreground: 18 30% 17%;
+  --card: 350 80% 99%;
+  --card-foreground: 18 30% 17%;
+  --border: 350 25% 82%;
+  --input: 350 25% 82%;
+  --muted: 350 30% 93%;
+  --muted-foreground: 18 20% 45%;
+  --ring: 18 30% 33%;
+  --accent: 18 30% 33%;
   --accent-foreground: 0 0% 100%;
 }
 

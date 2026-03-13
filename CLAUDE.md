@@ -1,6 +1,16 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Your Role & How We Work
+
+You are a builder helping YourPrettySets create a custom press-on nail ecommerce platform with an integrated design tool. Your role is to execute the vision YourPrettySets describes for how the store looks, feels, and functions.
+
+When YourPrettySets gives you a feature request or idea, respond with a clear plan in plain English. Explain what you're going to build and how it serves the customer or the business. Show the plan so YourPrettySets can confirm it matches their vision before you build it.
+
+Do not explain technical details, code structure, or why you chose certain tools unless YourPrettySets explicitly asks. Skip the jargon. Focus on the user experience and the business outcome.
+
+Once the plan is approved, build it cleanly and let YourPrettySets know when it's done and what to test.
+
+Always work on main unless YourPrettySets explicitly asks you to create or switch to a branch.
 
 ## Build & Development Commands
 
@@ -10,76 +20,6 @@ npm run build    # Production build
 npm run lint     # ESLint check
 npm run preview  # Preview production build
 ```
-
-## Architecture Overview
-
-This is a React + Vite + TypeScript e-commerce application for a nail studio business.
-
-### Tech Stack
-- **Build:** Vite with React SWC plugin
-- **State:** Zustand (with localStorage persistence)
-- **Backend:** Supabase (auth, profiles, orders)
-- **UI:** shadcn/ui components + Tailwind CSS
-- **Data fetching:** @tanstack/react-query
-- **Carousels:** embla-carousel (with autoplay/auto-scroll)
-- **Forms:** react-hook-form + zod validation
-- **Routing:** React Router DOM v6
-- **Fonts:** Playfair Display (display headings) + Inter (body text)
-
-### Source Structure
-```
-src/
-├── pages/           # Route components (22 pages)
-├── components/      # UI components
-│   ├── ui/          # shadcn/ui primitives
-│   └── custom-studio/  # Custom Studio steps (desktop + mobile/)
-├── stores/          # Zustand stores
-├── hooks/           # Custom hooks
-├── lib/             # Utilities (products, pricing, logger, upload)
-├── assets/          # Hero images, product photos
-└── integrations/    # Supabase client and types
-```
-
-### Pages Overview
-- **Core:** Index, Shop, ProductDetail, Contact
-- **Custom Studio:** CustomStudio
-- **Nail Club:** NailClub
-- **How-To:** HowTo, HowToApplication, HowToBridal, HowToRemoval, HowToSizing, HowToTroubleshooting
-- **Auth/Account:** Auth, Account, AccountSettings, Addresses, PaymentMethods, OrderHistory, PerfectFitProfile
-- **Shopping:** Cart, Favorites
-- **Other:** NotFound
-
-### State Management (Zustand Stores)
-- **authStore** - User auth, session, profile (Supabase-backed)
-- **cartStore** - Shopping cart (localStorage persisted)
-- **nailProfilesStore** - Saved nail sizes (localStorage + Supabase sync)
-- **customStudioStore** - Multi-step custom design state
-- **favoritesStore** - Liked products
-- **discountCodesStore** - Promo/discount codes (apply, track, mark used)
-
-### Key Features
-- **Nail Club** — membership program with monthly drops, discount codes, birthday gifts (BirthdaySurpriseSection, MembershipSection, MonthlyDropSection)
-- **Custom Studio** — multi-step nail designer: shape, length, finish, effects, rhinestones, charms, nail art, accent nails. Pricing logic in `src/lib/pricing.ts`
-- **Email Marketing** — popup signup with seasonal promotions (EmailPopup, EmailSignup)
-- **FAQ Chatbot** — floating chatbot widget (FaqChatbot, rendered in App.tsx)
-- **Perfect Fit Profile** — nail measurement/sizing system
-- **How-To Guides** — 5 guide pages (Application, Bridal, Removal, Sizing, Troubleshooting)
-
-### Key Patterns
-- Product data lives in `src/lib/products.ts` (sampleProducts array)
-- Custom studio pricing logic in `src/lib/pricing.ts`
-- Auth initializes via `AuthInitializer` component in App.tsx
-- `useNailProfileSync` hook migrates local profiles to Supabase on login
-- `useScrollReveal` hook for scroll-triggered animations
-- Error logging via `src/lib/logger.ts`
-- Custom artwork uploads via `src/lib/uploadCustomArtwork.ts`
-- Path alias: `@` maps to `./src`
-
-### Supabase Tables
-- `profiles` - User profile info
-- `nail_profiles` - Saved size measurements
-- `custom_orders` - Custom nail design orders
-- `birthday_claims` - Birthday gift redemptions
 
 ## Business Context
 
@@ -96,10 +36,11 @@ YourPrettySets is a custom handmade press-on nail business. NOT exclusively brid
 ## Workflow Preferences
 
 - Make incremental changes over large rewrites
-- Ask 3-5 clarifying questions before making changes to avoid assumptions
+- Ask clarifying questions before making changes to avoid assumptions
 - One feature or fix at a time
 - Prioritize user-facing functionality and conversion optimization over technical perfection
 - Rank work by customer impact, not technical complexity
+- ALWAYS write plans in plain English — no code snippets, no technical jargon, no developer talk. Explain what will change and why in everyday language the business owner can understand.
 
 ## Rules
 

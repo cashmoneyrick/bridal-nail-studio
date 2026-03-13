@@ -8,28 +8,28 @@ const steps = [
     title: "Choose Your Look",
     description:
       "Browse our curated collections or bring your vision to life in the Custom Studio.",
-    image: "/images/how-it-works/step-1-order.jpg",
+    gradient: "bg-gradient-to-br from-[hsl(30,6%,92%)] via-[hsl(30,4%,88%)] to-[hsl(125,9%,72%)]",
   },
   {
     number: "02",
     title: "Your Sizing Kit Arrives",
     description:
       "A complimentary fit kit ships to your door — no guesswork, just precision.",
-    image: "/images/how-it-works/step-2-sizing-kit.jpg",
+    gradient: "bg-gradient-to-br from-[hsl(125,9%,72%)] via-[hsl(125,9%,64%)] to-[hsl(207,53%,79%)]",
   },
   {
     number: "03",
     title: "Find Your Perfect Fit",
     description:
       "Five minutes, ten fingers. Match each nail and send us your sizes.",
-    image: "/images/how-it-works/step-3-find-size.jpg",
+    gradient: "bg-gradient-to-br from-[hsl(207,53%,82%)] via-[hsl(207,40%,76%)] to-[hsl(30,6%,90%)]",
   },
   {
     number: "04",
     title: "Handcrafted for You",
     description:
       "Your set is shaped, painted, and finished entirely by hand — ready in 5–7 days.",
-    image: "/images/how-it-works/step-4-submit.jpg",
+    gradient: "bg-gradient-to-br from-[hsl(125,9%,56%)] via-[hsl(130,12%,42%)] to-[hsl(130,15%,28%)]",
   },
 ];
 
@@ -80,14 +80,10 @@ const ThreeStepProcess = () => {
               key={i}
               className="group relative overflow-hidden rounded-2xl aspect-[3/5]"
             >
-              <img
-                src={step.image}
-                alt={step.title}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className={`absolute inset-0 ${step.gradient} transition-transform duration-700 group-hover:scale-105`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]" />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
               <div className="absolute top-5 left-5 z-10">
                 <span className="text-white/50 text-xs font-semibold tracking-[0.2em] uppercase">
                   Step {step.number}
@@ -117,14 +113,10 @@ const ThreeStepProcess = () => {
                 className="flex-[0_0_78%] sm:flex-[0_0_60%] min-w-0 mr-3 last:mr-0"
               >
                 <div className="relative overflow-hidden rounded-2xl aspect-[3/4]">
-                  <img
-                    src={step.image}
-                    alt={step.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+                  <div className={`absolute inset-0 ${step.gradient}`}>
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]" />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
                   <div className="absolute top-4 left-4 z-10">
                     <span className="text-white/50 text-xs font-semibold tracking-[0.2em] uppercase">
                       Step {step.number}

@@ -7,12 +7,21 @@ import { useFavoritesStore } from "@/stores/favoritesStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
 import SearchOverlay from "@/components/SearchOverlay";
+import { useMenuStore } from "@/stores/menuStore";
+
+const mobileNavLinks = [
+  { name: "Home", href: "/" },
+  { name: "Shop", href: "/shop" },
+  { name: "Custom Studio", href: "/create" },
+  { name: "How To", href: "/how-to" },
+  { name: "Contact", href: "/contact" },
+  { name: "Nail Club", href: "/club" },
+];
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoClicked, setIsLogoClicked] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleLogoClick = () => {
     if (window.innerWidth < 1024) {
@@ -22,6 +31,9 @@ const Navigation = () => {
   const favoritesCount = useFavoritesStore(state => state.items.length);
   const { user, profile, initialized } = useAuthStore();
   const totalCartItems = useCartStore(state => state.getTotalItems());
+  const setMobileNavOpen = useMenuStore(state => state.setMobileNavOpen);
+  const isSearchOpen = useMenuStore(state => state.isSearchOpen);
+  const setSearchOpen = useMenuStore(state => state.setSearchOpen);
 
   // Get display initial - prefer profile name, then email, then default
   const getDisplayInitial = () => {
@@ -55,10 +67,11 @@ const Navigation = () => {
 
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
+    setMobileNavOpen(isMobileMenuOpen);
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, setMobileNavOpen]);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -113,7 +126,7 @@ const Navigation = () => {
                 variant="ghost"
                 size="icon"
                 className={`rounded-full h-10 w-10 ${iconBtnClass}`}
-                onClick={() => setIsSearchOpen(true)}
+                onClick={() => setSearchOpen(true)}
                 aria-label="Search products"
               >
                 <Search className="h-[22px] w-[22px]" />
@@ -152,48 +165,18 @@ const Navigation = () => {
               </Link>
             </div>
 
-            {/* Mobile Icons + Menu Button */}
-            <div className="flex lg:hidden items-center space-x-0.5">
+            {/* Mobile: Hamburger only */}
+            <div className="flex lg:hidden items-center">
               <Button
                 variant="ghost"
                 size="icon"
-                className={`rounded-full h-8 w-8 ${iconBtnClass}`}
-                onClick={() => setIsSearchOpen(true)}
-                aria-label="Search products"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-              <Link to="/favorites" className="relative">
-                <Button variant="ghost" size="icon" className={`rounded-full h-8 w-8 ${iconBtnClass}`}>
-                  <Heart className="h-4 w-4" />
-                </Button>
-                {favoritesCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
-                    {favoritesCount > 9 ? '9+' : favoritesCount}
-                  </span>
-                )}
-              </Link>
-              <Link to="/cart" className="relative">
-                <Button variant="ghost" size="icon" className={`rounded-full h-8 w-8 ${iconBtnClass}`}>
-                  <ShoppingBag className="h-4 w-4" />
-                </Button>
-                {totalCartItems > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center">
-                    {totalCartItems > 9 ? '9+' : totalCartItems}
-                  </span>
-                )}
-              </Link>
-              <CartDrawer />
-              <Button
-                variant="ghost"
-                size="icon"
-                className={`rounded-full h-8 w-8 ${iconBtnClass}`}
+                className={`rounded-full h-11 w-11 ${iconBtnClass}`}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 {isMobileMenuOpen ? (
-                  <X className="h-5 w-5" />
+                  <X className="h-6 w-6" />
                 ) : (
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-6 w-6" />
                 )}
               </Button>
             </div>
@@ -208,7 +191,7 @@ const Navigation = () => {
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <div className="flex flex-col items-center justify-center h-full pb-20 gap-0" onClick={(e) => e.stopPropagation()}>
-            {navLinks.map((link, index) => (
+            {mobileNavLinks.map((link, index) => (
               <div key={link.name} className="flex flex-col items-center">
                 {index > 0 && <div className="w-6 h-px bg-white/15 my-1" />}
                 <Link
@@ -235,7 +218,7 @@ const Navigation = () => {
         </div>
       )}
 
-      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 };
